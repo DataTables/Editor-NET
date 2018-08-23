@@ -9,7 +9,12 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
+#if NETCOREAPP2_1
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+#else
 using System.Web;
+#endif
 using DataTables.EditorUtil;
 
 namespace DataTables
@@ -87,6 +92,19 @@ namespace DataTables
             var request = new DtRequest(data);
             return request.RequestType;
         }
+
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Get the form action. For use with WebAPI's 'FormDataCollection' collection
+        /// </summary>
+        /// <param name="data">Data sent from the client-side</param>
+        /// <returns>Request type</returns>
+        public static DtRequest.RequestTypes Action(IEnumerable<KeyValuePair<String, StringValues>> data = null)
+        {
+            var request = new DtRequest(data);
+            return request.RequestType;
+        }
+#endif
 
         /// <summary>
         /// Version string
@@ -250,7 +268,11 @@ namespace DataTables
         private DtResponse _out;
         private readonly List<MJoin> _mJoin = new List<MJoin>();
         private HttpRequest _request;
+#if NETCOREAPP2_1
+        private IFormFileCollection _requestFiles;
+#else
         private HttpFileCollection _requestFiles;
+#endif
         private readonly Dictionary<string, List<Delegate>> _events = new Dictionary<string, List<Delegate>>();
         private bool _tryCatch = true;
         private bool _debug = false;
@@ -798,6 +820,18 @@ namespace DataTables
             return Process(new DtRequest(data));
         }
 
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Get the form action. For use with WebAPI's 'FormDataCollection' collection
+        /// </summary>
+        /// <param name="data">Data sent from the client-side</param>
+        /// <returns>Request type</returns>
+        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null)
+        {
+            return Process(new DtRequest(data));
+        }
+#endif
+
         /// <summary>
         /// Process a request from the Editor client-side to get / set data.
         /// For use with MVC's 'Request.Form' collection
@@ -828,11 +862,17 @@ namespace DataTables
         public Editor Process(HttpRequest request)
         {
             _request = request;
+
+#if NETCOREAPP2_1
+            _requestFiles = request.Form.Files;
+#else
             _requestFiles = request.Files;
+#endif
 
             return Process(request.Form);
         }
 
+#if NET45
         /// <summary>
         /// Process a request from the Editor client-side to get / set data.
         /// For use with an HttpRequest object
@@ -845,6 +885,7 @@ namespace DataTables
 
             return Process(request.Form);
         }
+#endif
 
         /// <summary>
         /// Perform validation on a data set.
@@ -990,6 +1031,16 @@ namespace DataTables
          * Internal methods
          */
 
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Get the request object used for this instance
+        /// </summary>
+        /// <returns>HTTP request object</returns>
+        internal IFormFileCollection RequestFiles()
+        {
+            return _requestFiles;
+        }
+#else
         /// <summary>
         /// Get the request object used for this instance
         /// </summary>
@@ -998,6 +1049,7 @@ namespace DataTables
         {
             return _requestFiles;
         }
+#endif
 
         /// <summary>
         /// Get the request object used for this instance

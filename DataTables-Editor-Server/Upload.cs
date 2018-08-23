@@ -1,8 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.IO;
+#if NETCOREAPP2_1
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using IFormFile = Microsoft.AspNetCore.Http.IFormFile;
+#else
+using System.Web;
+using IFormFile = System.Web.HttpPostedFile;
+#endif
+
 
 namespace DataTables
 {
@@ -89,17 +97,17 @@ namespace DataTables
          * Private parameters
          */
         private string _actionStr;
-        private Func<HttpPostedFile, dynamic, dynamic> _actionFn;
         private IEnumerable<string> _extns;
         private string _extnError;
         private string _dbTable;
         private string _dbPKey;
         private Dictionary<string, object> _dbFields;
-        private readonly List<Func<HttpPostedFile, string>> _validators = new List<Func<HttpPostedFile, string>>();
         private string _error;
         private Func<List<Dictionary<string, object>>, bool> _dbCleanCallback;
         private string _dbCleanTableField;
         private readonly List<Action<Query>> _where = new List<Action<Query>>();
+        private Func<IFormFile, dynamic, dynamic> _actionFn;
+        private readonly List<Func<IFormFile, string>> _validators = new List<Func<IFormFile, string>>();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructor
@@ -126,7 +134,7 @@ namespace DataTables
         /// </summary>
         /// <param name="action">Callback function that is executed when a file
         /// is uploaded.</param>
-        public Upload(Func<HttpPostedFile, dynamic, dynamic> action)
+        public Upload(Func<IFormFile, dynamic, dynamic> action)
         {
             Action(action);
         }
@@ -163,7 +171,7 @@ namespace DataTables
         /// </summary>
         /// <param name="action">Callback</param>
         /// <returns>Self for chaining</returns>
-        public Upload Action(Func<HttpPostedFile, dynamic, dynamic> action)
+        public Upload Action(Func<IFormFile, dynamic, dynamic> action)
         {
             _actionStr = null;
             _actionFn = action;
@@ -263,7 +271,7 @@ namespace DataTables
         /// an HttpPostedFile, and a string is returned on error with the error message.
         /// If the validation does not fail, 'null' should be returned.</param>
         /// <returns>Self for chaining</returns>
-        public Upload Validator(Func<HttpPostedFile, string> fn)
+        public Upload Validator(Func<IFormFile, string> fn)
         {
             _validators.Add(fn);
 
@@ -462,7 +470,7 @@ namespace DataTables
         /// <param name="id">Primary key value</param>
         /// <param name="upload">Posted file</param>
         /// <returns>File identifier - typically the primary key</returns>
-        private dynamic _actionExec(dynamic id, HttpPostedFile upload)
+        private dynamic _actionExec(dynamic id, IFormFile upload)
         {
             if (_actionStr == null)
             {
@@ -472,11 +480,18 @@ namespace DataTables
 
             // Default action - move the file to the location specified by the
             // action string
-            var to = _path(upload.FileName, id);
+            string to = _path(upload.FileName, id);
 
             try
             {
+#if NETCOREAPP2_1
+                using (var stream = upload.OpenReadStream())
+                {
+                    upload.CopyTo(stream);
+                }
+#else
                 upload.SaveAs(to);
+#endif
             }
             catch (Exception e)
             {
@@ -568,7 +583,7 @@ namespace DataTables
         /// <param name="editor">Host editor</param>
         /// <param name="upload">Uploaded file</param>
         /// <returns>Primary key value for the newly uploaded file</returns>
-        private dynamic _dbExec(Editor editor, HttpPostedFile upload)
+        private dynamic _dbExec(Editor editor, IFormFile upload)
         {
             var db = editor.Db();
             var pathFields = new Dictionary<string, DbType>();
@@ -582,6 +597,11 @@ namespace DataTables
             {
                 var column = pair.Key;
                 var prop = pair.Value;
+#if NETCOREAPP2_1
+                var contentLength = (int)upload.Length;
+#else
+                var contentLength = upload.ContentLength;
+#endif
 
                 if (prop is DbType)
                 {
@@ -598,10 +618,14 @@ namespace DataTables
 
                         case DbType.ContentBinary:
                             byte[] fileData = null;
-
-                            using (var binaryReader = new BinaryReader(upload.InputStream))
+#if NETCOREAPP2_1
+                            var stream = upload.OpenReadStream();
+#else
+                            var stream = upload.InputStream;
+#endif
+                            using (var binaryReader = new BinaryReader(stream))
                             {
-                                fileData = binaryReader.ReadBytes(upload.ContentLength);
+                                fileData = binaryReader.ReadBytes(contentLength);
                                 q.Set(column, fileData);
                             }
                             break;
@@ -620,7 +644,7 @@ namespace DataTables
                             break;
 
                         case DbType.FileSize:
-                            q.Set(column, upload.ContentLength);
+                            q.Set(column, contentLength);
                             break;
 
                         case DbType.SystemPath:
@@ -642,7 +666,7 @@ namespace DataTables
                     try
                     {
                         // Callable function - execute to get the value
-                        var propFn = (Func<Database, HttpPostedFile, dynamic>)prop;
+                        var propFn = (Func<Database, IFormFile, dynamic>)prop;
                         q.Set(column, propFn(db, upload));
                     }
                     catch (Exception)
@@ -666,7 +690,11 @@ namespace DataTables
                 // For this to operate the action must be a string, which is
                 // validated in the `exec` method
                 var path = _path(upload.FileName, id);
+#if NETCOREAPP2_1
+                var physicalPath = editor.Request().PathBase.ToString() ?? "";
+#else
                 var physicalPath = editor.Request().PhysicalApplicationPath ?? "";
+#endif
                 var webPath = path.Replace(physicalPath, @"\");
 
                 var pathQ = db

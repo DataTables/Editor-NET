@@ -68,7 +68,7 @@ namespace DataTables
                 DataRow row = _dt.Rows[_FetchPointer];
                 Dictionary<string, object> data = row.Table.Columns
                     .Cast<DataColumn>()
-                    .ToDictionary(col => col.ColumnName, col => row.Field<object>(col.ColumnName));
+                    .ToDictionary(col => col.ColumnName, col => row[col.ColumnName]);
 
                 _FetchPointer++;
 
@@ -90,7 +90,7 @@ namespace DataTables
                 data.Add(
                     row.Table.Columns
                       .Cast<DataColumn>()
-                      .ToDictionary(col => col.ColumnName, col => row.Field<object>(col.ColumnName))
+                      .ToDictionary(col => col.ColumnName, col => row[col.ColumnName])
                 );
             }
 

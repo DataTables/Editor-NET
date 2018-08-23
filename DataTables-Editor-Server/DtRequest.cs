@@ -6,6 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#if NETCOREAPP2_1
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+#endif
 
 namespace DataTables
 {
@@ -191,12 +195,63 @@ namespace DataTables
          * Constructor
          */
 
+#if NETCOREAPP2_1
+        public DtRequest(IEnumerable<KeyValuePair<String, StringValues>> rawHttp)
+        {
+            var raw = rawHttp.ToDictionary(x => x.Key, x => x.Value.ToString());
+            _Build(raw);
+        }
+#endif
+
         /// <summary>
         /// Convert an HTTP request submitted by the client-side into a
         /// DtRequest object
         /// </summary>
         /// <param name="rawHttp">Data from the client-side</param>
         public DtRequest(IEnumerable<KeyValuePair<string, string>> rawHttp)
+        {
+            _Build(rawHttp);
+        }
+
+
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Private functions
+         */
+        private static object _HttpConv(string dataIn)
+        {
+            // Boolean
+            if (dataIn == "true")
+            {
+                return true;
+            }
+            if (dataIn == "false")
+            {
+                return false;
+            }
+
+            // Numeric looking data, but with leading zero
+            if (dataIn.IndexOf('0') == 0 && dataIn.Length > 1)
+            {
+                return dataIn;
+            }
+
+            try
+            {
+                return Convert.ToInt32(dataIn);
+            }
+            catch (Exception) { }
+
+            try
+            {
+                return Convert.ToDecimal(dataIn);
+            }
+            catch (Exception) { }
+
+            return dataIn;
+        }
+        
+        private void _Build(IEnumerable<KeyValuePair<string, string>> rawHttp)
         {
             var http = HttpData(rawHttp);
 
@@ -278,45 +333,6 @@ namespace DataTables
                 // DataTables get request
                 RequestType = RequestTypes.DataTablesGet;
             }
-        }
-
-
-
-        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-         * Private functions
-         */
-
-        private static object _HttpConv(string dataIn)
-        {
-            // Boolean
-            if (dataIn == "true")
-            {
-                return true;
-            }
-            if (dataIn == "false")
-            {
-                return false;
-            }
-
-            // Numeric looking data, but with leading zero
-            if (dataIn.IndexOf('0') == 0 && dataIn.Length > 1)
-            {
-                return dataIn;
-            }
-
-            try
-            {
-                return Convert.ToInt32(dataIn);
-            }
-            catch (Exception) { }
-
-            try
-            {
-                return Convert.ToDecimal(dataIn);
-            }
-            catch (Exception) { }
-
-            return dataIn;
         }
 
 

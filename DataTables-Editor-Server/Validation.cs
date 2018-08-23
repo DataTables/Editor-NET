@@ -9,8 +9,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using DataTables.EditorUtil;
+#if NETCOREAPP2_1
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using IFormFile = Microsoft.AspNetCore.Http.IFormFile;
+#else
+using System.Web;
+using IFormFile = System.Web.HttpPostedFile;
+#endif
 
 namespace DataTables
 {
@@ -691,11 +698,17 @@ namespace DataTables
         /// <param name="size">Max file size in bytes</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>File validation delegate</returns>
-        public static Func<HttpPostedFile, string> FileSize(int size, string msg="Uploaded file is too large.")
+        public static Func<IFormFile, string> FileSize(int size, string msg="Uploaded file is too large.")
         {
+#if NETCOREAPP2_1
+            return file => file.Length > size
+                ? msg
+                : null;
+#else
             return file => file.ContentLength > size
                 ? msg
                 : null;
+#endif
         }
 
         /// <summary>
@@ -704,9 +717,9 @@ namespace DataTables
         /// <param name="extensions">List of extensions that are allowed. This is case insensitive.</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>File validation delegate</returns>
-        public static Func<HttpPostedFile, string> FileExtensions(IEnumerable<string> extensions, string msg = "Invalid file type.")
+        public static Func<IFormFile, string> FileExtensions(IEnumerable<string> extensions, string msg = "Invalid file type.")
         {
-            return delegate(HttpPostedFile file)
+            return delegate(IFormFile file)
             {
                 var extn = Path.GetExtension(file.FileName).Replace(".", "");
                 return extensions.Contains(extn, StringComparer.InvariantCultureIgnoreCase)
