@@ -95,7 +95,7 @@ namespace DataTables
             {
                 DateTime dt;
 
-                if (val == null || val as string == "")
+                if (val == null || val as string == "" || val == DBNull.Value)
                 {
                     return null;
                 }
