@@ -864,12 +864,19 @@ namespace DataTables
             _request = request;
 
 #if NETCOREAPP2_1
-            _requestFiles = request.Form.Files;
+            if ( request.HasFormContentType ) {
+                _requestFiles = request.Form.Files;
+                return Process(request.Form);
+            }
+            else
+            {
+                var list = new List<KeyValuePair<string, string>>();
+                return Process(new DtRequest(list));
+            }
 #else
             _requestFiles = request.Files;
-#endif
-
             return Process(request.Form);
+#endif
         }
 
 #if NET45

@@ -7,11 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DataTables.EditorUtil;
-#if NET40
-using Microsoft.Security.Application;
-#else
-using System.Text.Encodings.Web;
-#endif
+using System.Web;
 
 namespace DataTables
 {
@@ -820,13 +816,8 @@ namespace DataTables
             {
                 return _xss(val);
             }
-#if NET40
-            // In .NET 4.0 we need to use a standalone library
-            return Encoder.HtmlEncode(val);
-#else
-            var htmlEncoder = HtmlEncoder.Create();
-            return htmlEncoder.Encode(val);
-#endif
+
+            return HttpUtility.HtmlEncode( val );
         }
 
 

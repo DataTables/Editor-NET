@@ -141,7 +141,7 @@ namespace DataTables.EditorUtil
         {
             try
             {
-                outData.Add(name, value == null
+                outData.Add(name, value == null || value == System.DBNull.Value
                     ? null
                     : Convert.ChangeType(value, type)
                 );
