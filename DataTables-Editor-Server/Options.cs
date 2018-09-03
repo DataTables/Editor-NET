@@ -22,21 +22,32 @@ namespace DataTables
         private Action<Query> _where;
         private string _order;
         private int _limit=-1;
-        private Dictionary<string, object> _manualOpts = new Dictionary<string, object>();
+        private List<Dictionary<string, object>> _manualOpts = new List<Dictionary<string, object>>();
 
 
+        /// <summary>
+        /// Add a manually defined option to the list from the database
+        /// </summary>
+        /// <param name="label">Label and value</param>
+        /// <returns>Self for chaining</returns>
         public Options Add(string label)
         {
             return Add(label, label);
         }
 
+        /// <summary>
+        /// Add a manually defined option to the list from the database
+        /// </summary>
+        /// <param name="label">Label</param>
+        /// <param name="value">Value</param>
+        /// <returns>Self for chaining</returns>
         public Options Add(string label, object value)
         {
-            new Dictionary<string, object>
+            _manualOpts.Add(new Dictionary<string, object>
             {
                 {"value", value},
                 {"label", label}
-            };
+            });
 
             return this;
         }
@@ -268,11 +279,16 @@ namespace DataTables
             {
                 {"value", row[_value]},
                 {"label", formatter(row)}
+            }).ToList();
+
+            _manualOpts.ToList().ForEach(opt =>
+            {
+                output.Add(opt);
             });
 
             if (_order == null)
             {
-                output = output.OrderBy(x => x["label"]);
+                output.Sort((a, b) => a["label"].ToString().CompareTo(b["label"].ToString()));
             }
 
             return output.ToList();
