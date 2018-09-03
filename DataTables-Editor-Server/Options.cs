@@ -22,6 +22,24 @@ namespace DataTables
         private Action<Query> _where;
         private string _order;
         private int _limit=-1;
+        private Dictionary<string, object> _manualOpts = new Dictionary<string, object>();
+
+
+        public Options Add(string label)
+        {
+            return Add(label, label);
+        }
+
+        public Options Add(string label, object value)
+        {
+            new Dictionary<string, object>
+            {
+                {"value", value},
+                {"label", label}
+            };
+
+            return this;
+        }
 
         /// <summary>
         /// Get the column name(s) for the options label
