@@ -278,6 +278,7 @@ namespace DataTables
         private bool _debug = false;
         private List<object> _DebugInfo = new List<object>();
         private Func<Editor, DtRequest.RequestTypes, DtRequest, string> _validator;
+        private bool _leftJoinRemove = false;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
@@ -489,6 +490,28 @@ namespace DataTables
         {
             _leftJoin.Add(new LeftJoin(table, field1, op, field2));
 
+            return this;
+        }
+
+        /// <summary>
+        /// Get the left join remove value.
+        /// </summary>
+        /// <returns>left join remove value</returns>
+        public bool LeftJoinRemove()
+        {
+            return _leftJoinRemove;
+        }
+
+        /// <summary>
+	    /// Indicate if a remove should be performed on left joined tables when deleting
+	    /// from the parent row. Note that this is disabled by default and will be
+	    /// removed completely in v2. Use `ON DELETE CASCADE` in your database instead.
+        /// </summary>
+        /// <param name="remove">Value to set</param>
+        /// <returns>Self for chaining</returns>
+        public Editor LeftJoinRemove(bool remove)
+        {
+            _leftJoinRemove = remove;
             return this;
         }
 
@@ -1507,32 +1530,34 @@ namespace DataTables
             }
 
             // Remove from the left join tables
-            for (int i = 0, ien = _leftJoin.Count(); i < ien; i++)
-            {
-                var join = _leftJoin[i];
-                string parentLink;
-                string childLink;
+            if ( _leftJoinRemove ) {
+                for (int i = 0, ien = _leftJoin.Count(); i < ien; i++)
+                {
+                    var join = _leftJoin[i];
+                    string parentLink;
+                    string childLink;
 
 
-                // which side of the join refers to the parent table?
-                if (join.Field1.IndexOf(join.Table) == 0)
-                {
-                    parentLink = join.Field2;
-                    childLink = join.Field1;
-                }
-                else
-                {
-                    parentLink = join.Field1;
-                    childLink = join.Field2;
-                }
+                    // which side of the join refers to the parent table?
+                    if (join.Field1.IndexOf(join.Table) == 0)
+                    {
+                        parentLink = join.Field2;
+                        childLink = join.Field1;
+                    }
+                    else
+                    {
+                        parentLink = join.Field1;
+                        childLink = join.Field2;
+                    }
 
-                // Only delete on the primary key, since that is what the ids refer
-                // to - otherwise we'd be deleting random data! Note that this
-                // won't work with compound keys since the parent link would be
-                // over multiple fields.
-                if (_pkey.Length == 1 && parentLink == _pkey[0])
-                {
-                    _RemoveTable(join.Table, ids, new[] {childLink});
+                    // Only delete on the primary key, since that is what the ids refer
+                    // to - otherwise we'd be deleting random data! Note that this
+                    // won't work with compound keys since the parent link would be
+                    // over multiple fields.
+                    if (_pkey.Length == 1 && parentLink == _pkey[0])
+                    {
+                        _RemoveTable(join.Table, ids, new[] {childLink});
+                    }
                 }
             }
 
