@@ -273,8 +273,15 @@ namespace DataTables
         /// <returns>Result instance</returns>
         public Result Push(string table, Dictionary<string, dynamic> set, Dictionary<string, dynamic> where, string[] pkey=null)
         {
+            var selectColumns = new[] { "*" };
+
+            if (pkey != null)
+            {
+                selectColumns = pkey;
+            }
+
             // Update or insert
-            if (Select(table, new[] { "*" }, where).Count() > 0)
+            if (Select(table, selectColumns, where).Count() > 0)
             {
                 return Update(table, set, where);
             }

@@ -640,7 +640,7 @@ namespace DataTables
                             break;
 
                         case DbType.FileName:
-                            q.Set(column, upload.FileName);
+                            q.Set(column, Path.GetFileName(upload.FileName));
                             break;
 
                         case DbType.FileSize:
