@@ -81,6 +81,7 @@ namespace DataTables
 
         internal string[] _pkey;
 
+        private int _whereInCnt = 1;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Static methods
@@ -699,6 +700,37 @@ namespace DataTables
             _WhereGroup(true, op);
             fn(this);
             _WhereGroup(false, op);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Provide a method that can be used to perform a `WHERE ... IN (...)` query with bound values and parameters.
+        /// </summary>
+        /// <param name="field">Field name to condition on</param>
+        /// <param name="values">Values to bind</param>
+        /// <param name="op">Conditional operator to use to join to the preceding condition.</param>
+        /// <returns></returns>
+        public Query WhereIn(string field, IEnumerable<object> values, string op = "AND")
+        {
+            var binders = new List<string>();
+            var prefix = ":wherein";
+
+            foreach (var val in values)
+            {
+                var binder = prefix + _whereInCnt.ToString();
+
+                Bind(binder, val);
+
+                binders.Add(binder);
+                _whereInCnt++;
+            }
+
+            _where.Add(new Where()
+                .Operator(op)
+                .Field(_ProtectIdentifiers(field))
+                .Query(_ProtectIdentifiers(field) + " IN (" + String.Join(",", binders + ")"))
+            );
 
             return this;
         }

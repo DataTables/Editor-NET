@@ -373,31 +373,51 @@ namespace DataTables
             {
                 query.Join(_table, _childField + " = " + _hostField);
             }
+            
+            var readField = "";
+            var joinFieldName = _hostField.Split('.')[1];
+            if (NestedData.InData(_hostField, response.data[0]))
+            {
+                readField = _hostField;
+            }
+            else if (NestedData.InData(joinFieldName, response.data[0]))
+            {
+                readField = joinFieldName;
+            }
+            else if (!pkeyIsJoin)
+            {
+                throw new Exception(
+                    "Join was performed on the field '" + _hostField + "' which was not " +
+                    "included in the Editor field list. The join field must be " +
+                    "included as a regular field in the Editor instance."
+                );
+            }
+
+            // Get list of pkey values and apply as a WHERE IN condition
+            // This is primarily useful in server-side processing mode and when filtering
+            // the table as it means only a sub-set will be selected
+            // This is only applied for "sensible" data sets. It will just complicate
+            // matters for really large data sets:
+            // https://stackoverflow.com/questions/21178390/in-clause-limitation-in-sql-server
+            if (response.data.Count < 1000)
+            {
+                var whereIn = new List<object>();
+
+                foreach (var data in response.data)
+                {
+                    whereIn.Add( pkeyIsJoin
+                        ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                        : NestedData.ReadProp(readField, data).ToString()
+                    );
+                }
+
+                query.WhereIn(_hostField, whereIn);
+            }
 
             var result = query.Exec();
 
             if (result.Count() != 0 && response.data.Count() != 0)
             {
-                var readField = "";
-                var joinFieldName = _hostField.Split('.')[1];
-
-                if (NestedData.InData(_hostField, response.data[0]))
-                {
-                    readField = _hostField;
-                }
-                else if (NestedData.InData(joinFieldName, response.data[0]))
-                {
-                    readField = joinFieldName;
-                }
-                else if (!pkeyIsJoin)
-                {
-                    throw new Exception(
-                        "Join was performed on the field '" + _hostField + "' which was not " +
-                        "included in the Editor field list. The join field must be " +
-                        "included as a regular field in the Editor instance."
-                    );
-                }
-
                 // Map the data to the primary key for fast look up
                 var join = new Dictionary<string, List<object>>();
                 Dictionary<string, object> row;
