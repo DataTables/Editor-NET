@@ -722,7 +722,6 @@ namespace DataTables
 
             foreach (var val in values)
             {
-                Console.WriteLine("wherein val: "+ val);
                 var binder = prefix + _whereInCnt.ToString();
 
                 Bind(binder, val);
