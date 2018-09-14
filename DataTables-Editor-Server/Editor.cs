@@ -1693,9 +1693,12 @@ namespace DataTables
                     {
                         var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
 
-                        foreach (var i in d )
+                        if ( d != null )
                         {
-                            joinData.Add(i);
+                            foreach (var i in d )
+                            {
+                                joinData.Add(i);
+                            }
                         }
                     }
                 }
@@ -1747,7 +1750,7 @@ namespace DataTables
                 {
                     foreach (var row in data)
                     {
-                        var val = field.Val("set", row);
+                        var val = NestedData.ReadProp(field.Name(), row);
 
                         if ( val != null )
                         {

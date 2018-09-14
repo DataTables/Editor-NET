@@ -317,140 +317,143 @@ namespace DataTables
         /// Data "get" request - get the joined data
         /// </summary>
         /// <param name="editor">Host Editor instance</param>
-        /// <param name="response">DataTables reponse object for where the data
+        /// <param name="response">DataTables response object for where the data
         /// should be written to</param>
         internal void Data(Editor editor, DtResponse response)
         {
             _Prepare(editor);
 
-            // This is something that will likely come in a future version, but it
-            // is a relatively low use feature. Please get in touch if this is
-            // something you require.
-            var pkeyA = editor.Pkey();
-            if (pkeyA.Length > 1)
+            if (response.data.Count() != 0)
             {
-                throw new Exception("MJoin is not currently supported with a compound primary key for the main table.");
-            }
-
-            // If the Editor primary key is join key, then it is read automatically
-            // and into Editor's primary key store
-            var pkeyIsJoin = _hostField == pkeyA[0] ||
-                             _hostField == editor.Table()[0];
-
-            // Build the basic query
-            var query = editor.Db()
-                .Query("select")
-                .Distinct(true)
-                .Get(_hostField + " as dteditor_pkey")
-                .Table(editor.Table()[0]);
-
-            if (Order() != null)
-            {
-                query.Order(Order());
-            }
-
-            _ApplyWhere(query);
-
-            foreach (var field in _fields.Where(field => field.Apply("get") && field.GetValue() == null))
-            {
-                if (field.DbField().IndexOf('.') == -1)
+                // This is something that will likely come in a future version, but it
+                // is a relatively low use feature. Please get in touch if this is
+                // something you require.
+                var pkeyA = editor.Pkey();
+                if (pkeyA.Length > 1)
                 {
-                    query.Get(_table + "." + field.DbField() + " as " + field.DbField());
+                    throw new Exception("MJoin is not currently supported with a compound primary key for the main table.");
+                }
+
+                // If the Editor primary key is join key, then it is read automatically
+                // and into Editor's primary key store
+                var pkeyIsJoin = _hostField == pkeyA[0] ||
+                                _hostField == editor.Table()[0];
+
+                // Build the basic query
+                var query = editor.Db()
+                    .Query("select")
+                    .Distinct(true)
+                    .Get(_hostField + " as dteditor_pkey")
+                    .Table(editor.Table()[0]);
+
+                if (Order() != null)
+                {
+                    query.Order(Order());
+                }
+
+                _ApplyWhere(query);
+
+                foreach (var field in _fields.Where(field => field.Apply("get") && field.GetValue() == null))
+                {
+                    if (field.DbField().IndexOf('.') == -1)
+                    {
+                        query.Get(_table + "." + field.DbField() + " as " + field.DbField());
+                    }
+                    else
+                    {
+                        query.Get(field.DbField());
+                    }
+                }
+
+                // Create the joins
+                if (_linkTable != null)
+                {
+                    query.Join(_linkTable, _hostField + " = " + _linkHostField);
+                    query.Join(_table, _childField + " = " + _linkChildField);
                 }
                 else
                 {
-                    query.Get(field.DbField());
+                    query.Join(_table, _childField + " = " + _hostField);
                 }
-            }
-
-            // Create the joins
-            if (_linkTable != null)
-            {
-                query.Join(_linkTable, _hostField + " = " + _linkHostField);
-                query.Join(_table, _childField + " = " + _linkChildField);
-            }
-            else
-            {
-                query.Join(_table, _childField + " = " + _hostField);
-            }
-            
-            var readField = "";
-            var joinFieldName = _hostField.Split('.')[1];
-            if (NestedData.InData(_hostField, response.data[0]))
-            {
-                readField = _hostField;
-            }
-            else if (NestedData.InData(joinFieldName, response.data[0]))
-            {
-                readField = joinFieldName;
-            }
-            else if (!pkeyIsJoin)
-            {
-                throw new Exception(
-                    "Join was performed on the field '" + _hostField + "' which was not " +
-                    "included in the Editor field list. The join field must be " +
-                    "included as a regular field in the Editor instance."
-                );
-            }
-
-            // Get list of pkey values and apply as a WHERE IN condition
-            // This is primarily useful in server-side processing mode and when filtering
-            // the table as it means only a sub-set will be selected
-            // This is only applied for "sensible" data sets. It will just complicate
-            // matters for really large data sets:
-            // https://stackoverflow.com/questions/21178390/in-clause-limitation-in-sql-server
-            if (response.data.Count < 1000)
-            {
-                var whereIn = new List<object>();
-
-                foreach (var data in response.data)
+                
+                var readField = "";
+                var joinFieldName = _hostField.Split('.')[1];
+                if (NestedData.InData(_hostField, response.data[0]))
                 {
-                    whereIn.Add( pkeyIsJoin
-                        ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
-                        : NestedData.ReadProp(readField, data).ToString()
+                    readField = _hostField;
+                }
+                else if (NestedData.InData(joinFieldName, response.data[0]))
+                {
+                    readField = joinFieldName;
+                }
+                else if (!pkeyIsJoin)
+                {
+                    throw new Exception(
+                        "Join was performed on the field '" + _hostField + "' which was not " +
+                        "included in the Editor field list. The join field must be " +
+                        "included as a regular field in the Editor instance."
                     );
                 }
 
-                query.WhereIn(_hostField, whereIn);
-            }
-
-            var result = query.Exec();
-
-            if (result.Count() != 0 && response.data.Count() != 0)
-            {
-                // Map the data to the primary key for fast look up
-                var join = new Dictionary<string, List<object>>();
-                Dictionary<string, object> row;
-
-                while ((row = result.Fetch()) != null)
+                // Get list of pkey values and apply as a WHERE IN condition
+                // This is primarily useful in server-side processing mode and when filtering
+                // the table as it means only a sub-set will be selected
+                // This is only applied for "sensible" data sets. It will just complicate
+                // matters for really large data sets:
+                // https://stackoverflow.com/questions/21178390/in-clause-limitation-in-sql-server
+                if (response.data.Count < 1000)
                 {
-                    var inner = new Dictionary<string, object>();
+                    var whereIn = new List<object>();
 
-                    foreach (var field in _fields.Where(field => field.Apply("get")))
+                    foreach (var data in response.data)
                     {
-                        field.Write(inner, row);
+                        whereIn.Add( pkeyIsJoin
+                            ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                            : NestedData.ReadProp(readField, data).ToString()
+                        );
                     }
 
-                    var lookup = row["dteditor_pkey"].ToString();
-                    if (!join.ContainsKey(lookup))
-                    {
-                        join.Add(lookup, new List<object>());
-                    }
-
-                    join[lookup].Add(inner);
+                    query.WhereIn(_hostField, whereIn);
                 }
 
-                // Loop over the data and do a join based on the data available
-                foreach (var data in response.data)
-                {
-                    var linkField = pkeyIsJoin
-                        ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
-                        : NestedData.ReadProp(readField, data).ToString();
+                var result = query.Exec();
 
-                    data.Add(_name, join.ContainsKey(linkField)
-                        ? join[linkField]
-                        : new List<object>()
-                    );
+                if (result.Count() != 0)
+                {
+                    // Map the data to the primary key for fast look up
+                    var join = new Dictionary<string, List<object>>();
+                    Dictionary<string, object> row;
+
+                    while ((row = result.Fetch()) != null)
+                    {
+                        var inner = new Dictionary<string, object>();
+
+                        foreach (var field in _fields.Where(field => field.Apply("get")))
+                        {
+                            field.Write(inner, row);
+                        }
+
+                        var lookup = row["dteditor_pkey"].ToString();
+                        if (!join.ContainsKey(lookup))
+                        {
+                            join.Add(lookup, new List<object>());
+                        }
+
+                        join[lookup].Add(inner);
+                    }
+
+                    // Loop over the data and do a join based on the data available
+                    foreach (var data in response.data)
+                    {
+                        var linkField = pkeyIsJoin
+                            ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                            : NestedData.ReadProp(readField, data).ToString();
+
+                        data.Add(_name, join.ContainsKey(linkField)
+                            ? join[linkField]
+                            : new List<object>()
+                        );
+                    }
                 }
             }
 

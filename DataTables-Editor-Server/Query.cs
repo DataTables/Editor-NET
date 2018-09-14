@@ -718,10 +718,11 @@ namespace DataTables
             }
 
             var binders = new List<string>();
-            var prefix = ":wherein";
+            var prefix = _bindChar+"wherein";
 
             foreach (var val in values)
             {
+                Console.WriteLine("wherein val: "+ val);
                 var binder = prefix + _whereInCnt.ToString();
 
                 Bind(binder, val);
@@ -733,7 +734,7 @@ namespace DataTables
             _where.Add(new Where()
                 .Operator(op)
                 .Field(_ProtectIdentifiers(field))
-                .Query(_ProtectIdentifiers(field) + " IN (" + String.Join(",", binders + ")"))
+                .Query(_ProtectIdentifiers(field) + " IN (" + String.Join(",", binders)+ ")")
             );
 
             return this;
