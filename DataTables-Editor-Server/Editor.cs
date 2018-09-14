@@ -1368,7 +1368,7 @@ namespace DataTables
             }
 
             // Uploaded files
-            dtData.files = _FileData();
+            dtData.files = _FileData(null, null, dtData.data);
 
             if (PostGet != null)
             {
@@ -1654,7 +1654,7 @@ namespace DataTables
             }
             else
             {
-                _out.files = _FileData(upload.Table(), res);
+                _out.files = _FileData(upload.Table(), new object[] {res});
                 _out.upload.id = res;
 
                 PostUpload?.Invoke(this, new PostUploadEventArgs
@@ -1668,17 +1668,39 @@ namespace DataTables
         }
 
 
-        private Dictionary<string, Dictionary<string, Dictionary<string, object>>> _FileData(string limitTable = null, object id = null)
-        {
+        private Dictionary<string, Dictionary<string, Dictionary<string, object>>> _FileData(
+            string limitTable = null,
+            ICollection<object> ids = null,
+            List<Dictionary<string, object>> data = null
+        ) {
             var files = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
 
             // The fields in this instance
-            _FileDataFields(files, _field, limitTable, id);
+            _FileDataFields(files, _field, limitTable, ids, data);
 
             // From joined tables
             foreach (var join in _mJoin)
             {
-                _FileDataFields(files, join.Fields(), limitTable, id);
+                // If we have data from the get, it is nested from the join, so we need to
+                // un-nest it (i.e. get the array of joined data for each row)
+                List<Dictionary<string, object>> joinData = null;
+
+                if ( data != null )
+                {
+                    joinData = new List<Dictionary<string, object>>();
+
+                    foreach (var row in data)
+                    {
+                        var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
+
+                        foreach (var i in d )
+                        {
+                            joinData.Add(i);
+                        }
+                    }
+                }
+
+                _FileDataFields(files, join.Fields(), limitTable, ids, joinData);
             }
 
             return files;
@@ -1686,7 +1708,7 @@ namespace DataTables
 
 
         private void _FileDataFields(IDictionary<string, Dictionary<string, Dictionary<string, object>>> @files,
-            IEnumerable<Field> fields, string limitTable, object id)
+            IEnumerable<Field> fields, string limitTable, ICollection<object> ids, List<Dictionary<string, object>> data = null)
         {
             foreach (var field in fields)
             {
@@ -1714,7 +1736,36 @@ namespace DataTables
                     continue;
                 }
 
-                var fileData = upload.Data(_db, id);
+                // Make a collection of the ids used in this data set to get a limited data set
+                // in return (security and performance)
+                if ( ids == null )
+                {
+                    ids = new List<object>();
+                }
+
+                if ( data != null )
+                {
+                    foreach (var row in data)
+                    {
+                        var val = field.Val("set", row);
+
+                        if ( val != null )
+                        {
+                            ids.Add(val);
+                        }
+                    }
+
+                    if ( ids.Count == 0 ) {
+                        // If no data to fetch, then don't bother
+                        return;
+                    }
+                    else if ( ids.Count > 1000 ) {
+                        // Don't use whereIn for really large data sets
+                        ids = new List<object>();
+                    }
+                }
+
+                var fileData = upload.Data(_db, ids);
 
                 if (fileData != null)
                 {

@@ -300,9 +300,9 @@ namespace DataTables
         /// Get database information from the table
         /// </summary>
         /// <param name="db">Database instance</param>
-        /// <param name="id">Limit the results to a specific id</param>
+        /// <param name="ids">Limit the results to a collection of ids</param>
         /// <returns>Database information</returns>
-        internal Dictionary<string, Dictionary<string, object>> Data(Database db, object id = null)
+        internal Dictionary<string, Dictionary<string, object>> Data(Database db, ICollection<object> ids = null)
         {
             if (_dbTable == null)
             {
@@ -325,9 +325,9 @@ namespace DataTables
                 }
             }
 
-            if (id != null)
+            if (ids != null)
             {
-                q.Where(_dbPKey, id);
+                q.WhereIn(_dbPKey, ids);
             }
 
             foreach ( var condition in _where )

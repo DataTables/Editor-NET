@@ -711,8 +711,12 @@ namespace DataTables
         /// <param name="values">Values to bind</param>
         /// <param name="op">Conditional operator to use to join to the preceding condition.</param>
         /// <returns></returns>
-        public Query WhereIn(string field, IEnumerable<object> values, string op = "AND")
+        public Query WhereIn(string field, ICollection<object> values, string op = "AND")
         {
+            if ( values.Count == 0 ) {
+                return this;
+            }
+
             var binders = new List<string>();
             var prefix = ":wherein";
 
