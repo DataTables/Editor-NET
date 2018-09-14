@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTables", "DataTables-Editor-Server\DataTables.csproj", "{949C3FEA-1DD1-4FA9-B340-0ADC61CD6FB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTables-Editor-Server", "DataTables-Editor-Server\DataTables-Editor-Server.csproj", "{949C3FEA-1DD1-4FA9-B340-0ADC61CD6FB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
