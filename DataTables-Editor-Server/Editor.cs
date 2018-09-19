@@ -262,6 +262,7 @@ namespace DataTables
         private Dictionary<string, Type> _userModelT = new Dictionary<string, Type>();
         private string[] _pkey = { "id" };
         private readonly List<string> _table = new List<string>();
+        private readonly List<string> _readTableNames = new List<string>();
         private bool _transaction = true;
         private readonly List<WhereCondition> _where = new List<WhereCondition>();
         private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
@@ -578,6 +579,42 @@ namespace DataTables
 
             _events[name].Add(callback);
 
+            return this;
+        }
+
+
+        /// <summary>
+        /// Get the read database table name this Editor instance will use
+        /// </summary>
+        /// <returns>Table name</returns>
+        public List<string> ReadTable()
+        {
+            return _readTableNames;
+        }
+
+        /// <summary>
+        /// Set the read database table name this Editor instance will use. If not set,
+        /// the table from `Editor.Table()` will be used.
+        /// </summary>
+        /// <param name="t">Table name</param>
+        /// <returns>Self for chaining</returns>
+        public Editor ReadTable(string t)
+        {
+            _readTableNames.Add(t);
+            return this;
+        }
+
+        /// <summary>
+        /// Add multiple tables to the Editor instance
+        /// </summary>
+        /// <param name="tables">Collection of tables to add</param>
+        /// <returns>Self for chaining</returns>
+        public Editor ReadTable(IEnumerable<string> tables)
+        {
+            foreach (var t in tables)
+            {
+                _readTableNames.Add(t);
+            }
             return this;
         }
 
@@ -1302,7 +1339,7 @@ namespace DataTables
 
             Query query = _db
                 .Query("select")
-                .Table(_table)
+                .Table(_ReadTable())
                 .Get(_pkey);
 
             // Add all fields that we need to get from the database
@@ -1928,7 +1965,7 @@ namespace DataTables
             // Get the nuber of rows in the result set
             var setCount = _db
                 .Query("select")
-                .Table(_table)
+                .Table(_ReadTable())
                 .Get("COUNT( " + _pkey[0] + " ) as cnt");
             _GetWhere(setCount);
             _SspFilter(setCount, http);
@@ -1939,7 +1976,7 @@ namespace DataTables
             // Get the number of rows in the full set
             var fullCount = _db
                 .Query("select")
-                .Table(_table)
+                .Table(_ReadTable())
                 .Get("COUNT( " + _pkey[0] + " ) as cnt");
             _GetWhere(fullCount);
 
@@ -2303,6 +2340,13 @@ namespace DataTables
             var pkeys = string.Join(",", _pkey);
 
             return pkeys.GetHashCode().ToString("X");
+        }
+
+        private List<string> _ReadTable()
+        {
+            return _readTableNames.Count != 0 ?
+                _readTableNames :
+                _table;
         }
     }
 }
