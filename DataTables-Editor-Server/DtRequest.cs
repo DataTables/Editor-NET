@@ -231,7 +231,7 @@ namespace DataTables
             }
 
             // Numeric looking data, but with leading zero
-            if (dataIn.IndexOf('0') == 0 && dataIn.Length > 1)
+            if (dataIn.Length > 1 && (dataIn.IndexOf('0') == 0 || dataIn.IndexOf('-') == dataIn.Length-1 ))
             {
                 return dataIn;
             }
