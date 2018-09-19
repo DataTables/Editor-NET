@@ -866,7 +866,24 @@ namespace DataTables
 
             for (int i = 0, ien = _table.Count; i < ien; i++)
             {
-                tables.Add( _ProtectIdentifiers(_table[i]));
+                var table = _table[i];
+                string name = table;
+
+                if (_type == "insert")
+                {
+                    if (table.IndexOf(" as ") != -1)
+                    {
+                        var split = table.Split(new[] {" as "}, StringSplitOptions.None);
+                        name = split[0];
+                    }
+                    else if (table.IndexOf(" ") != -1)
+                    {
+                        var split = table.Split(new[] {" "}, StringSplitOptions.None);
+                        name = split[0];
+                    }
+                }
+
+                tables.Add( _ProtectIdentifiers(name));
             }
 
             return " " + string.Join(",", tables.ToArray()) + " ";
