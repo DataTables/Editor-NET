@@ -69,7 +69,10 @@ namespace DataTables.DatabaseUtil.Sqlite
 
             using (var dr = _stmt.ExecuteReader())
             {
-                dt.Load(dr);
+                try {
+                    dt.Load(dr);
+                }
+                catch {}
             }
 
             return new Sqlite.Result(_db, dt, this);

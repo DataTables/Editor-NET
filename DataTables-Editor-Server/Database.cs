@@ -150,7 +150,7 @@ namespace DataTables
                     return "Npgsql";
 
                 case "sqlite":
-                    return "System.Data.SQLite";
+                    return "Microsoft.Data.Sqlite";
 
                 case "sqlserverce":
                     return "System.Data.SqlServerCe";
