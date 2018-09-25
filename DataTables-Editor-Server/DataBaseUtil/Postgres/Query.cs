@@ -86,6 +86,12 @@ namespace DataTables.DatabaseUtil.Postgres
                 param.ParameterName = binding.Name;
                 param.Value = binding.Value ?? DBNull.Value;
 
+                // // Postgres requires that numeric looking data is actually numeric
+                try {
+                    param.Value = Convert.ToInt32(binding.Value);
+                }
+                catch {}
+
                 if (binding.Type != null)
                 {
                     param.DbType = binding.Type;
