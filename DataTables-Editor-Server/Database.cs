@@ -101,6 +101,11 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Set the debug callback function
+        /// </summary>
+        /// <param name="callback">Function that will be used to log debug messages</param>
+        /// <returns>Self for chaining</returns>
         public Database Debug(Action<object> callback)
         {
             _DebugCallback = callback;
@@ -111,7 +116,7 @@ namespace DataTables
         /// Record debug information
         /// </summary>
         /// <param name="sql">Query</param>
-        /// <param name="bindings">Bidnings</param>
+        /// <param name="bindings">Bindings</param>
         /// <returns>Self for chaining</returns>
         internal Database DebugInfo(string sql, List<Binding> bindings)
         {
