@@ -218,6 +218,15 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Get the database type
+        /// </summary>
+        /// <returns>Database type</returns>
+        public string DbType ()
+        {
+            return _DbType;
+        }
+
+        /// <summary>
         /// Perform a delete query on a table.
         /// 
         /// This is a short cut method that creates and update query and then uses the

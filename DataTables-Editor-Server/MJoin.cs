@@ -395,25 +395,32 @@ namespace DataTables
                     );
                 }
 
-                // Get list of pkey values and apply as a WHERE IN condition
-                // This is primarily useful in server-side processing mode and when filtering
-                // the table as it means only a sub-set will be selected
-                // This is only applied for "sensible" data sets. It will just complicate
-                // matters for really large data sets:
-                // https://stackoverflow.com/questions/21178390/in-clause-limitation-in-sql-server
-                if (response.data.Count < 1000)
+                // There appears to be a bug in the MySQL drivers for .NETCore whereby if there is
+                // only one result in the original data set, then it can only read one result into
+                // the new data set when using WHERE IN. Any other number of rows is fine. Tried
+                // different versions of the server and driver but to no avail, so this is a workaround.
+                if (editor.Db().DbType() != "mysql" || response.data.Count != 1)
                 {
-                    var whereIn = new List<object>();
-
-                    foreach (var data in response.data)
+                    // Get list of pkey values and apply as a WHERE IN condition
+                    // This is primarily useful in server-side processing mode and when filtering
+                    // the table as it means only a sub-set will be selected
+                    // This is only applied for "sensible" data sets. It will just complicate
+                    // matters for really large data sets:
+                    // https://stackoverflow.com/questions/21178390/in-clause-limitation-in-sql-server
+                    if (response.data.Count < 1000)
                     {
-                        whereIn.Add( pkeyIsJoin
-                            ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
-                            : NestedData.ReadProp(readField, data).ToString()
-                        );
-                    }
+                        var whereIn = new List<object>();
 
-                    query.WhereIn(_hostField, whereIn);
+                        foreach (var data in response.data)
+                        {
+                            whereIn.Add( pkeyIsJoin
+                                ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                                : NestedData.ReadProp(readField, data).ToString()
+                            );
+                        }
+
+                        query.WhereIn(_hostField, whereIn);
+                    }
                 }
 
                 var result = query.Exec();
