@@ -85,10 +85,25 @@ namespace DataTables.DatabaseUtil.Postgres
                 param = cmd.CreateParameter();
                 param.ParameterName = binding.Name;
                 param.Value = binding.Value ?? DBNull.Value;
+                param.DbType = System.Data.DbType.Object;
 
-                // // Postgres requires that numeric looking data is actually numeric
+                // Editor's type system is very weak, but Postgres is strong.
+                // Postgres requires that numeric looking data is actually numeric
                 try {
-                    param.Value = Convert.ToInt32(binding.Value);
+                    var str = binding.Value.ToString();
+                    
+                    if ( str.IndexOf('-') > 0 ) {
+
+                    }
+                    else {
+                        param.Value = Convert.ToInt32(binding.Value);
+                    }
+                }
+                catch {}
+
+                // And DateTime
+                try {
+                    param.Value = DateTime.Parse(binding.Value);
                 }
                 catch {}
 
