@@ -92,8 +92,8 @@ namespace DataTables.DatabaseUtil.Postgres
                 try {
                     var str = binding.Value.ToString();
                     
-                    if ( str.IndexOf('-') > 0 ) {
-
+                    if ( str.IndexOf('-') > 0 || str.IndexOf('0') == 0 ) {
+                        // noop
                     }
                     else {
                         param.Value = Convert.ToInt32(binding.Value);
