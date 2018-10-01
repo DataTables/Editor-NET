@@ -1728,13 +1728,16 @@ namespace DataTables
 
                     foreach (var row in data)
                     {
-                        var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
-
-                        if ( d != null )
+                        if ( row.ContainsKey( join.Name() ) )
                         {
-                            foreach (var i in d )
+                            var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
+
+                            if ( d != null )
                             {
-                                joinData.Add(i);
+                                foreach (var i in d )
+                                {
+                                    joinData.Add(i);
+                                }
                             }
                         }
                     }

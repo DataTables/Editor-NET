@@ -425,42 +425,39 @@ namespace DataTables
 
                 var result = query.Exec();
 
-                if (result.Count() != 0)
+                // Map the data to the primary key for fast look up
+                var join = new Dictionary<string, List<object>>();
+                Dictionary<string, object> row;
+
+                while ((row = result.Fetch()) != null)
                 {
-                    // Map the data to the primary key for fast look up
-                    var join = new Dictionary<string, List<object>>();
-                    Dictionary<string, object> row;
+                    var inner = new Dictionary<string, object>();
 
-                    while ((row = result.Fetch()) != null)
+                    foreach (var field in _fields.Where(field => field.Apply("get")))
                     {
-                        var inner = new Dictionary<string, object>();
-
-                        foreach (var field in _fields.Where(field => field.Apply("get")))
-                        {
-                            field.Write(inner, row);
-                        }
-
-                        var lookup = row["dteditor_pkey"].ToString();
-                        if (!join.ContainsKey(lookup))
-                        {
-                            join.Add(lookup, new List<object>());
-                        }
-
-                        join[lookup].Add(inner);
+                        field.Write(inner, row);
                     }
 
-                    // Loop over the data and do a join based on the data available
-                    foreach (var data in response.data)
+                    var lookup = row["dteditor_pkey"].ToString();
+                    if (!join.ContainsKey(lookup))
                     {
-                        var linkField = pkeyIsJoin
-                            ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
-                            : NestedData.ReadProp(readField, data).ToString();
-
-                        data.Add(_name, join.ContainsKey(linkField)
-                            ? join[linkField]
-                            : new List<object>()
-                        );
+                        join.Add(lookup, new List<object>());
                     }
+
+                    join[lookup].Add(inner);
+                }
+
+                // Loop over the data and do a join based on the data available
+                foreach (var data in response.data)
+                {
+                    var linkField = pkeyIsJoin
+                        ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                        : NestedData.ReadProp(readField, data).ToString();
+
+                    data.Add(_name, join.ContainsKey(linkField)
+                        ? join[linkField]
+                        : new List<object>()
+                    );
                 }
             }
 

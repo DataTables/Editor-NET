@@ -319,8 +319,14 @@ namespace DataTables
                 var column = pair.Key;
                 var prop = pair.Value;
 
-                if (prop is DbType && (DbType)prop != DbType.Content && (DbType)prop != DbType.ContentBinary)
+                if (prop is DbType)
                 {
+                    if ( (DbType)prop != DbType.Content && (DbType)prop != DbType.ContentBinary )
+                    {
+                        q.Get(column);
+                    }
+                }
+                else {
                     q.Get(column);
                 }
             }
@@ -480,14 +486,17 @@ namespace DataTables
 
             // Default action - move the file to the location specified by the
             // action string
-            string to = _path(upload.FileName, id);
+            string to = _path(_actionStr, upload.FileName, id);
 
             try
             {
 #if NETCOREAPP2_1
-                using (var stream = upload.OpenReadStream())
+                using (var readStream = upload.OpenReadStream())
                 {
-                    upload.CopyTo(stream);
+                    using (var writeStream = new StreamWriter(to))
+                    {
+                        readStream.CopyTo(writeStream.BaseStream);
+                    }
                 }
 #else
                 upload.SaveAs(to);
@@ -586,7 +595,7 @@ namespace DataTables
         private dynamic _dbExec(Editor editor, IFormFile upload)
         {
             var db = editor.Db();
-            var pathFields = new Dictionary<string, DbType>();
+            var pathFields = new Dictionary<string, string>();
 
             // Insert the details requested, for the columns requested
             var q = db.Query("insert")
@@ -648,12 +657,12 @@ namespace DataTables
                             break;
 
                         case DbType.SystemPath:
-                            pathFields.Add(column, DbType.SystemPath);
+                            pathFields.Add(column, "__SYSTEM_PATH__");
                             q.Set(column, "-"); // Use a temporary value to avoid cases
                             break; // where the db will reject empty values
 
                         case DbType.WebPath:
-                            pathFields.Add(column, DbType.WebPath);
+                            pathFields.Add(column, "__WEB_PATH__");
                             q.Set(column, "-"); // Use a temporary value (as above)
                             break;
 
@@ -667,12 +676,15 @@ namespace DataTables
                     {
                         // Callable function - execute to get the value
                         var propFn = (Func<Database, IFormFile, dynamic>)prop;
-                        q.Set(column, propFn(db, upload));
+                        
+                        pathFields.Add(column, propFn(db, upload));
+                        q.Set(column, "-"); // Use a temporary value (as above)
                     }
                     catch (Exception)
                     {
                         // Not a function, so use the value as it is given
-                        q.Set(column, prop);
+                        pathFields.Add(column, prop.ToString());
+                        q.Set(column, "-"); // Use a temporary value (as above)
                     }
                 }
             }
@@ -689,13 +701,18 @@ namespace DataTables
             {
                 // For this to operate the action must be a string, which is
                 // validated in the `exec` method
-                var path = _path(upload.FileName, id);
+                var path = _path(_actionStr, upload.FileName, id);
 #if NETCOREAPP2_1
-                var physicalPath = editor.Request().PathBase.ToString() ?? "";
+                var physicalPath = Directory.GetCurrentDirectory() ?? "";
+                var webPath = physicalPath.Length != 0 ?
+                    path.Replace(physicalPath, "") :
+                    "";
 #else
                 var physicalPath = editor.Request().PhysicalApplicationPath ?? "";
+                var webPath = physicalPath.Length != 0 ?
+                    path.Replace(physicalPath, Path.DirectorySeparatorChar.ToString()) :
+                    "";
 #endif
-                var webPath = path.Replace(physicalPath, @"\");
 
                 var pathQ = db
                     .Query("update")
@@ -704,7 +721,11 @@ namespace DataTables
 
                 foreach (var pathField in pathFields)
                 {
-                    pathQ.Set(pathField.Key, pathField.Value == DbType.WebPath ? webPath : path);
+                    var val = _path(pathField.Value, upload.FileName, id)
+                        .Replace("__SYSTEM_PATH__", path)
+                        .Replace("__WEB_PATH__", webPath);
+
+                    pathQ.Set(pathField.Key, val);
                 }
 
                 pathQ.Exec();
@@ -716,12 +737,13 @@ namespace DataTables
         /// <summary>
         /// Apply macros to a user specified path
         /// </summary>
+        /// <param name="val">The value to be transformed</param>
         /// <param name="name">File path</param>
         /// <param name="id">Primary key value for the file</param>
         /// <returns>Resolved path</returns>
-        private string _path(string name, string id)
+        private string _path(string val, string name, string id)
         {
-            return _actionStr
+            return val
                 .Replace("__NAME__", Path.GetFileNameWithoutExtension(name))
                 .Replace("__ID__", id)
                 .Replace("__EXTN__", Path.GetExtension(name));
