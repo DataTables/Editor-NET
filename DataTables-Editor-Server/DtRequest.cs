@@ -47,7 +47,7 @@ namespace DataTables
                 {
                     var value = _HttpConv(pair.Value);
 
-                    if (pair.Key.Contains('['))
+                    if (pair.Key.Contains("["))
                     {
                         var keys = pair.Key.Split('[');
                         var innerDic = dataOut;

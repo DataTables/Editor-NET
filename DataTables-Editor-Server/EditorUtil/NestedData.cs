@@ -16,7 +16,7 @@ namespace DataTables.EditorUtil
         /// <returns>`true` if present, `false` otherwise</returns>
         internal static bool InData(string name, Dictionary<string, object> data)
         {
-            if (!name.Contains('.'))
+            if (!name.Contains("."))
             {
                 return data.ContainsKey(name);
             }

@@ -1890,7 +1890,7 @@ namespace DataTables
             // Check if the primary key has a table identifier - if not, add one
             for (int i = 0, ien = _pkey.Length; i < ien; i++)
             {
-                if (!_pkey[i].Contains('.'))
+                if (!_pkey[i].Contains("."))
                 {
                     _pkey[i] = _Alias(_table[0]) + '.' + _pkey[i];
                 }
@@ -1903,7 +1903,7 @@ namespace DataTables
             {
                 var name = field.DbField();
 
-                if (!name.Contains('.'))
+                if (!name.Contains("."))
                 {
                     throw new Exception("Table part of the field '" + name + "' was not found. " +
                         "In Editor instance that use a join, all the fields must have the " +
