@@ -25,18 +25,15 @@ namespace DataTables.DatabaseUtil.Sqlite
 
         override public string InsertId()
         {
-            if (_dt.Rows.Count > 0)
-            {
-                var provider = DbProviderFactories.GetFactory(_db.Adapter());
-                var cmd = provider.CreateCommand();
+            var provider = DbProviderFactories.GetFactory(_db.Adapter());
+            var cmd = provider.CreateCommand();
 
-                cmd.CommandText = "select last_insert_rowid()";
-                cmd.Connection = _db.Conn();
+            cmd.CommandText = "select last_insert_rowid()";
+            cmd.Connection = _db.Conn();
+            cmd.Transaction = _db.DbTransaction;
 
-                return (string)cmd.ExecuteScalar();
-            }
-
-            return null;
+            var id = cmd.ExecuteScalar();
+            return id.ToString();
         }
     }
 }
