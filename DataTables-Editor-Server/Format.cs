@@ -113,7 +113,15 @@ namespace DataTables
                 {
                     var str = Convert.ToString(val);
 
-                    dt = System.DateTime.ParseExact(str, from, System.Globalization.CultureInfo.InvariantCulture);
+                    try
+                    {
+                        dt = System.DateTime.ParseExact(str, from, System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    catch (Exception)
+                    {
+                        // Give it a best shot (sqlite with ISO8601 for example)
+                        dt = System.DateTime.Parse(str, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                    }
                 }
 
                 return dt.ToString(to);
