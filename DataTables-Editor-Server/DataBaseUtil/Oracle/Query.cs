@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -126,7 +126,13 @@ namespace DataTables.DatabaseUtil.Oracle
                     }
                     else
                     {
-                        throw new Exception("Unable to determine primary key type");
+                        // Best effort
+                        var outParam = cmd.CreateParameter();
+                        outParam.ParameterName = ":dtvalue";
+                        outParam.Direction = ParameterDirection.Output;
+                        outParam.DbType = DbType.Int32;
+                        cmd.Parameters.Add(outParam);
+                        cmd.UpdatedRowSource = UpdateRowSource.OutputParameters;
                     }
                 }
             }
