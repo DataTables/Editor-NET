@@ -1,4 +1,4 @@
-﻿// <copyright>Copyright (c) 2014-2017 SpryMedia Ltd - All Rights Reserved</copyright>
+// <copyright>Copyright (c) 2014-2017 SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // Editor class for reading tables as well as creating, editing and deleting rows
@@ -2209,10 +2209,16 @@ namespace DataTables
                 return null;
             }
 
+            string[] pkey = null;
+            if ( Array.IndexOf(_pkey, table) > -1 )
+            {
+                pkey = _pkey;
+            } 
+
             // Insert or update
             return action == "create" ?
-                _db.Insert(table, set, _pkey) :
-                _db.Push(table, set, @where, _pkey);
+                _db.Insert(table, set, pkey) :
+                _db.Push(table, set, @where, pkey);
         }
 
 
