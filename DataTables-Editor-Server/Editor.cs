@@ -2210,7 +2210,7 @@ namespace DataTables
             }
 
             string[] pkey = null;
-            if ( Array.IndexOf(_pkey, table) > -1 )
+            if (_table.Contains(table))
             {
                 pkey = _pkey;
             } 
