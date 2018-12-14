@@ -685,7 +685,8 @@ namespace DataTables
                     catch (Exception)
                     {
                         // Not a function, so use the value as it is given
-                        q.Set(column, prop.ToString());
+                        pathFields.Add(column, prop.ToString());
+                        q.Set(column, "-"); // Use a temporary value (as above)
                     }
                 }
             }
