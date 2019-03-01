@@ -729,6 +729,45 @@ namespace DataTables
         }
 
 
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Mjoin validation
+         */
+
+        /// <summary>
+        /// Mjoin minimum number of selected values validation
+        /// </summary>
+        /// <param name="count">Minimum number of items required.</param>
+        /// <param name="msg">Error message if validation fails.</param>
+        /// <returns>Mjoin validation delegate</returns>
+        public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMinCount(int count, string msg = "Too few items")
+        {
+            return delegate(Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            {
+                return data.Count < count
+                    ? msg
+                    : null;
+            };
+        }
+
+
+        /// <summary>
+        /// Mjoin maximum number of selected values validation
+        /// </summary>
+        /// <param name="count">Maximum number of items required.</param>
+        /// <param name="msg">Error message if validation fails.</param>
+        /// <returns>Mjoin validation delegate</returns>
+        public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMaxCount(int count, string msg = "Too many items")
+        {
+            return delegate(Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            {
+                return data.Count > count 
+                    ? msg
+                    : null;
+            };
+        }
+
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
          */

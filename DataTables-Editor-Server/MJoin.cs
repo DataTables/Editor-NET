@@ -51,6 +51,8 @@ namespace DataTables
         private string _linkHostField;
         private string _linkChildField;
         private string _order;
+        private List<Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>> _validators = new List<Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>>();
+        private List<string> _validatorFields = new List<string>();
 
 
 
@@ -235,6 +237,13 @@ namespace DataTables
         public MJoin Table(string table)
         {
             _table = table;
+            return this;
+        }
+
+        public MJoin Validator(string fieldName, Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> fn)
+        {
+            _validators.Add(fn);
+            _validatorFields.Add(fieldName);
             return this;
         }
 
@@ -591,16 +600,34 @@ namespace DataTables
         /// <param name="response">DataTables response object to record the errors</param>
         /// <param name="editor">Host Editor instance</param>
         /// <param name="data">Data submitted by the client</param>
-        internal void Validate(DtResponse response, Editor editor, Dictionary<string, object> data)
+        internal void Validate(DtResponse response, Editor editor, Dictionary<string, object> data, DtRequest.RequestTypes action)
         {
-            if (!_set || !data.ContainsKey(_name))
+            if (!_set)
             {
                 return;
             }
 
             _Prepare(editor);
-            var list = (Dictionary<string, object>)data[_name];
+            var list = data.ContainsKey(_name) ?
+                (Dictionary<string, object>)data[_name] :
+                new Dictionary<string, object>();
+            
+            // Grouped validation
+            for (var i=0 ; i<_validators.Count() ; i++)
+            {
+                var res = _validators[i](editor, action, list);
 
+                if (res != "" && res != null)
+                {
+                    response.fieldErrors.Add(new DtResponse.FieldError
+                    {
+                        name = _validatorFields[i],
+                        status = res
+                    });
+                }
+            }
+
+            // Field validation
             foreach (var dataSet in list.Select(item => item.Value as Dictionary<string, object>))
             {
                 foreach (var field in _fields)

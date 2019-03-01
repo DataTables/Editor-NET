@@ -109,7 +109,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "1.8.1";
+        public const string Version = "1.8.2-dev";
 
         /// <summary>
         /// Create a new Editor instance
@@ -278,7 +278,7 @@ namespace DataTables
         private bool _tryCatch = true;
         private bool _debug = false;
         private List<object> _DebugInfo = new List<object>();
-        private Func<Editor, DtRequest.RequestTypes, DtRequest, string> _validator;
+        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validator = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
         private bool _leftJoinRemove = false;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -996,7 +996,7 @@ namespace DataTables
                 // MJoin validation
                 foreach (var mjoin in _mJoin)
                 {
-                    mjoin.Validate(response, this, values);
+                    mjoin.Validate(response, this, values, request.RequestType);
                 }
             }
 
@@ -1006,8 +1006,8 @@ namespace DataTables
         /// <summary>
         /// Get the global validator
         /// </summary>
-        /// <returns>Validation function set - nullable</returns>
-        public Func<Editor, DtRequest.RequestTypes, DtRequest, string> Validator()
+        /// <returns>Validation functions set</returns>
+        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator()
         {
             return _validator;
         }
@@ -1019,7 +1019,7 @@ namespace DataTables
         /// <returns></returns>
         public Editor Validator(Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
         {
-            _validator = validator;
+            _validator.Add(validator);
             return this;
         }
 
@@ -1147,13 +1147,14 @@ namespace DataTables
             _PrepModel();
 
             // Global validation
-            if (_validator != null)
+            foreach (var validator in _validator)
             {
-                var ret = _validator(this, data.RequestType, data);
+                var ret = validator(this, data.RequestType, data);
 
                 if (ret != "")
                 {
                     _out.error = ret;
+                    break;
                 }
             }
 
