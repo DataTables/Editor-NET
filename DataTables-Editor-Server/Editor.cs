@@ -109,7 +109,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "1.8.2-dev";
+        public const string Version = "1.9.0";
 
         /// <summary>
         /// Create a new Editor instance
