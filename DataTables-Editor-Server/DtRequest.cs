@@ -236,17 +236,19 @@ namespace DataTables
                 return dataIn;
             }
 
-            try
-            {
-                return Convert.ToInt32(dataIn);
-            }
-            catch (Exception) { }
+			int test;
+			var res = Int32.TryParse(dataIn, out test);
+			if (res)
+			{
+				return test;
+			}
 
-            try
-            {
-                return Convert.ToDecimal(dataIn);
-            }
-            catch (Exception) { }
+			decimal testDec;
+			res = Decimal.TryParse(dataIn, out testDec);
+			if (res)
+			{
+				return testDec;
+			}
 
             return dataIn;
         }
