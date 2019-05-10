@@ -435,7 +435,7 @@ namespace DataTables
                 var result = query.Exec();
 
                 // Map the data to the primary key for fast look up
-                var join = new Dictionary<string, List<object>>();
+                var join = new Dictionary<string, List<Dictionary<string, object>>>();
                 Dictionary<string, object> row;
 
                 while ((row = result.Fetch()) != null)
@@ -450,7 +450,7 @@ namespace DataTables
                     var lookup = row["dteditor_pkey"].ToString();
                     if (!join.ContainsKey(lookup))
                     {
-                        join.Add(lookup, new List<object>());
+                        join.Add(lookup, new List<Dictionary<string, object>>());
                     }
 
                     join[lookup].Add(inner);
@@ -465,7 +465,7 @@ namespace DataTables
 
                     data.Add(_name, join.ContainsKey(linkField)
                         ? join[linkField]
-                        : new List<object>()
+                        : new List<Dictionary<string, object>>()
                     );
                 }
             }
