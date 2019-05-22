@@ -1143,11 +1143,20 @@ namespace DataTables
             }
             else if (bind)
             {
-                _where.Add(new Where()
-                    .Operator(type)
-                    .Field(_ProtectIdentifiers(key))
-                    .Query(_ProtectIdentifiers(key) + " " + op + " " + _bindChar + "where_" + whereCount)
-                );
+                if (this._db.DbType() == "postgres" && op == "like") {
+                    _where.Add(new Where()
+                        .Operator(type)
+                        .Field(_ProtectIdentifiers(key))
+                        .Query(_ProtectIdentifiers(key) + "::text ilike " + _bindChar + "where_" + whereCount)
+                    );
+                }
+                else {
+                    _where.Add(new Where()
+                        .Operator(type)
+                        .Field(_ProtectIdentifiers(key))
+                        .Query(_ProtectIdentifiers(key) + " " + op + " " + _bindChar + "where_" + whereCount)
+                    );
+                }
                 Bind(_bindChar + "where_" + whereCount, value);
             }
             else
