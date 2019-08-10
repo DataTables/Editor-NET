@@ -44,6 +44,8 @@ namespace DataTables.DatabaseUtil.Oracle
 
         internal override string _fieldQuote => "\"";
 
+        internal override string[] _identifierLimiter => new[] { "\"", "\"" };
+
         /// <summary>
         /// Bind parameters to the SQL statement
         /// </summary>
@@ -62,7 +64,7 @@ namespace DataTables.DatabaseUtil.Oracle
             if (_type == "insert" && _pkey != null)
             {
                 // Add a returning parameter statement into an output parameter
-                sql += " RETURNING " + _pkey[0] + " INTO :dtvalue";
+                sql += " RETURNING "\" + _pkey[0] + "\" INTO :dtvalue";
             }
 
             cmd.CommandText = sql;
@@ -181,30 +183,6 @@ namespace DataTables.DatabaseUtil.Oracle
             }
             
             return new Result(_db, dt, this);
-        }
-
-        /// <summary>
-        /// Oracle table statement
-        /// </summary>
-        /// <returns>SQL for the table</returns>
-        protected override string _BuildTable()
-        {
-            var tablesOut = new List<string>();
-
-            foreach (var t in _table)
-            {
-                if (t.Contains(" as "))
-                {
-                    var a = t.Split(new[] { " as " }, StringSplitOptions.None);
-                    tablesOut.Add(a[0] + " " + a[1]);
-                }
-                else
-                {
-                    tablesOut.Add(t);
-                }
-            }
-
-            return " " + string.Join(", ", tablesOut.ToArray()) + " ";
         }
 
         /// <summary>
