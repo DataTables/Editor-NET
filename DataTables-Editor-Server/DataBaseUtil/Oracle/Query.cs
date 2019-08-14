@@ -184,6 +184,30 @@ namespace DataTables.DatabaseUtil.Oracle
             
             return new Result(_db, dt, this);
         }
+        
+        /// <summary>	
+        /// Oracle table statement	
+        /// </summary>	
+        /// <returns>SQL for the table</returns>	
+        protected override string _BuildTable()	
+        {	
+            var tablesOut = new List<string>();	
+
+             foreach (var t in _table)	
+            {	
+                if (t.Contains(" as "))	
+                {	
+                    var a = t.Split(new[] { " as " }, StringSplitOptions.None);	
+                    tablesOut.Add(a[0] + " " + a[1]);	
+                }	
+                else	
+                {	
+                    tablesOut.Add(t);	
+                }	
+            }	
+
+             return " " + string.Join(", ", tablesOut.ToArray()) + " ";	
+        }
 
         /// <summary>
         /// Create LIMIT / OFFSET for SQL Server 2012+. Note that this will only work
