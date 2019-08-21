@@ -1853,10 +1853,18 @@ namespace DataTables
                 pkey = _pkey;
             }
 
+            var tableMatch = table;
+
+            if (table.Contains(" as "))
+            {
+                var split = table.Split(new[] { " as " }, StringSplitOptions.None);
+                tableMatch = split[1];
+            }
+
             // Check that there is a field which has a set option for this table
             var count = _field.Count(
                 field => !field.DbField().Contains(".") || (
-                    _Part(field.DbField()) == table &&
+                    _Part(field.DbField()) == tableMatch &&
                     field.Set() != DataTables.Field.SetType.None
                 )
             );
