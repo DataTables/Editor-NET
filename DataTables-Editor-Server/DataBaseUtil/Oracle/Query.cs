@@ -64,7 +64,7 @@ namespace DataTables.DatabaseUtil.Oracle
             if (_type == "insert" && _pkey != null)
             {
                 // Add a returning parameter statement into an output parameter
-                sql += " RETURNING \"" + _pkey[0] + "\" INTO :dtvalue";
+                sql += " RETURNING " + _ProtectIdentifiers(_pkey[0]) + " INTO :dtvalue";
             }
 
             cmd.CommandText = sql;
