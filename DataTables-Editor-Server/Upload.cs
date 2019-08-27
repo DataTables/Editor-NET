@@ -483,7 +483,7 @@ namespace DataTables
                 // Custom function
                 return _actionFn != null ?
                     _actionFn(upload, id) :
-                    null;
+                    id;
             }
 
             // Default action - move the file to the location specified by the
