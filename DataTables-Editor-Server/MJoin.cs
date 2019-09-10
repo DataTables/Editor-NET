@@ -710,7 +710,7 @@ namespace DataTables
                         i == 2 ? _links[3] :
                                  _links[2];
 
-                    if (partner.Contains(_table + "."))
+                    if (partner.Contains(_table + ".") && partner.IndexOf(_table + ".") == 0)
                     {
                         _linkChildField = _links[i];
                     }
