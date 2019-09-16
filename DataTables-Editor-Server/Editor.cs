@@ -1249,9 +1249,9 @@ namespace DataTables
                                 _out.data.Add(d);
                             }
                         }
-                    }
 
-                    _FileClean();
+                    	_FileClean();
+                    }
                 }
             }
 
