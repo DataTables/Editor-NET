@@ -1178,7 +1178,8 @@ namespace DataTables
                     _Remove(data);
                     _FileClean();
                 }
-                else
+                else if (data.RequestType == DtRequest.RequestTypes.EditorCreate ||
+                         data.RequestType == DtRequest.RequestTypes.EditorEdit)
                 {
                     // Create or edit
                     // Trigger pre events before validation, so validation could be added
