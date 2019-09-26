@@ -4,6 +4,7 @@
 // Field class which defines how individual fields for Editor
 // </summary>
 using System;
+using System.Data;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using DataTables.EditorUtil;
@@ -146,6 +147,7 @@ namespace DataTables
         private dynamic _getValue;
         private string _name;
         private Type _type = typeof(string);
+        private DbType? _dbType = null;
         private string _typeError = ""; // No longer used - deprecated
         private SetType _set = SetType.Both;
         private Func<object, Dictionary<string, object>, object> _setFormatter;
@@ -201,6 +203,17 @@ namespace DataTables
                 _dbField = field;
             }
 
+            return this;
+        }
+
+        public DbType? DbType()
+        {
+            return _dbType;
+        }
+
+        public Field DbType(DbType? type)
+        {
+            _dbType = type;
             return this;
         }
 

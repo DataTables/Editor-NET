@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data;
 using System.Text.RegularExpressions;
 using DataTables.DatabaseUtil;
 using DataTables.EditorUtil;
@@ -393,6 +394,34 @@ namespace DataTables
                 if (bind)
                 {
                     Bind(_bindChar + field, val);
+                }
+                else
+                {
+                    _noBind.Add(field, val);
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set a single field to a given value
+        /// </summary>
+        /// <param name="field">Field name to set</param>
+        /// <param name="val">Value to set</param>
+        /// <param name="bind">Bind (i.e. escape) the value, or not. Set to false
+        /// if you want to use a field reference or function as the value</param>
+        /// <param name="type">Db type</param>
+        /// <returns>Query instance for chaining</returns>
+        public Query Set(string field, dynamic val, Boolean bind, DbType? type)
+        {
+            if (field != null)
+            {
+                _field.Add(field);
+
+                if (bind)
+                {
+                    Bind(_bindChar + field, val, type);
                 }
                 else
                 {

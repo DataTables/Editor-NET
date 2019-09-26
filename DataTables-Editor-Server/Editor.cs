@@ -4,6 +4,7 @@
 // Editor class for reading tables as well as creating, editing and deleting rows
 // </summary>
 using System;
+using System.Data;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -2182,6 +2183,23 @@ namespace DataTables
             var set = new Dictionary<string, object>();
             var action = where == null ? "create" : "edit";
             var tableAlias = _Alias(table);
+            var runIt = false;
+
+            string[] pkey = null;
+            if (_table.Contains(table))
+            {
+                pkey = _pkey;
+            } 
+
+            var query = _db
+                .Query(action == "create" ? "insert" : "update")
+                .Table(table)
+                .Pkey(pkey);
+            
+            if (where != null)
+            {
+                query.Where(where);
+            }
 
             foreach (var field in _field)
             {
@@ -2209,25 +2227,23 @@ namespace DataTables
                 // Some db's (specifically postgres) don't like having the table
                 // name prefixing the column name.
                 var fieldPart = _Part(field.DbField(), "field");
-                set.Add(fieldPart, field.Val("set", values));
+
+                query.Set(fieldPart, field.Val("set", values), true, field.DbType());
+                // set.Add(fieldPart, field.Val("set", values));
+
+                runIt = true;
             }
 
             // If nothing to do, then do nothing!
-            if (!set.Any())
-            {
+            if (runIt == false) {
                 return null;
             }
 
-            string[] pkey = null;
-            if (_table.Contains(table))
-            {
-                pkey = _pkey;
-            } 
-
             // Insert or update
-            return action == "create" ?
-                _db.Insert(table, set, pkey) :
-                _db.Push(table, set, @where, pkey);
+            return query.Exec();
+            // return action == "create" ?
+            //     _db.Insert(table, set, pkey) :
+            //     _db.Push(table, set, @where, pkey);
         }
 
 
