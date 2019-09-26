@@ -2189,13 +2189,13 @@ namespace DataTables
             if (_table.Contains(table))
             {
                 pkey = _pkey;
-            } 
+            }
 
             var query = _db
                 .Query(action == "create" ? "insert" : "update")
                 .Table(table)
                 .Pkey(pkey);
-            
+
             if (where != null)
             {
                 query.Where(where);
@@ -2217,7 +2217,7 @@ namespace DataTables
                     continue;
                 }
 
-                // /Check if this field should be set, based on the options and
+                // Check if this field should be set, based on the options and
                 // submitted data
                 if (!field.Apply(action, values))
                 {
@@ -2229,7 +2229,6 @@ namespace DataTables
                 var fieldPart = _Part(field.DbField(), "field");
 
                 query.Set(fieldPart, field.Val("set", values), true, field.DbType());
-                // set.Add(fieldPart, field.Val("set", values));
 
                 runIt = true;
             }
@@ -2241,9 +2240,6 @@ namespace DataTables
 
             // Insert or update
             return query.Exec();
-            // return action == "create" ?
-            //     _db.Insert(table, set, pkey) :
-            //     _db.Push(table, set, @where, pkey);
         }
 
 
