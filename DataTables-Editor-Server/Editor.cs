@@ -2287,7 +2287,7 @@ namespace DataTables
 
             if (name.Contains("."))
             {
-                var a = name.Split('.');
+                var a = name.Split(new [] {'.'});
 
                 if (a.Count() == 3)
                 {

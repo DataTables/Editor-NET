@@ -253,7 +253,7 @@ namespace DataTables
             {
                 // If ordering is used and the field specified isn't in the list to select,
                 // then the select distinct would throw an error. So we need to add it in.
-                foreach (var field in _order.Split(','))
+                foreach (var field in _order.Split(new [] {','}))
                 {
                     var col = field.ToLower().Replace(" asc", "").Replace(" desc", "");
 

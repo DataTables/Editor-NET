@@ -527,7 +527,7 @@ namespace DataTables
 
             string table;
             string field;
-            var a = fieldName.Split('.');
+            var a = fieldName.Split(new [] {'.'});
 
             switch (a.Count())
             {

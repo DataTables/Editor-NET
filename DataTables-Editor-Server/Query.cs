@@ -309,7 +309,7 @@ namespace DataTables
                 return this;
             }
 
-            string[] ordering = order.Split(',');
+            string[] ordering = order.Split(new [] {','});
 
             for (int i = 0; i < ordering.Length; i++)
             {
@@ -464,7 +464,7 @@ namespace DataTables
                 return null;
             }
 
-            string[] tables = table.Split(',');
+            string[] tables = table.Split(new [] {','});
 
             for (int i = 0; i < tables.Length; i++)
             {
@@ -1080,7 +1080,7 @@ namespace DataTables
                 alias = "";
             }
 
-            var a = identifier.Split('.');
+            var a = identifier.Split(new [] {'.'});
             return left + string.Join(right + '.' + left, a) + right + alias;
         }
 

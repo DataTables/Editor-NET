@@ -21,7 +21,7 @@ namespace DataTables.EditorUtil
                 return data.ContainsKey(name);
             }
 
-            var names = name.Split('.');
+            var names = name.Split(new [] {'.'});
             var inner = data;
 
             for (int i = 0, ien = names.Length - 1; i < ien; i++)
@@ -56,7 +56,7 @@ namespace DataTables.EditorUtil
                     null;
             }
 
-            var names = name.Split('.');
+            var names = name.Split(new [] {'.'});
             var inner = inData;
 
             for (var i = 0; i < names.Length - 1; i++)
@@ -94,7 +94,7 @@ namespace DataTables.EditorUtil
                 return;
             }
 
-            var names = name.Split('.');
+            var names = name.Split(new [] {'.'});
             var inner = outData;
 
             for (var i = 0; i < names.Length - 1; i++)

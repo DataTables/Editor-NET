@@ -386,7 +386,7 @@ namespace DataTables
                 }
                 
                 var readField = "";
-                var joinFieldName = _hostField.Split('.')[1];
+                var joinFieldName = _hostField.Split(new [] {'.'})[1];
                 if (NestedData.InData(_hostField, response.data[0]))
                 {
                     readField = _hostField;
@@ -506,12 +506,12 @@ namespace DataTables
                     // remove the table name from the field as some dbs (postgres)
                     // don't like it. Might be nicer to have the Database classes
                     // do this - todo
-                    var a = _childField.Split('.');
+                    var a = _childField.Split(new [] {'.'});
                     _editor.Db()
                         .Query("Insert")
                         .Table(_linkTable)
-                        .Set(_linkHostField.Split('.').Last(), parentId)
-                        .Set(_linkChildField.Split('.').Last(), dataSet[a[1]])
+                        .Set(_linkHostField.Split(new [] {'.'}).Last(), parentId)
+                        .Set(_linkChildField.Split(new [] {'.'}).Last(), dataSet[a[1]])
                         .Exec();
                 }
                 else
@@ -519,13 +519,13 @@ namespace DataTables
                     var query = _editor.Db()
                         .Query("Insert")
                         .Table(_table)
-                        .Set(_childField.Split('.').Last(), parentId);
+                        .Set(_childField.Split(new [] {'.'}).Last(), parentId);
 
                     foreach (var field in _fields)
                     {
                         if (field.Apply("set", dataSet))
                         {
-                            query.Set(field.DbField().Split('.').Last(), field.Val("set", dataSet));
+                            query.Set(field.DbField().Split(new [] {'.'}).Last(), field.Val("set", dataSet));
                         }
                     }
 
@@ -687,7 +687,7 @@ namespace DataTables
             // Resolve what field names belong to what varible for processing
             for (int i = 0, ien = _links.Count(); i < ien; i++)
             {
-                var a = _links[i].Split('.');
+                var a = _links[i].Split(new [] {'.'});
 
                 if (a[0] == _table)
                 {

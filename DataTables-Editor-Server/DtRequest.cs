@@ -49,7 +49,7 @@ namespace DataTables
 
                     if (pair.Key.Contains("["))
                     {
-                        var keys = pair.Key.Split('[');
+                        var keys = pair.Key.Split(new[] {'['});
                         var innerDic = dataOut;
                         string key;
 
