@@ -103,7 +103,14 @@ namespace DataTables.DatabaseUtil.Postgres
 
                 // And DateTime
                 try {
-                    param.Value = DateTime.Parse(binding.Value);
+                    var str = binding.Value.ToString();
+
+                    if (str.IndexOf(',') >= 0) {
+                        // noop
+                    }
+                    else {
+                        param.Value = DateTime.Parse(binding.Value);
+                    }
                 }
                 catch {}
 
