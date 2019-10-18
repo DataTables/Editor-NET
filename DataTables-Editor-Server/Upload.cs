@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-#if NETCOREAPP2_1
+#if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using IFormFile = Microsoft.AspNetCore.Http.IFormFile;
@@ -492,7 +492,7 @@ namespace DataTables
 
             try
             {
-#if NETCOREAPP2_1
+#if NETCOREAPP
                 using (var readStream = upload.OpenReadStream())
                 {
                     using (var writeStream = new StreamWriter(to))
@@ -608,7 +608,7 @@ namespace DataTables
             {
                 var column = pair.Key;
                 var prop = pair.Value;
-#if NETCOREAPP2_1
+#if NETCOREAPP
                 var contentLength = (int)upload.Length;
 #else
                 var contentLength = upload.ContentLength;
@@ -629,7 +629,7 @@ namespace DataTables
 
                         case DbType.ContentBinary:
                             byte[] fileData = null;
-#if NETCOREAPP2_1
+#if NETCOREAPP
                             var stream = upload.OpenReadStream();
 #else
                             var stream = upload.InputStream;
@@ -704,7 +704,7 @@ namespace DataTables
                 // For this to operate the action must be a string, which is
                 // validated in the `exec` method
                 var path = _path(_actionStr, upload.FileName, id);
-#if NETCOREAPP2_1
+#if NETCOREAPP
                 var physicalPath = Directory.GetCurrentDirectory() ?? "";
                 var webPath = physicalPath.Length != 0 ?
                     path.Replace(physicalPath, "") :

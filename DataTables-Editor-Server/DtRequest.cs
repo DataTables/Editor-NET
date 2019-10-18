@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if NETCOREAPP2_1
+#if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 #endif
@@ -195,7 +195,7 @@ namespace DataTables
          * Constructor
          */
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
         public DtRequest(IEnumerable<KeyValuePair<String, StringValues>> rawHttp)
         {
             var raw = rawHttp.ToDictionary(x => x.Key, x => x.Value.ToString());

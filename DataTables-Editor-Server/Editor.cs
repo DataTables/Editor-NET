@@ -10,7 +10,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Reflection;
-#if NETCOREAPP2_1
+#if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 #else
@@ -94,7 +94,7 @@ namespace DataTables
             return request.RequestType;
         }
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
         /// <summary>
         /// Get the form action. For use with WebAPI's 'FormDataCollection' collection
         /// </summary>
@@ -270,7 +270,7 @@ namespace DataTables
         private DtResponse _out;
         private readonly List<MJoin> _mJoin = new List<MJoin>();
         private HttpRequest _request;
-#if NETCOREAPP2_1
+#if NETCOREAPP
         private IFormFileCollection _requestFiles;
 #else
         private HttpFileCollection _requestFiles;
@@ -881,7 +881,7 @@ namespace DataTables
             return Process(new DtRequest(data));
         }
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
         /// <summary>
         /// Get the form action. For use with WebAPI's 'FormDataCollection' collection
         /// </summary>
@@ -924,7 +924,7 @@ namespace DataTables
         {
             _request = request;
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
             if ( request.HasFormContentType ) {
                 _requestFiles = request.Form.Files;
                 return Process(request.Form);
@@ -1099,7 +1099,7 @@ namespace DataTables
          * Internal methods
          */
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
         /// <summary>
         /// Get the request object used for this instance
         /// </summary>

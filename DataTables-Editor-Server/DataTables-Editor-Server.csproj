@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net45;net46;net47</TargetFrameworks>
-    <Version >1.9.1</Version>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.0;net45;net46;net47;net48</TargetFrameworks>
+    <Version>1.9.1</Version>
     <Authors>SpryMedia Ltd</Authors>
     <Product>DataTables Editor - server-side libraries for .NET</Product>
     <Copyright>SpryMedia Ltd</Copyright>
@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/DataTables/Editor-NET</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>DataTables, Javascript, jQuery, Editor, CRUD</PackageTags>
-    <AssemblyVersion >1.9.1.0</AssemblyVersion>
+    <AssemblyVersion>1.9.1.0</AssemblyVersion>
     <PackageLicenseUrl>https://editor.datatables.net/license</PackageLicenseUrl>
     <Description>Editor is a Create, Read, Update and Delete (CRUD) plug-in for DataTables that provides the ability to easily add, edit and delete rows on a database that is displayed by a DataTable.
 
@@ -19,6 +19,7 @@ The software available in this package, acts as server-side libraries for Editor
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -29,6 +30,7 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -39,6 +41,18 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
+    <PackageReference Include="Microsoft.CSharp">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encodings.Web">
+      <Version>4.5.0</Version>
+    </PackageReference>
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -54,6 +68,24 @@ The software available in this package, acts as server-side libraries for Editor
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.5.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+	    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions">
+      <Version>2.1.0</Version>
+    </PackageReference>
+
+    <PackageReference Include="Microsoft.CSharp">
+      <Version>4.6.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 </Project>

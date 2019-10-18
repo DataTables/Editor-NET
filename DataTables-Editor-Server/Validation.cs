@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DataTables.EditorUtil;
-#if NETCOREAPP2_1
+#if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using IFormFile = Microsoft.AspNetCore.Http.IFormFile;
@@ -700,7 +700,7 @@ namespace DataTables
         /// <returns>File validation delegate</returns>
         public static Func<IFormFile, string> FileSize(int size, string msg="Uploaded file is too large.")
         {
-#if NETCOREAPP2_1
+#if NETCOREAPP
             return file => file.Length > size
                 ? msg
                 : null;
