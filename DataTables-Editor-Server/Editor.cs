@@ -875,10 +875,11 @@ namespace DataTables
         /// For use with WebAPI's 'FormDataCollection' collection
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
+        /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(IEnumerable<KeyValuePair<string, string>> data = null)
+        public Editor Process(IEnumerable<KeyValuePair<string, string>> data = null, string culture=null)
         {
-            return Process(new DtRequest(data));
+            return Process(new DtRequest(data, culture));
         }
 
 #if NETCOREAPP
@@ -886,10 +887,11 @@ namespace DataTables
         /// Get the form action. For use with WebAPI's 'FormDataCollection' collection
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
+        /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Request type</returns>
-        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null)
+        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null, string culture=null)
         {
-            return Process(new DtRequest(data));
+            return Process(new DtRequest(data, culture));
         }
 #endif
 
@@ -898,8 +900,9 @@ namespace DataTables
         /// For use with MVC's 'Request.Form' collection
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
+        /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(NameValueCollection data = null)
+        public Editor Process(NameValueCollection data = null, string culture=null)
         {
             var list = new List<KeyValuePair<string, string>>();
 
@@ -911,7 +914,7 @@ namespace DataTables
                 }
             }
 
-            return Process(new DtRequest(list));
+            return Process(new DtRequest(list, culture));
         }
 
         /// <summary>
@@ -919,8 +922,9 @@ namespace DataTables
         /// For use with an HttpRequest object
         /// </summary>
         /// <param name="request">Data sent from the client-side</param>
+        /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(HttpRequest request)
+        public Editor Process(HttpRequest request, string culture=null)
         {
             _request = request;
 
@@ -932,7 +936,7 @@ namespace DataTables
             else
             {
                 var list = new List<KeyValuePair<string, string>>();
-                return Process(new DtRequest(list));
+                return Process(new DtRequest(list, culture));
             }
 #else
             _requestFiles = request.Files;
@@ -946,12 +950,13 @@ namespace DataTables
         /// For use with an HttpRequest object
         /// </summary>
         /// <param name="request">Data sent from the client-side</param>
+        /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(UnvalidatedRequestValues request)
+        public Editor Process(UnvalidatedRequestValues request, string culture=null)
         {
             _requestFiles = request.Files;
 
-            return Process(request.Form);
+            return Process(request.Form, culture);
         }
 #endif
 

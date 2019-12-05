@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -36,16 +37,22 @@ namespace DataTables
         /// Note that currently this does not support nested arrays or objects in arrays
         /// </summary>
         /// <param name="dataIn">Collection of HTTP parameters sent by the client-side</param>
+        /// <param name="cultureStr">Culture for locale specific conversions</param>
         /// <returns>Dictionary with the data and values contained. These may contain nested lists and dictionaries.</returns>
-        public static Dictionary<string, object> HttpData(IEnumerable<KeyValuePair<string, string>> dataIn)
+        public static Dictionary<string, object> HttpData(IEnumerable<KeyValuePair<string, string>> dataIn, string cultureStr = null)
         {
             var dataOut = new Dictionary<string, object>();
+            CultureInfo culture = null;
+            
+            if (cultureStr != null) {
+                culture = CultureInfo.CreateSpecificCulture(cultureStr);
+            }
 
             if (dataIn != null)
             {
                 foreach (var pair in dataIn)
                 {
-                    var value = _HttpConv(pair.Value);
+                    var value = _HttpConv(pair.Value, culture);
 
                     if (pair.Key.Contains("["))
                     {
@@ -196,10 +203,10 @@ namespace DataTables
          */
 
 #if NETCOREAPP
-        public DtRequest(IEnumerable<KeyValuePair<String, StringValues>> rawHttp)
+        public DtRequest(IEnumerable<KeyValuePair<String, StringValues>> rawHttp, string culture=null)
         {
             var raw = rawHttp.ToDictionary(x => x.Key, x => x.Value.ToString());
-            _Build(raw);
+            _Build(raw, culture);
         }
 #endif
 
@@ -208,9 +215,9 @@ namespace DataTables
         /// DtRequest object
         /// </summary>
         /// <param name="rawHttp">Data from the client-side</param>
-        public DtRequest(IEnumerable<KeyValuePair<string, string>> rawHttp)
+        public DtRequest(IEnumerable<KeyValuePair<string, string>> rawHttp, string culture=null)
         {
-            _Build(rawHttp);
+            _Build(rawHttp, culture);
         }
 
 
@@ -218,7 +225,7 @@ namespace DataTables
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private functions
          */
-        private static object _HttpConv(string dataIn)
+        private static object _HttpConv(string dataIn, CultureInfo culture)
         {
             // Boolean
             if (dataIn == "true")
@@ -238,14 +245,16 @@ namespace DataTables
 
 			int test;
 			var res = Int32.TryParse(dataIn, out test);
-			if (res)
+            if (res)
 			{
 				return test;
 			}
 
 			decimal testDec;
-			res = Decimal.TryParse(dataIn, out testDec);
-			if (res)
+			var resDec = culture != null
+                ? Decimal.TryParse(dataIn, NumberStyles.AllowDecimalPoint, culture, out testDec)
+                : Decimal.TryParse(dataIn, out testDec);
+			if (resDec)
 			{
 				return testDec;
 			}
@@ -253,9 +262,9 @@ namespace DataTables
             return dataIn;
         }
         
-        private void _Build(IEnumerable<KeyValuePair<string, string>> rawHttp)
+        private void _Build(IEnumerable<KeyValuePair<string, string>> rawHttp, string culture)
         {
-            var http = HttpData(rawHttp);
+            var http = HttpData(rawHttp, culture);
 
             if (http.ContainsKey("action"))
             {
