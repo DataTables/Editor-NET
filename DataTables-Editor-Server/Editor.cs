@@ -270,6 +270,8 @@ namespace DataTables
         private DtResponse _out;
         private readonly List<MJoin> _mJoin = new List<MJoin>();
         private HttpRequest _request;
+
+        private bool _write = true;
 #if NETCOREAPP
         private IFormFileCollection _requestFiles;
 #else
@@ -1099,6 +1101,23 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Get the value of this._write
+        /// </summary>
+        /// <returns>bool the value of this._write</returns>
+        public bool Write(){
+            return this._write;
+        }
+
+        /// <summary>
+        /// Set the value of write
+        /// </summary>
+        /// <param name="writeVal">The value that this._write is to be set to</param>
+        /// <returns>Self for chaining</returns>
+        public Editor Write(bool writeVal) {
+            this._write = writeVal;
+            return this;
+        }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -1172,19 +1191,19 @@ namespace DataTables
                     // DataTable get request
                     _out.Merge(_Get(null, data));
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorUpload)
+                else if (data.RequestType == DtRequest.RequestTypes.EditorUpload && this._write)
                 {
                     // File upload
                     _Upload(data);
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorRemove)
+                else if (data.RequestType == DtRequest.RequestTypes.EditorRemove && this._write)
                 {
                     // Remove rows
                     _Remove(data);
                     _FileClean();
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorCreate ||
-                         data.RequestType == DtRequest.RequestTypes.EditorEdit)
+                else if ((data.RequestType == DtRequest.RequestTypes.EditorCreate ||
+                         data.RequestType == DtRequest.RequestTypes.EditorEdit) && this._write)
                 {
                     // Create or edit
                     // Trigger pre events before validation, so validation could be added
