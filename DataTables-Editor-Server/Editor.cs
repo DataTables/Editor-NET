@@ -1353,18 +1353,21 @@ namespace DataTables
             // Add all fields that we need to get from the database
             foreach (var field in _field)
             {
-                // Don't reselect a pkey column if it was already added
-                if (_pkey.Contains(field.DbField()))
-                {
-                    continue;
-                }
-
-                if (field.Apply("get") && field.GetValue() == null)
-                {
-                    query.Get(field.DbField());
+                for(int j = 0;  j < http.Columns.Count(); j++){
+                    if(field.Name() == http.Columns[j].Data){
+                        // Don't reselect a pkey column if it was already added
+                        if (_pkey.Contains(field.DbField()))
+                        {
+                            continue;
+                        }
+                        
+                        if (field.Apply("get") && field.GetValue() == null)
+                        {
+                            query.Get(field.DbField());
+                        }
+                    }
                 }
             }
-
             _GetWhere(query);
             _PerformLeftJoin(query);
             var ssp = _SspQuery(query, http);
@@ -1395,6 +1398,15 @@ namespace DataTables
             // Field options
             if (id == null)
             {
+                // Create an array of fields to pass to SearchPaneOptions
+                Field[] fields = new Field[http.Columns.Count()];
+                for(int i = 0; i < this._field.Count(); i++){
+                    for(int j = 0;  j < http.Columns.Count(); j++){
+                        if(this._field[i].Name() == http.Columns[j].Data){
+                            fields[i] = this._field[i];
+                        }
+                    }
+                }
                 foreach (var field in _field)
                 {
                     var opts = field.OptionsExec(_db);
@@ -1402,6 +1414,13 @@ namespace DataTables
                     if (opts != null)
                     {
                         dtData.options.Add(field.Name(), opts);
+                    }
+
+                    var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, http);
+
+                    if(spOpts != null)
+                    {
+                        dtData.searchPanes.options.Add(field.Name(), spOpts);
                     }
                 }
             }
@@ -2073,6 +2092,20 @@ namespace DataTables
                         }
                     }
                 });
+            }
+
+            if(http.searchPanes != null){
+                // Add the Where statements due to SearchPanes Selections
+                foreach(var field in this._field){
+                    if(http.searchPanes.ContainsKey(field.Name())){
+                        query.Where(qu =>
+                    {
+                        foreach(var opt in http.searchPanes[field.Name()]){
+                            qu.OrWhere(field.Name(), "%" + opt + "%", "like");
+                        }
+                    });
+                    }
+                }
             }
 
             // Column filters

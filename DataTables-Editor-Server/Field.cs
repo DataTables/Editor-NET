@@ -156,6 +156,8 @@ namespace DataTables
             new List<Func<object, Dictionary<string, object>, ValidationHost, string>>();
         private Func<List<Dictionary<string, object>>> _optsFn;
         private Options _opts;
+        private SearchPaneOptions _spOpts;
+        private Func<List<Dictionary<string, object>>> _spOptsFn;
         private Upload _upload;
         private Func<string, string> _xss;
         private bool _xssFormat = true;
@@ -435,6 +437,115 @@ namespace DataTables
             _opts = opts;
 
             return this;
+        }
+
+        /// <summary>
+        /// Get the SearchPaneOptions object configured for this field
+        /// </summary>
+        /// <returns>SearchPaneOptions object</returns>
+        public SearchPaneOptions SearchPaneOptions() {
+            return _spOpts;
+        }
+
+        /// <summary>
+        /// Set a function that will retrieve a list of values that can be used
+        /// for the SearchPaneOptions list in SearchPanes for this field.
+        /// </summary>
+        /// <param name="fn">Delegate that will return a list of SearchPane options</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchPaneOptions(Func<List<Dictionary<string, object>>> fn){
+            _spOpts = null;
+            _spOptsFn = fn;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set the SearchPaneOptions for this field using a SearchPaneOptions instance
+        /// </summary>
+        /// <param name="opts">Configured SearchPaneOptions object</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchPaneOptions(SearchPaneOptions spOpts){
+            _spOpts = spOpts;
+            _spOptsFn = null;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Provide database information for where to get a list of values that
+        /// can be used for the options list in SearchPanes.
+        ///
+        /// Note that this is for simple cases only. For more complex operations
+        /// use the delegate overload.
+        /// </summary>
+        /// <param name="table">Table name to read the options from</param>
+        /// <param name="value">Column name to read the option values from</param>
+        /// <param name="label">Column name to read the label values from</param>
+        /// <param name="condition">Function that will using the Query class passed in to apply a condtion</param>
+        /// <param name="format">Formatting function (called for every option)</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchPaneOptions(string table, string value, string label, Action<Query> condition = null, Func<Dictionary<string, object>, string> format = null) {
+            if(table == null){
+                return this;
+            }
+
+            var spOpts = new SearchPaneOptions()
+                .Table(table)
+                .Value(value)
+                .Label(label);
+
+            if(condition != null){
+                spOpts.Where(condition);
+            }
+
+            if(format != null){
+                spOpts.Render(format);
+            }
+
+            _spOptsFn = null;
+            _spOpts = spOpts;
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Provide database information for where to get a list of values that
+        /// can be used for the options list in SearchPanes.
+        ///
+        /// Note that this is for simple cases only. For more complex operations
+        /// use the delegate overload.
+        /// </summary>
+        /// <param name="table">Table name to read the options from</param>
+        /// <param name="value">Column name to read the option values from</param>
+        /// <param name="label">Column name to read the label values from</param>
+        /// <param name="condition">Function that will using the Query class passed in to apply a condtion</param>
+        /// <param name="format">Formatting function (called for every option)</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchPaneOptions(string table, string value, IEnumerable<string> label, Action<Query> condition = null, Func<Dictionary<string, object>, string> format = null) {
+            if(table == null){
+                return this;
+            }
+
+            var spOpts = new SearchPaneOptions()
+                .Table(table)
+                .Value(value)
+                .Label(label);
+
+            if(condition != null){
+                spOpts.Where(condition);
+            }
+
+            if(format != null){
+                spOpts.Render(format);
+            }
+
+            _spOptsFn = null;
+            _spOpts = spOpts;
+
+            return this;
+
         }
 
         /// <summary>
@@ -722,6 +833,26 @@ namespace DataTables
                 return _opts.Exec(db);
             }
 
+            return null;
+        }
+
+        /// <summary>
+        /// Execute the spOpts to get the list of SearchPaneOptions to return to the client-
+        /// side
+        /// </summary>
+        /// <param name="field">Field instance</param>
+        /// <param name="editor">Editor instance</param>
+        /// <param name="leftJoin">List of LeftJoins instance</param>
+        /// <param name="fields">Field[] instance</param>
+        /// <param name="http">DtRequest instance</param>
+        /// <returns>List of SearchPaneOptions</returns>
+        internal List<Dictionary<string, object>> SearchPaneOptionsExec(Field field, Editor editor, List<LeftJoin> leftJoin, Field[] fields, DtRequest http) {
+            if (_spOptsFn != null){
+                return _spOptsFn();
+            }
+            if(_spOpts != null) {
+                return _spOpts.Exec(field, editor, leftJoin, http, fields);
+            }
             return null;
         }
 
