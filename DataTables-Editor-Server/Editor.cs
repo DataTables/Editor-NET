@@ -1372,20 +1372,36 @@ namespace DataTables
             // Add all fields that we need to get from the database
             foreach (var field in _field)
             {
-                for(int j = 0;  j < http.Columns.Count(); j++){
-                    if(field.Name() == http.Columns[j].Data){
-                        // Don't reselect a pkey column if it was already added
-                        if (_pkey.Contains(field.DbField()))
-                        {
-                            continue;
-                        }
-                        
-                        if (field.Apply("get") && field.GetValue() == null)
-                        {
-                            query.Get(field.DbField());
+                // If the Request is based on SSP then consider the columns
+                if(http != null && http.RequestType == DtRequest.RequestTypes.DataTablesSsp){
+                    
+                    for(int j = 0;  j < http.Columns.Count(); j++){ // This is an addition
+                        if(field.Name() == http.Columns[j].Data){ // This is an addition
+                            // Don't reselect a pkey column if it was already added
+                            if (_pkey.Contains(field.DbField()))
+                            {
+                                continue;
+                            }
+                            if (field.Apply("get") && field.GetValue() == null)
+                            {
+                                query.Get(field.DbField());
+                            }
                         }
                     }
                 }
+                else {
+                    // Don't reselect a pkey column if it was already added
+                    if (_pkey.Contains(field.DbField()))
+                    {
+                        continue;
+                    }
+                    
+                    if (field.Apply("get") && field.GetValue() == null)
+                    {
+                        query.Get(field.DbField());
+                    }
+                }
+                
             }
             _GetWhere(query);
             _PerformLeftJoin(query);
@@ -1419,10 +1435,12 @@ namespace DataTables
             {
                 // Create an array of fields to pass to SearchPaneOptions
                 Field[] fields = new Field[http.Columns.Count()];
+                int x = 0;
                 for(int i = 0; i < this._field.Count(); i++){
                     for(int j = 0;  j < http.Columns.Count(); j++){
                         if(this._field[i].Name() == http.Columns[j].Data){
-                            fields[i] = this._field[i];
+                            fields[x] = this._field[i];
+                            x++;
                         }
                     }
                 }

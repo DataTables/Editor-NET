@@ -327,31 +327,13 @@ namespace DataTables
             var q = db.Query("select")
                 .Distinct(true)
                 .Table(editor.Table())
-                .Get(this._label.ElementAt(0) + " as label")
+                .Get(_label + " as label")
                 .Get(this._value + " as value")
                 .Get("COUNT(*) as total")
                 .GroupBy(this._value)
                 .Where(this._where);
 
             _PerformLeftJoin(q);
-            var fieldsInt = new List<string>(this._label) { _value };
-
-            if (_order != null)
-            {
-                // If ordering is used and the field specified isn"t in the list to select,
-                // then the select distinct would throw an error. So we need to add it in.
-                foreach (var field in _order.Split(','))
-                {
-                    var col = field.ToLower().Replace(" asc", "").Replace(" desc", "");
-
-                    if (! fieldsInt.Contains(col))
-                    {
-                        q.Get(col);
-                    }
-                }
-               
-                q.Order(_order);
-            }
 
             if (_limit != -1)
             {
