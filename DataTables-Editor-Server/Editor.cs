@@ -1372,37 +1372,18 @@ namespace DataTables
             // Add all fields that we need to get from the database
             foreach (var field in _field)
             {
-                // If the Request is based on SSP then consider the columns
-                if(http != null && http.RequestType == DtRequest.RequestTypes.DataTablesSsp){
-                    
-                    for(int j = 0;  j < http.Columns.Count(); j++){ // This is an addition
-                        if(field.Name() == http.Columns[j].Data){ // This is an addition
-                            // Don't reselect a pkey column if it was already added
-                            if (_pkey.Contains(field.DbField()))
-                            {
-                                continue;
-                            }
-                            if (field.Apply("get") && field.GetValue() == null)
-                            {
-                                query.Get(field.DbField());
-                            }
-                        }
-                    }
-                }
-                else {
-                    // Don't reselect a pkey column if it was already added
-                    if (_pkey.Contains(field.DbField()))
-                    {
-                        continue;
-                    }
-                    
-                    if (field.Apply("get") && field.GetValue() == null)
-                    {
-                        query.Get(field.DbField());
-                    }
+                // Don't reselect a pkey column if it was already added
+                if (_pkey.Contains(field.DbField()))
+                {
+                    continue;
                 }
                 
+                if (field.Apply("get") && field.GetValue() == null)
+                {
+                    query.Get(field.DbField());
+                }
             }
+
             _GetWhere(query);
             _PerformLeftJoin(query);
             var ssp = _SspQuery(query, http);
