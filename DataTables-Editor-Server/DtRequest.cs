@@ -356,7 +356,7 @@ namespace DataTables
                             // Add an array of the selections for each column
                             for(int i = 0; i < keykeyList.Count(); i++)
                             {
-                                string toSplit = (string)httpSPKey[keykeyList[i]];
+                                string toSplit = httpSPKey[keykeyList[i]].ToString();
                                 string[] values = toSplit.Split(',');
 
                                 // Don't add multiple selections for one column
