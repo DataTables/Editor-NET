@@ -314,7 +314,7 @@ namespace DataTables
                     query.Where(qu =>
                     {
                         foreach(var opt in http.searchPanes[fields[i].Name()]){
-                            qu.OrWhere(fields[i].Name(), "%" + opt + "%", "like");
+                            qu.OrWhere(fields[i].Name(), opt, "=");
                         }
                     });
                 }

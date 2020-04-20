@@ -2119,7 +2119,7 @@ namespace DataTables
                         query.Where(qu =>
                     {
                         foreach(var opt in http.searchPanes[field.Name()]){
-                            qu.OrWhere(field.Name(), "%" + opt + "%", "like");
+                            qu.OrWhere(field.Name(), opt, "=");
                         }
                     });
                     }
