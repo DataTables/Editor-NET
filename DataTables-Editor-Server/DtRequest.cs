@@ -187,6 +187,11 @@ namespace DataTables
         public Dictionary<string, object> Data;
 
         /// <summary>
+        /// Information for searchPanes
+        /// </summary>
+        public Dictionary<string, string[]> searchPanes = new Dictionary<string, string[]>();
+
+        /// <summary>
         /// List of ids for Editor to operate on
         /// </summary>
         public List<string> Ids = new List<string>();
@@ -195,8 +200,6 @@ namespace DataTables
         /// Upload field name
         /// </summary>
         public string UploadField;
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructor
@@ -319,14 +322,13 @@ namespace DataTables
                         Dir = order["dir"].ToString()
                     });
                 }
-
                 foreach (var item in http["columns"] as Dictionary<string, object>)
                 {
                     var column = item.Value as Dictionary<string, object>;
                     var colSearch = column["search"] as Dictionary<string, object>;
-
                     Columns.Add(new ColumnT
                     {
+                        // TODO
                         Name = column["name"].ToString(),
                         Data = column["data"].ToString(),
                         Searchable = (Boolean)column["searchable"],
@@ -337,6 +339,34 @@ namespace DataTables
                             Regex = (Boolean)colSearch["regex"],
                         }
                     });
+                }
+                // SearchPanes
+                if(http.ContainsKey("searchPanes")){
+                    // Iterate throught the searchPanes object to extract the keys (column names) and values (SearchPane selections)
+                    foreach (var item in http["searchPanes"]as Dictionary<string, object>)
+                    {
+                        // Get the column names
+                        Dictionary<string, object> httpSP = (Dictionary<string, object>) http["searchPanes"];
+                        List<string> keyList = new List<string>(httpSP.Keys);
+
+                        foreach(var key in keyList){
+                            Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                            List<string> keykeyList = new List<string>(httpSPKey.Keys);
+
+                            // Add an array of the selections for each column
+                            for(int i = 0; i < keykeyList.Count(); i++)
+                            {
+                                string toSplit = httpSPKey[keykeyList[i]].ToString();
+                                string[] values = toSplit.Split(',');
+
+                                // Don't add multiple selections for one column
+                                if(!searchPanes.ContainsKey(key)){
+                                    searchPanes.Add(key, values);
+                                }
+
+                            }
+                        }                        
+                    }
                 }
             }
             else

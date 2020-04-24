@@ -50,6 +50,8 @@ namespace DataTables
          */
         internal string _type;
 
+        internal string _groupBy;
+
         internal Database _db;
 
         internal DbCommand _stmt;
@@ -226,6 +228,18 @@ namespace DataTables
             {
                 Get(field);
             }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add string representing the field to group by
+        /// </summary>
+        /// <param name="groupBy">The string for the group by</param>
+        /// <returns>Query instance for chaining</returns>
+        public Query GroupBy(string groupBy)
+        {
+            this._groupBy = groupBy;
 
             return this;
         }
@@ -816,6 +830,19 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Create a GROUP BY satement
+        /// </summary>
+        /// <returns>SQL GROUP BY statement</returns>
+        virtual protected string _BuildGroupBy()
+        {
+            string output = "";
+            if(this._groupBy != null){
+                output = " GROUP BY " + this._groupBy;
+            }
+            return output;
+        }
+
+        /// <summary>
         /// Create a JOIN satement list
         /// </summary>
         /// <returns>SQL list of joins</returns>
@@ -1124,6 +1151,7 @@ namespace DataTables
                 + "FROM " + _BuildTable()
                 + _BuildJoin()
                 + _BuildWhere()
+                + _BuildGroupBy()
                 + _BuildOrder()
                 + _BuildLimit()
             );

@@ -81,6 +81,12 @@ namespace DataTables
             new Dictionary<string, object>();
 
         /// <summary>
+        /// Object containing a list of options from SearchPanes
+        /// </summary>
+        public SearchPanesReturn searchPanes = 
+            new SearchPanesReturn();
+
+        /// <summary>
         /// File information for the upload input types
         /// </summary>
         public Dictionary<string, Dictionary<string, Dictionary<string, object>>> files =
@@ -157,6 +163,10 @@ namespace DataTables
             if (b.options.Count() != 0)
             {
                 this.options = b.options;
+            }
+
+            if (b.searchPanes.options.Count() != 0){
+                this.searchPanes.options = b.searchPanes.options;
             }
 
             if (b.files.Count() != 0)

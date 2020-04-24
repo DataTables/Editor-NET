@@ -270,6 +270,8 @@ namespace DataTables
         private DtResponse _out;
         private readonly List<MJoin> _mJoin = new List<MJoin>();
         private HttpRequest _request;
+
+        private bool _write = true;
 #if NETCOREAPP
         private IFormFileCollection _requestFiles;
 #else
@@ -1099,6 +1101,23 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Get the value of this._write
+        /// </summary>
+        /// <returns>bool the value of this._write</returns>
+        public bool Write(){
+            return this._write;
+        }
+
+        /// <summary>
+        /// Set the value of write
+        /// </summary>
+        /// <param name="writeVal">The value that this._write is to be set to</param>
+        /// <returns>Self for chaining</returns>
+        public Editor Write(bool writeVal) {
+            this._write = writeVal;
+            return this;
+        }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -1172,19 +1191,19 @@ namespace DataTables
                     // DataTable get request
                     _out.Merge(_Get(null, data));
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorUpload)
+                else if (data.RequestType == DtRequest.RequestTypes.EditorUpload && this._write)
                 {
                     // File upload
                     _Upload(data);
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorRemove)
+                else if (data.RequestType == DtRequest.RequestTypes.EditorRemove && this._write)
                 {
                     // Remove rows
                     _Remove(data);
                     _FileClean();
                 }
-                else if (data.RequestType == DtRequest.RequestTypes.EditorCreate ||
-                         data.RequestType == DtRequest.RequestTypes.EditorEdit)
+                else if ((data.RequestType == DtRequest.RequestTypes.EditorCreate ||
+                         data.RequestType == DtRequest.RequestTypes.EditorEdit) && this._write)
                 {
                     // Create or edit
                     // Trigger pre events before validation, so validation could be added
@@ -1358,7 +1377,7 @@ namespace DataTables
                 {
                     continue;
                 }
-
+                
                 if (field.Apply("get") && field.GetValue() == null)
                 {
                     query.Get(field.DbField());
@@ -1395,6 +1414,17 @@ namespace DataTables
             // Field options
             if (id == null)
             {
+                // Create an array of fields to pass to SearchPaneOptions
+                Field[] fields = new Field[http.Columns.Count()];
+                int x = 0;
+                for(int i = 0; i < this._field.Count(); i++){
+                    for(int j = 0;  j < http.Columns.Count(); j++){
+                        if(this._field[i].Name() == http.Columns[j].Data){
+                            fields[x] = this._field[i];
+                            x++;
+                        }
+                    }
+                }
                 foreach (var field in _field)
                 {
                     var opts = field.OptionsExec(_db);
@@ -1402,6 +1432,13 @@ namespace DataTables
                     if (opts != null)
                     {
                         dtData.options.Add(field.Name(), opts);
+                    }
+
+                    var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, http);
+
+                    if(spOpts != null)
+                    {
+                        dtData.searchPanes.options.Add(field.Name(), spOpts);
                     }
                 }
             }
@@ -2073,6 +2110,20 @@ namespace DataTables
                         }
                     }
                 });
+            }
+
+            if(http.searchPanes != null){
+                // Add the Where statements due to SearchPanes Selections
+                foreach(var field in this._field){
+                    if(http.searchPanes.ContainsKey(field.Name())){
+                        query.Where(qu =>
+                    {
+                        foreach(var opt in http.searchPanes[field.Name()]){
+                            qu.OrWhere(field.Name(), opt, "=");
+                        }
+                    });
+                    }
+                }
             }
 
             // Column filters
