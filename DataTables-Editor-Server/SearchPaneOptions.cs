@@ -22,36 +22,7 @@ namespace DataTables
         private Func<Dictionary<string, object>, string> _renderer;
         private Action<Query> _where;
         private string _order;
-        private int _limit=-1;
-        private List<Dictionary<string, object>> _manualOpts = new List<Dictionary<string, object>>();
         private List<LeftJoin> _leftJoin = new List<LeftJoin>();
-
-        /// <summary>
-        /// Add a manually defined option to the list from the database
-        /// </summary>
-        /// <param name="label">Label and value</param>
-        /// <returns>Self for chaining</returns>
-        public SearchPaneOptions Add(string label)
-        {
-            return Add(label, label);
-        }
-
-        /// <summary>
-        /// Add a manually defined option to the list from the database
-        /// </summary>
-        /// <param name="label">Label</param>
-        /// <param name="value">Value</param>
-        /// <returns>Self for chaining</returns>
-        public SearchPaneOptions Add(string label, object value)
-        {
-            _manualOpts.Add(new Dictionary<string, object>
-            {
-                {"value", value},
-                {"label", label}
-            });
-
-            return this;
-        }
 
         /// <summary>
         /// Get the column name(s) for the options label
@@ -84,28 +55,6 @@ namespace DataTables
         public SearchPaneOptions Label(IEnumerable<string> label)
         {
             _label = label;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Get the current limit
-        /// </summary>
-        /// <returns>Limit</returns>
-        public int Limit()
-        {
-            return _limit;
-        }
-
-        /// <summary>
-        /// Set the limit for the number of SearchPaneOptions returned. NOTE if you are using
-        /// SQL Server, make sure you also set an `Order` option.
-        /// </summary>
-        /// <param name="limit">Number of records to limit to</param>
-        /// <returns>Self for chaining</returns>
-        public SearchPaneOptions Limit(int limit)
-        {
-            _limit = limit;
 
             return this;
         }
@@ -335,11 +284,6 @@ namespace DataTables
 
             _PerformLeftJoin(q);
 
-            if (_limit != -1)
-            {
-                q.Limit(_limit);
-            }
-
             var rows = q
                 .Exec()
                 .FetchAll();
@@ -370,11 +314,6 @@ namespace DataTables
                 }
                 
             }
-
-            _manualOpts.ToList().ForEach(opt =>
-            {
-                output.Add(opt);
-            });
 
             if (_order == null)
             {
