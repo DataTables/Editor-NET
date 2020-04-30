@@ -157,7 +157,7 @@ namespace DataTables
         private Func<List<Dictionary<string, object>>> _optsFn;
         private Options _opts;
         private SearchPaneOptions _spOpts;
-        private Func<List<Dictionary<string, object>>> _spOptsFn;
+        private Func<Database, Editor, List<Dictionary<string, object>>> _spOptsFn;
         private Upload _upload;
         private Func<string, string> _xss;
         private bool _xssFormat = true;
@@ -453,7 +453,7 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of SearchPane options</param>
         /// <returns>Self for chaining</returns>
-        public Field SearchPaneOptions(Func<List<Dictionary<string, object>>> fn){
+        public Field SearchPaneOptions(Func<object, object, List<Dictionary<string, object>>> fn){
             _spOpts = null;
             _spOptsFn = fn;
 
@@ -772,7 +772,7 @@ namespace DataTables
         /// <returns>List of SearchPaneOptions</returns>
         internal List<Dictionary<string, object>> SearchPaneOptionsExec(Field field, Editor editor, List<LeftJoin> leftJoin, Field[] fields, DtRequest http) {
             if (_spOptsFn != null){
-                return _spOptsFn();
+                return _spOptsFn(editor.Db(), editor);
             }
             if(_spOpts != null) {
                 return _spOpts.Exec(field, editor, leftJoin, http, fields);
