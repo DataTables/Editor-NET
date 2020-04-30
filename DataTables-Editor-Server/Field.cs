@@ -473,44 +473,6 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Provide database information for where to get a list of values that
-        /// can be used for the options list in SearchPanes.
-        ///
-        /// Note that this is for simple cases only. For more complex operations
-        /// use the delegate overload.
-        /// </summary>
-        /// <param name="table">Table name to read the options from</param>
-        /// <param name="value">Column name to read the option values from</param>
-        /// <param name="label">Column name to read the label values from</param>
-        /// <param name="condition">Function that will using the Query class passed in to apply a condtion</param>
-        /// <param name="format">Formatting function (called for every option)</param>
-        /// <returns>Self for chaining</returns>
-        public Field SearchPaneOptions(string table, string value, IEnumerable<string> label, Action<Query> condition = null, Func<Dictionary<string, object>, string> format = null) {
-            if(table == null){
-                return this;
-            }
-
-            var spOpts = new SearchPaneOptions()
-                .Table(table)
-                .Value(value)
-                .Label(label);
-
-            if(condition != null){
-                spOpts.Where(condition);
-            }
-
-            if(format != null){
-                spOpts.Render(format);
-            }
-
-            _spOptsFn = null;
-            _spOpts = spOpts;
-
-            return this;
-
-        }
-
-        /// <summary>
         /// Get the "Set" flag for this field
         /// </summary>
         /// <returns>Set flag</returns>
