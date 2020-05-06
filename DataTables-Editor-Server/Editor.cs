@@ -180,11 +180,18 @@ namespace DataTables
         public event EventHandler<PostGetEventArgs> PostGet;
 
         /// <summary>
-        /// Event which is triggered immediately prior to a row being created.
+        /// Event which is triggered prior to a row being created and before validation.
         /// Note that for multi-row creation it is triggered for each row
         /// indivudally.
         /// </summary>
         public event EventHandler<PreCreateEventArgs> PreCreate;
+
+        /// <summary>
+        /// Event which is triggered immediately prior to a row being created and
+        /// after validation. Note that for multi-row creation it is triggered for
+        /// each row indivudally.
+        /// </summary>
+        public event EventHandler<ValidatedCreateEventArgs> ValidatedCreate;
 
         /// <summary>
         /// Event which is triggered after the new row has been written to the
@@ -202,11 +209,18 @@ namespace DataTables
         public event EventHandler<PostCreateEventArgs> PostCreate;
 
         /// <summary>
-        /// Event which is triggered immediately prior to a row being edited.
+        /// Event which is triggered prior to a row being edited and before validation.
         /// Note that for multi-row editing, it is triggered for each row
         /// individually.
         /// </summary>
         public event EventHandler<PreEditEventArgs> PreEdit;
+
+        /// <summary>
+        /// Event which is triggered immediately prior to a row being edited and
+        /// after validation. Note that for multi-row editing, it is triggered for
+        /// each row individually.
+        /// </summary>
+        public event EventHandler<ValidatedEditEventArgs> ValidatedEdit;
 
         /// <summary>
         /// Event which is triggered after the row has been updated on the
@@ -1475,6 +1489,12 @@ namespace DataTables
             // generated values.
             _PkeyValidateInsert(values);
 
+            ValidatedCreate?.Invoke(this, new ValidatedCreateEventArgs
+            {
+                Editor = this,
+                Values = values
+            });
+
             // Insert the new row
             var id = _InsertOrUpdate(null, values);
 
@@ -1525,6 +1545,13 @@ namespace DataTables
         private Dictionary<string, object> _Update(string id, Dictionary<string, object> values)
         {
             id = id.Replace(_idPrefix, "");
+
+            ValidatedEdit?.Invoke(this, new ValidatedEditEventArgs
+            {
+                Editor = this,
+                Id = id,
+                Values = values
+            });
 
             // Update or insert the rows for the parent table and the left joined
             // tables
