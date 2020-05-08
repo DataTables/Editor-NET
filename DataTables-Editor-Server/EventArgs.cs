@@ -71,6 +71,28 @@ namespace DataTables
         public bool Cancel = false;
     }
 
+    /// <summary>
+    /// Arguments for the 'ValidatedCreate' Editor event
+    /// </summary>
+    public class ValidatedCreateEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Editor instance that triggered the event
+        /// </summary>
+        public Editor Editor;
+
+        /// <summary>
+        /// Values submitted to the server by the client
+        /// </summary>
+        public Dictionary<string, object> Values;
+
+        /// <summary>
+        /// Event cancel flag. Set to `true` in your event handler to stop any further
+        /// processing after the event has been triggered.
+        /// </summary>
+        public bool Cancel = false;
+    }
+
 
     /// <summary>
     /// Arguments for the 'WriteCreate' Editor event
@@ -147,6 +169,34 @@ namespace DataTables
     /// Arguments for the 'PreEdit' Editor event
     /// </summary>
     public class PreEditEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Editor instance that triggered the event
+        /// </summary>
+        public Editor Editor;
+
+        /// <summary>
+        /// Id of the row to be edited
+        /// </summary>
+        public object Id;
+
+        /// <summary>
+        /// Values submitted to the server by the client
+        /// </summary>
+        public Dictionary<string, object> Values;
+
+        /// <summary>
+        /// Event cancel flag. Set to `true` in your event handler to stop any further
+        /// processing after the event has been triggered.
+        /// </summary>
+        public bool Cancel = false;
+    }
+
+
+    /// <summary>
+    /// Arguments for the 'ValidatedEdit' Editor event
+    /// </summary>
+    public class ValidatedEditEventArgs : EventArgs
     {
         /// <summary>
         /// Editor instance that triggered the event
