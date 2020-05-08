@@ -342,9 +342,6 @@ namespace DataTables
                 }
                 // SearchPanes
                 if(http.ContainsKey("searchPanes")){
-                    // Iterate throught the searchPanes object to extract the keys (column names) and values (SearchPane selections)
-                    foreach (var item in http["searchPanes"]as Dictionary<string, object>)
-                    {
                         // Get the column names
                         Dictionary<string, object> httpSP = (Dictionary<string, object>) http["searchPanes"];
                         List<string> keyList = new List<string>(httpSP.Keys);
@@ -352,21 +349,19 @@ namespace DataTables
                         foreach(var key in keyList){
                             Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
                             List<string> keykeyList = new List<string>(httpSPKey.Keys);
-
-                            // Add an array of the selections for each column
-                            for(int i = 0; i < keykeyList.Count(); i++)
-                            {
-                                string toSplit = httpSPKey[keykeyList[i]].ToString();
-                                string[] values = toSplit.Split(',');
-
-                                // Don't add multiple selections for one column
-                                if(!searchPanes.ContainsKey(key)){
-                                    searchPanes.Add(key, values);
-                                }
-
+                            string[] values = new string[keykeyList.Count()];
+                            int count = 0;
+                            foreach(var keykey in keykeyList){
+                                values[count] = httpSPKey[keykey].ToString();
+                                count++;
                             }
-                        }                        
-                    }
+
+                            // Don't add multiple selections for one column
+                            if(!searchPanes.ContainsKey(key)){
+                                searchPanes.Add(key, values);
+                            }
+                            
+                        }
                 }
             }
             else
