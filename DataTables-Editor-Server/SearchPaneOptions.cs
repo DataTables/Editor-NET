@@ -19,7 +19,7 @@ namespace DataTables
         private string _table;
         private string _value;
         private IEnumerable<string> _label;
-        private Func<Dictionary<string, object>, string> _renderer;
+        private Func<string, string> _renderer;
         private Action<Query> _where;
         private string _order;
         private List<LeftJoin> _leftJoin = new List<LeftJoin>();
@@ -84,8 +84,9 @@ namespace DataTables
         /// Get the rendering function
         /// </summary>
         /// <returns>Rendering function</returns>
-        public Func<Dictionary<string, object>, string> Render()
+        public Func<string, string> Render()
         {
+            Console.WriteLine(89);
             return _renderer;
         }
 
@@ -94,8 +95,9 @@ namespace DataTables
         /// </summary>
         /// <param name="renderer">Rendering function. Called once for each option</param>
         /// <returns>Self for chaining</returns>
-        public SearchPaneOptions Render(Func<Dictionary<string, object>, string> renderer)
+        public SearchPaneOptions Render(Func<string, string> renderer)
         {
+            Console.WriteLine(100);
             _renderer = renderer;
 
             return this;
@@ -227,19 +229,10 @@ namespace DataTables
                 _label = this._label.First();
             }
 
-            var formatter = _renderer ?? (row =>
+            // Just return the label if no default renderer
+            var formatter = _renderer ?? (str =>
             {
-                var list = new List<string>();
-
-                foreach (var label in this._label)
-                {
-                    if (row[label] != null)
-                    {
-                        list.Add(row[label].ToString());
-                    }
-                }
-
-                return string.Join(" ", list);
+                return str;
             });
 
             if(leftJoinIn.Count() > 0){
@@ -295,7 +288,7 @@ namespace DataTables
                 for( int j=0 ; j<res.Count() ; j ++) {
                     if(res[j]["value"].ToString() == rows[i]["value"].ToString()) {
                         output.Add(new Dictionary<string, object>{
-                            {"label", rows[i]["label"].ToString()},
+                            {"label", formatter(rows[i]["label"].ToString())},
                             {"total", rows[i]["total"]},
                             {"value", rows[i]["value"].ToString()},
                             {"count", res[j]["count"]}
@@ -306,7 +299,7 @@ namespace DataTables
 		// If it has not been set then there aren't any so set count to 0
                 if(!set) {
                     output.Add(new Dictionary<string, object>{
-                        {"label", rows[i]["label"].ToString()},
+                        {"label", formatter(rows[i]["label"].ToString())},
                         {"total", rows[i]["total"]},
                         {"value", rows[i]["value"].ToString()},
                         {"count", 0}
