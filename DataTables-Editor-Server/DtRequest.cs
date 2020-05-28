@@ -62,7 +62,7 @@ namespace DataTables
 
                         for (int i = 0, ien = keys.Count() - 1; i < ien; i++)
                         {
-                            key = keys[i].TrimEnd(']');
+                            key = keys[i].TrimEnd(new[] {']'});
                             if (key == "")
                             {
                                 // If the key is empty it is an array index value
@@ -76,7 +76,7 @@ namespace DataTables
                             innerDic = innerDic[key] as Dictionary<string, object>;
                         }
 
-                        key = keys.Last().TrimEnd(']');
+                        key = keys.Last().TrimEnd(new[] {']'});
                         if (key == "")
                         {
                             key = innerDic.Count().ToString();
