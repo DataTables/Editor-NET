@@ -960,7 +960,7 @@ namespace DataTables
 #endif
         }
 
-#if NET45
+#if NETFRAMEWORK
         /// <summary>
         /// Process a request from the Editor client-side to get / set data.
         /// For use with an HttpRequest object
