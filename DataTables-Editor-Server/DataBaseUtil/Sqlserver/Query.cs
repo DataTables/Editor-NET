@@ -73,6 +73,12 @@ namespace DataTables.DatabaseUtil.Sqlserver
             if (_type == "insert")
             {
                 var pkeyCmd = provider.CreateCommand();
+                var parts = _table[0].Split('.');
+                var schemaName = parts.Count() > 1 ? parts[0] : "";
+                var tableName = parts.Count() > 1 ? parts[1] : _table[0];
+                var schemaQuery = schemaName != "" ?
+                    " KCU.TABLE_SCHEMA = @schema AND " :
+                    "";
 
                 // We need to find out what the primary key column name and type is
                 pkeyCmd.CommandText = @"
@@ -84,8 +90,9 @@ namespace DataTables.DatabaseUtil.Sqlserver
                     FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
                     INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU ON
                         TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND
-	                    TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND
-	                    KCU.TABLE_NAME = @table
+	                    TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND " +
+                        schemaQuery +
+	                    @"KCU.TABLE_NAME = @table
                     JOIN
                         INFORMATION_SCHEMA.COLUMNS as C ON
 	                        C.table_name = KCU.table_name AND
@@ -97,8 +104,15 @@ namespace DataTables.DatabaseUtil.Sqlserver
 
                 param = pkeyCmd.CreateParameter();
                 param.ParameterName = "@table";
-                param.Value = _table[0];
+                param.Value = tableName;
                 pkeyCmd.Parameters.Add(param);
+
+                if (schemaName != "") {
+                    param = pkeyCmd.CreateParameter();
+                    param.ParameterName = "@schema";
+                    param.Value = schemaName;
+                    pkeyCmd.Parameters.Add(param);
+                }
 
                 using (var dr = pkeyCmd.ExecuteReader())
                 {
