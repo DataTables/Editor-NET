@@ -5,6 +5,7 @@
 // </summary>
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -330,6 +331,15 @@ namespace DataTables
         {
             _db = db;
             return this;
+        }
+
+        /// <summary>
+        /// Get the current database transaction
+        /// </summary>
+        /// <returns>Database transaction, or null if not in a transaction</returns>
+        public DbTransaction DbTransaction()
+        {
+            return _db.GetTransaction();
         }
 
         /// <summary>

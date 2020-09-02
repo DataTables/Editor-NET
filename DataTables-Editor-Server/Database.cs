@@ -27,9 +27,10 @@ namespace DataTables
         private string _DbType;
         private List<DebugInfo> _debugInfo = new List<DebugInfo>();
         private DbConnection _Conn;
-        internal DbTransaction DbTransaction = null;
         private bool _DbInited = false;
         private Action<object> _DebugCallback = null;
+        
+        public DbTransaction DbTransaction = null;
 
         /// <summary>
         /// Create a database connection
@@ -249,6 +250,14 @@ namespace DataTables
         public void Dispose()
         {
             _Conn.Close();
+        }
+
+        /// <summary>
+        /// Get the current database transaction. Will return `null` if not in a transaction
+        /// </summary>
+        public DbTransaction GetTransaction()
+        {
+            return DbTransaction;
         }
 
         /// <summary>
