@@ -220,7 +220,13 @@ namespace DataTables
                 this._value = fieldIn.DbField();
             }
             if(this._table == null){
-                this._table = editor.Table().ToString();
+                var readTable = editor.ReadTable();
+                if(readTable == null) {
+                    this._table = editor.Table().ToString();
+                }
+                else {
+                    this._table = readTable[0];
+                }
             }
             if(this._label == null){
                 _label = this._value;
@@ -240,7 +246,7 @@ namespace DataTables
             }
 
             var query = db.Query("select")
-                .Table(editor.Table());
+                .Table(this._table);
             
             if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
                 query.Get(this._value + " as value")
@@ -268,7 +274,7 @@ namespace DataTables
 
             var q = db.Query("select")
                 .Distinct(true)
-                .Table(editor.Table())
+                .Table(this._table)
                 .Get(_label + " as label")
                 .Get(this._value + " as value")
                 .Get("COUNT(*) as total")
