@@ -86,7 +86,6 @@ namespace DataTables
         /// <returns>Rendering function</returns>
         public Func<string, string> Render()
         {
-            Console.WriteLine(89);
             return _renderer;
         }
 
@@ -97,7 +96,6 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public SearchPaneOptions Render(Func<string, string> renderer)
         {
-            Console.WriteLine(100);
             _renderer = renderer;
 
             return this;
@@ -219,10 +217,11 @@ namespace DataTables
             if(this._value == null){
                 this._value = fieldIn.DbField();
             }
+
             if(this._table == null){
                 var readTable = editor.ReadTable();
-                if(readTable == null) {
-                    this._table = editor.Table().ToString();
+                if(readTable.Count() == 0) {
+                    this._table = editor.Table()[0].ToString();
                 }
                 else {
                     this._table = readTable[0];
