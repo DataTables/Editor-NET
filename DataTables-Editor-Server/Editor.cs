@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "1.9.6";
+        public const string Version = "2.0.0-dev";
 
         /// <summary>
         /// Create a new Editor instance
@@ -1467,6 +1467,8 @@ namespace DataTables
                 }
             }
 
+            
+
             // Row based joins
             foreach (var mjoin in _mJoin)
             {
@@ -1487,7 +1489,14 @@ namespace DataTables
                 PostGet(this, args);
             }
 
-            return dtData.Merge(ssp);
+            dtData.Merge(ssp);
+
+            if (dtData.searchPanes.options.Count() == 0)
+            {
+                dtData.searchPanes = null;
+            }
+            
+            return dtData;
         }
 
 

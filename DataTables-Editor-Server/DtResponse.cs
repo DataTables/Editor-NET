@@ -165,8 +165,12 @@ namespace DataTables
                 this.options = b.options;
             }
 
-            if (b.searchPanes.options.Count() != 0){
+            if (b.searchPanes != null && b.searchPanes.options != null && b.searchPanes.options.Count() != 0)
+            {
                 this.searchPanes.options = b.searchPanes.options;
+            }
+            else if (b.searchPanes == null) {
+                this.searchPanes = null;
             }
 
             if (b.files.Count() != 0)
