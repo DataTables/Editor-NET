@@ -514,7 +514,7 @@ namespace DataTables
         /// <param name="op">Join condition (`=`, '&lt;`, etc)</param>
         /// <param name="field2">Field from the child table to use as the join link</param>
         /// <returns>Self for chaining</returns>
-        public Editor LeftJoin(string table, string field1, string op, string field2)
+        public Editor LeftJoin(string table, string field1, string op = null, string field2 = null)
         {
             _leftJoin.Add(new LeftJoin(table, field1, op, field2));
 
@@ -2339,10 +2339,12 @@ namespace DataTables
 
         private void _PerformLeftJoin(Query q)
         {
-            if (_leftJoin.Count() != 0)
+            foreach (var join in _leftJoin)
             {
-                foreach (var join in _leftJoin)
-                {
+                if (join.Field2 == null && join.Operator == null ) {
+                    q.Join(join.Table, join.Field1, "LEFT", false);
+                }
+                else {
                     q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
                 }
             }

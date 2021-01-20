@@ -251,7 +251,7 @@ namespace DataTables
         /// <param name="condition">JOIN condition</param>
         /// <param name="type">JOIN type</param>
         /// <returns>Query instance for chaining</returns>
-        public Query Join(string table, string condition, string type = "")
+        public Query Join(string table, string condition, string type = "", bool bind = true)
         {
             string[] joinTypes = new string[] { "LEFT", "RIGHT", "INNER", "OUTER", "LEFT OUTER", "RIGHT OUTER" };
 
@@ -270,7 +270,7 @@ namespace DataTables
             Regex r = new Regex(@"([\w\.]+)([\W\s]+)(.+)");
             Match m = r.Match(condition);
 
-            if (m.Success)
+            if (bind && m.Success)
             {
                 string cap1 = _ProtectIdentifiers(m.Groups[1].Value);
                 string cap3 = _ProtectIdentifiers(m.Groups[3].Value);
