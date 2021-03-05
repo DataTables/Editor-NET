@@ -5,10 +5,10 @@
         {
           "files": [
             "**.csproj",
-			"**/*.cs"
+            "**/*.cs"
           ],
-		  "exclude": [ "**/bin/**", "**/obj/**" ],
-		  "src": ".."
+          "exclude": [ "**/bin/**", "**/obj/**" ],
+          "src": ".."
         }
       ],
       "dest": "api",
