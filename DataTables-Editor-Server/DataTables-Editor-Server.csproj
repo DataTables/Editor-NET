@@ -24,7 +24,7 @@ The software available in this package, acts as server-side libraries for Editor
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encodings.Web">
-      <Version>4.5.0</Version>
+      <Version>4.5.1</Version>
     </PackageReference>
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -35,7 +35,7 @@ The software available in this package, acts as server-side libraries for Editor
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encodings.Web">
-      <Version>4.5.0</Version>
+      <Version>4.5.1</Version>
     </PackageReference>
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -46,7 +46,7 @@ The software available in this package, acts as server-side libraries for Editor
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encodings.Web">
-      <Version>4.5.0</Version>
+      <Version>4.5.1</Version>
     </PackageReference>
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -57,7 +57,7 @@ The software available in this package, acts as server-side libraries for Editor
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encodings.Web">
-      <Version>4.5.0</Version>
+      <Version>4.5.1</Version>
     </PackageReference>
     <Reference Include="System.Web" />
   </ItemGroup>
