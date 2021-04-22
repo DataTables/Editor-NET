@@ -1502,11 +1502,20 @@ namespace DataTables
 
         private Dictionary<string, object> _Insert(Dictionary<string, object> values)
         {
+            // Get values to generate the id, including from SetValue, not just the
+            // submitted values
+            var all = new Dictionary<string, object>();
+
+            foreach (var field in _field)
+            {
+                NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+            }
+
             // Only allow a composite insert if the values for the key are
             // submitted. This is required because there is no reliable way in MySQL
             // to return the newly inserted row, so we can't know any newly
             // generated values.
-            _PkeyValidateInsert(values);
+            _PkeyValidateInsert(all);
 
             ValidatedCreate?.Invoke(this, new ValidatedCreateEventArgs
             {
@@ -1525,8 +1534,8 @@ namespace DataTables
             // Was the primary key altered as part of the edit, if so use the
             // submitted values
             id = _pkey.Length > 1
-                ? PkeyToValue(values)
-                : _PkeySubmitMerge(id.ToString(), values);
+                ? PkeyToValue(all)
+                : _PkeySubmitMerge(id.ToString(), all);
             
             // Row based joins
             foreach (var mjoin in _mJoin)

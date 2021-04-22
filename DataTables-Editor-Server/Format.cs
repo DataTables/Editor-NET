@@ -137,6 +137,10 @@ namespace DataTables
         {
             return delegate(object val, Dictionary<string, object> data)
             {
+                if (val == null) {
+                    return null;
+                }
+
                 var str = (string)val;
                 return str.Split(new[] { delimiter }, StringSplitOptions.None);
             };
@@ -152,6 +156,10 @@ namespace DataTables
         {
             return delegate(object val, Dictionary<string, object> data)
             {
+                if (val == null) {
+                    return null;
+                }
+
                 var str = (string[])val;
                 return string.Join(delimiter, str);
             };
@@ -166,7 +174,9 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> NullEmpty()
         {
-            return (val, data) => val.ToString() == "" ? null : val;
+            return (val, data) => val == null || val.ToString() == ""
+                ? null
+                : val;
         }
 
         /// <summary>
@@ -179,7 +189,9 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> IfEmpty(object emptyValue)
         {
-            return (val, data) => val.ToString() == "" ? emptyValue : val;
+            return (val, data) => val == null || val.ToString() == ""
+                ? emptyValue
+                : val;
         }
 
         /// <summary>
@@ -192,7 +204,9 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> FromDecimalChar(char dec = ',')
         {
-            return (val, data) => val.ToString().Replace(dec, '.');
+            return (val, data) => val != null
+                ? val.ToString().Replace(dec, '.')
+                : null;
         }
 
         /// <summary>
@@ -203,7 +217,9 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> ToDecimalChar(char dec = ',')
         {
-            return (val, data) => val.ToString().Replace('.', dec);
+            return (val, data) => val != null
+                ? val.ToString().Replace('.', dec)
+                : null;
         }
     }
 }
