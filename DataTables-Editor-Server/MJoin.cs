@@ -386,7 +386,7 @@ namespace DataTables
                 }
                 
                 var readField = "";
-                var joinFieldName = _hostField.Split(new [] {'.'})[1];
+                var joinFieldName = _hostField.Split(new[] { '.' }).Last();
                 if (NestedData.InData(_hostField, response.data[0]))
                 {
                     readField = _hostField;
@@ -689,17 +689,19 @@ namespace DataTables
             {
                 var a = _links[i].Split(new [] {'.'});
 
-                if (a[0] == _table)
+                string tableName = string.Join(".", a.Take(a.Length - 1));
+
+                if (tableName == _table)
                 {
                     _childField = _links[i];
                 }
-                else if (a[0] == _editor.Table()[0])
+                else if (tableName == _editor.Table()[0])
                 {
                     _hostField = _links[i];
                 }
                 else
                 {
-                    _linkTable = a[0];
+                    _linkTable = tableName;
 
                     // Need to figure out if the link refers to the host
                     // table, or the child table - this is based on the
