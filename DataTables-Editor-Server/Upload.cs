@@ -321,12 +321,13 @@ namespace DataTables
 
                 if (prop is DbType)
                 {
-                    if ( (DbType)prop != DbType.Content && (DbType)prop != DbType.ContentBinary )
+                    if ((DbType)prop != DbType.Content && (DbType)prop != DbType.ContentBinary)
                     {
                         q.Get(column);
                     }
                 }
-                else {
+                else
+                {
                     q.Get(column);
                 }
             }
@@ -336,7 +337,7 @@ namespace DataTables
                 q.WhereIn(_dbPKey, ids);
             }
 
-            foreach ( var condition in _where )
+            foreach (var condition in _where)
             {
                 q.Where(condition);
             }
@@ -527,22 +528,20 @@ namespace DataTables
 
             string table;
             string field;
-            var a = fieldName.Split(new [] {'.'});
-
-            switch (a.Count())
+            var a = fieldName.Split(new[] { '.' });
+            if (a.Length == 1)
             {
-                case 1:
-                    table = editorTable;
-                    field = a[0];
-                    break;
-                case 2:
-                    table = a[0];
-                    field = a[1];
-                    break;
-                default:
-                    table = a[1];
-                    field = a[2];
-                    break;
+                table = editorTable;
+                field = a[0];
+            }
+            else
+            {
+                // editorTable can be Table or schema.Table
+                // fieldName can be Field (a.lenght == 1), Table.Field or schema.Table.Field
+                var editorTableName = editorTable.Split(new[] { '.' }).Last();
+                var fieldTableName = a.Length == 2 ? a[0] : a[1];
+                table = fieldTableName == editorTableName ? editorTable : string.Join(".", a.Take(a.Length - 1));
+                field = a.Last();
             }
 
             // Get the infromation from the database about the orphaned children
@@ -602,7 +601,7 @@ namespace DataTables
             // Insert the details requested, for the columns requested
             var q = db.Query("insert")
                 .Table(_dbTable)
-                .Pkey(new []{_dbPKey});
+                .Pkey(new[] { _dbPKey });
 
             foreach (var pair in _dbFields)
             {
@@ -678,7 +677,7 @@ namespace DataTables
                     {
                         // Callable function - execute to get the value
                         var propFn = (Func<Database, IFormFile, dynamic>)prop;
-                        
+
                         pathFields.Add(column, propFn(db, upload));
                         q.Set(column, "-"); // Use a temporary value (as above)
                     }

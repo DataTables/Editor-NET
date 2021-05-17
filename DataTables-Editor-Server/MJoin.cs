@@ -28,9 +28,8 @@ namespace DataTables
         public MJoin(string table)
         {
             Table(table);
-            Name(table);
+            Name(table.Split(new[] { '.' }).Last());
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private parameters
@@ -384,7 +383,7 @@ namespace DataTables
                 {
                     query.Join(_table, _childField + " = " + _hostField);
                 }
-                
+
                 var readField = "";
                 var joinFieldName = _hostField.Split(new[] { '.' }).Last();
                 if (NestedData.InData(_hostField, response.data[0]))
@@ -422,7 +421,7 @@ namespace DataTables
 
                         foreach (var data in response.data)
                         {
-                            whereIn.Add( pkeyIsJoin
+                            whereIn.Add(pkeyIsJoin
                                 ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
                                 : NestedData.ReadProp(readField, data).ToString()
                             );
@@ -506,12 +505,13 @@ namespace DataTables
                     // remove the table name from the field as some dbs (postgres)
                     // don't like it. Might be nicer to have the Database classes
                     // do this - todo
-                    var a = _childField.Split(new [] {'.'});
+                    var a = _childField.Split(new[] { '.' });
+
                     _editor.Db()
                         .Query("Insert")
                         .Table(_linkTable)
-                        .Set(_linkHostField.Split(new [] {'.'}).Last(), parentId)
-                        .Set(_linkChildField.Split(new [] {'.'}).Last(), dataSet[a[1]])
+                        .Set(_linkHostField.Split(new[] { '.' }).Last(), parentId)
+                        .Set(_linkChildField.Split(new[] { '.' }).Last(), dataSet[a.Last()])
                         .Exec();
                 }
                 else
@@ -519,13 +519,13 @@ namespace DataTables
                     var query = _editor.Db()
                         .Query("Insert")
                         .Table(_table)
-                        .Set(_childField.Split(new [] {'.'}).Last(), parentId);
+                        .Set(_childField.Split(new[] { '.' }).Last(), parentId);
 
                     foreach (var field in _fields)
                     {
                         if (field.Apply("set", dataSet))
                         {
-                            query.Set(field.DbField().Split(new [] {'.'}).Last(), field.Val("set", dataSet));
+                            query.Set(field.DbField().Split(new[] { '.' }).Last(), field.Val("set", dataSet));
                         }
                     }
 
@@ -611,9 +611,9 @@ namespace DataTables
             var list = data.ContainsKey(_name) ?
                 (Dictionary<string, object>)data[_name] :
                 new Dictionary<string, object>();
-            
+
             // Grouped validation
-            for (var i=0 ; i<_validators.Count() ; i++)
+            for (var i = 0; i < _validators.Count(); i++)
             {
                 var res = _validators[i](editor, action, list);
 
@@ -687,7 +687,7 @@ namespace DataTables
             // Resolve what field names belong to what varible for processing
             for (int i = 0, ien = _links.Count(); i < ien; i++)
             {
-                var a = _links[i].Split(new [] {'.'});
+                var a = _links[i].Split(new[] { '.' });
 
                 string tableName = string.Join(".", a.Take(a.Length - 1));
 
