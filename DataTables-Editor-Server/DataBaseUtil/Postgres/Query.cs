@@ -25,6 +25,8 @@ namespace DataTables.DatabaseUtil.Postgres
 
         override internal string _fieldQuote { get { return "\""; } }
 
+        internal override string[] _identifierLimiter => new[] { "\"", "\"" };
+
 
         /// <summary>
         /// Bind parameters to the SQL statement
