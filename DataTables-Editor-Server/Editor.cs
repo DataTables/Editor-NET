@@ -795,7 +795,8 @@ namespace DataTables
                 }
                 else
                 {
-                    val = NestedData.ReadProp(column, row).ToString();
+                    var field = _FindField(column, "db");
+                    val = NestedData.ReadProp(field.Name(), row).ToString();
                 }
 
                 if (val == null)
