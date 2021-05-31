@@ -192,6 +192,11 @@ namespace DataTables
         public Dictionary<string, string[]> searchPanes = new Dictionary<string, string[]>();
 
         /// <summary>
+        /// Information for searchPanes_null
+        /// </summary>
+        public Dictionary<string, bool[]> searchPanes_null = new Dictionary<string, bool[]>();
+
+        /// <summary>
         /// List of ids for Editor to operate on
         /// </summary>
         public List<string> Ids = new List<string>();
@@ -359,6 +364,31 @@ namespace DataTables
                             // Don't add multiple selections for one column
                             if(!searchPanes.ContainsKey(key)){
                                 searchPanes.Add(key, values);
+                            }
+                            
+                        }
+                }
+                // SearchPanes_null
+                if(http.ContainsKey("searchPanes_null")){
+                        // Get the column names
+                        Dictionary<string, object> httpSP = (Dictionary<string, object>) http["searchPanes_null"];
+                        List<string> keyList = new List<string>(httpSP.Keys);
+
+                        foreach(var key in keyList){
+                            Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                            List<string> keykeyList = new List<string>(httpSPKey.Keys);
+                            bool[] values = new bool[keykeyList.Count()];
+                            int count = 0;
+                            foreach(var keykey in keykeyList){
+                                if(httpSPKey[keykey] is bool) {
+                                    values[count] = (bool) httpSPKey[keykey];
+                                    count++;
+                                }
+                            }
+
+                            // Don't add multiple selections for one column
+                            if(!searchPanes_null.ContainsKey(key)){
+                                searchPanes_null.Add(key, values);
                             }
                             
                         }

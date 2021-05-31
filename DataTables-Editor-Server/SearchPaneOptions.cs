@@ -252,16 +252,19 @@ namespace DataTables
                     .Get("COUNT(*) as count")
                     .GroupBy(this._value);
             }
-            // Loop over fields
-            for(int i = 0; i < fields.Count(); i++)
-            {
-                if (http.searchPanes.ContainsKey(fields[i].Name()))
-                {
+            // Loop over fields - for cascade
+            for(int i = 0; i < fields.Count(); i++) {
+                if (http.searchPanes.ContainsKey(fields[i].Name())) {
 		    // Apply Or where based upon searchPanes selections
-                    query.Where(qu =>
-                    {
-                        foreach(var opt in http.searchPanes[fields[i].Name()]){
-                            qu.OrWhere(fields[i].Name(), opt, "=");
+                    query.Where(qu => {
+                        for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
+                            qu.OrWhere(
+                                fields[i].Name(),
+                                http.searchPanes_null[fields[i].Name()][j] ?
+                                    null :
+                                    http.searchPanes[fields[i].Name()][j],
+                                "="
+                            );
                         }
                     });
                 }
@@ -293,9 +296,11 @@ namespace DataTables
                 for( int j=0 ; j<res.Count() ; j ++) {
                     if(res[j]["value"].ToString() == rows[i]["value"].ToString()) {
                         output.Add(new Dictionary<string, object>{
-                            {"label", formatter(rows[i]["label"].ToString())},
+                            {"label", formatter(
+                                (rows[i]["label"] is DBNull) ? null : rows[i]["label"].ToString()
+                                )},
                             {"total", rows[i]["total"]},
-                            {"value", rows[i]["value"].ToString()},
+                            {"value", rows[i]["value"] is DBNull ? null : rows[i]["value"].ToString()},
                             {"count", res[j]["count"]}
                         });
                         set = true;
@@ -304,9 +309,10 @@ namespace DataTables
 		// If it has not been set then there aren't any so set count to 0
                 if(!set) {
                     output.Add(new Dictionary<string, object>{
-                        {"label", formatter(rows[i]["label"].ToString())},
+                        {"label", formatter(
+                            (rows[i]["label"] is DBNull) ? null : rows[i]["label"].ToString())},
                         {"total", rows[i]["total"]},
-                        {"value", rows[i]["value"].ToString()},
+                        {"value", rows[i]["value"] is DBNull ? null : rows[i]["value"].ToString()},
                         {"count", 0}
                     });
                 }
@@ -315,7 +321,16 @@ namespace DataTables
 
             if (_order == null)
             {
-                output.Sort((a, b) => a["label"].ToString().CompareTo(b["label"].ToString()));
+                string emptyStringa = "";
+                string emptyStringb = "";
+                output.Sort((a, b) => (a["label"] == null && b["label"] == null) ?
+                    emptyStringa.CompareTo(emptyStringb) :
+                    (a["label"] == null) ?
+                        emptyStringa.CompareTo(b["label"].ToString()) :
+                        (b["label"] == null) ?
+                            a["label"].ToString().CompareTo(emptyStringb) :
+                            a["label"].ToString().CompareTo(b["label"].ToString())
+                );
             }
 
             return output.ToList();

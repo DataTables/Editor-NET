@@ -2173,11 +2173,17 @@ namespace DataTables
                 foreach(var field in this._field){
                     if(http.searchPanes.ContainsKey(field.Name())){
                         query.Where(qu =>
-                    {
-                        foreach(var opt in http.searchPanes[field.Name()]){
-                            qu.OrWhere(field.Name(), opt, "=");
-                        }
-                    });
+                            {
+                                for(int j =0; j < http.searchPanes[field.Name()].Count(); j++){
+                                    qu.OrWhere(
+                                        field.Name(),
+                                        http.searchPanes_null[field.Name()] != null && http.searchPanes_null[field.Name()][j] ?
+                                            null :
+                                            http.searchPanes[field.Name()][j],
+                                        "="
+                                    );
+                                }
+                            });
                     }
                 }
             }
