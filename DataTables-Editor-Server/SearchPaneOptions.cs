@@ -260,7 +260,7 @@ namespace DataTables
                         for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
                             qu.OrWhere(
                                 fields[i].Name(),
-                                http.searchPanes_null[fields[i].Name()][j] ?
+                                http.searchPanes_null.ContainsKey(fields[i].Name()) && http.searchPanes_null[fields[i].Name()][j] ?
                                     null :
                                     http.searchPanes[fields[i].Name()][j],
                                 "="
