@@ -18,7 +18,7 @@ namespace DataTables
         private string _table;
         private string _value;
         private IEnumerable<string> _label;
-        private Func<Dictionary<string, object>, string> _renderer;
+        private Func<Dictionary<string, object>, object> _renderer;
         private Action<Query> _where;
         private string _order;
         private int _limit=-1;
@@ -134,7 +134,7 @@ namespace DataTables
         /// Get the rendering function
         /// </summary>
         /// <returns>Rendering function</returns>
-        public Func<Dictionary<string, object>, string> Render()
+        public Func<Dictionary<string, object>, object> Render()
         {
             return _renderer;
         }
@@ -144,7 +144,7 @@ namespace DataTables
         /// </summary>
         /// <param name="renderer">Rendering function. Called once for each option</param>
         /// <returns>Self for chaining</returns>
-        public Options Render(Func<Dictionary<string, object>, string> renderer)
+        public Options Render(Func<Dictionary<string, object>, object> renderer)
         {
             _renderer = renderer;
 
