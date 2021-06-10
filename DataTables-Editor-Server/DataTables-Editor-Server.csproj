@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.1;net45;net46;net47;net48</TargetFrameworks>
-    <Version >2.0.3</Version>
+    <Version >2.0.4</Version>
     <Authors>SpryMedia Ltd</Authors>
     <Product>DataTables Editor - server-side libraries for .NET</Product>
     <Copyright>SpryMedia Ltd</Copyright>
@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/DataTables/Editor-NET</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>DataTables, Javascript, jQuery, Editor, CRUD</PackageTags>
-    <AssemblyVersion >2.0.3.0</AssemblyVersion>
+    <AssemblyVersion >2.0.4.0</AssemblyVersion>
     <PackageLicenseUrl>https://editor.datatables.net/license</PackageLicenseUrl>
     <Description>Editor is a Create, Read, Update and Delete (CRUD) plug-in for DataTables that provides the ability to easily add, edit and delete rows on a database that is displayed by a DataTable.
 
