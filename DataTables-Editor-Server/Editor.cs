@@ -1329,6 +1329,16 @@ namespace DataTables
             // Add the properties
             foreach (var pi in model.GetProperties())
             {
+                // Check for ignore attribute
+                var ignAttr = pi
+                    .GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
+                    .Cast<EditorIgnoreAttribute>().FirstOrDefault();
+
+                if (ignAttr != null && ignAttr.Ignore)
+                {
+                    continue;
+                }
+
                 var field = _FindField(parent + pi.Name, "name");
 
                 // If the field doesn't exist yet, create it
@@ -1341,17 +1351,18 @@ namespace DataTables
                 // Then assign the information from the model
                 field.Type(pi.PropertyType);
 
-                var prop = pi.GetCustomAttributes(typeof(EditorTypeErrorAttribute), true);
-                var err = prop
-                     .Cast<EditorTypeErrorAttribute>().FirstOrDefault();
+                var err = pi
+                    .GetCustomAttributes(typeof(EditorTypeErrorAttribute), true)
+                    .Cast<EditorTypeErrorAttribute>().FirstOrDefault();
 
                 if (err != null)
                 {
                     field.TypeError(err.Msg);
                 }
 
-                var name = pi.GetCustomAttributes(typeof(EditorHttpNameAttribute), false)
-                     .Cast<EditorHttpNameAttribute>().FirstOrDefault();
+                var name = pi
+                    .GetCustomAttributes(typeof(EditorHttpNameAttribute), false)
+                    .Cast<EditorHttpNameAttribute>().FirstOrDefault();
 
                 if (name != null)
                 {

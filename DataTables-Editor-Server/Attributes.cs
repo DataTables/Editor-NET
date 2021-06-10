@@ -53,4 +53,26 @@ namespace DataTables
             Name = name;
         }
     }
+
+    /// <summary>
+    /// Tell Editor to not use this property from the model as part of the data to
+    /// process (fetch from the database, or expect from the client-side)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class EditorIgnoreAttribute : Attribute
+    {
+        /// <summary>
+        /// Field's ignore flag
+        /// </summary>
+        public bool Ignore = false;
+
+        /// <summary>
+        /// Constructor for a field attribute telling Editor to ignore a property in a model
+        /// </summary>
+        /// <param name="ign">Ignore flag</param>
+        public EditorIgnoreAttribute(bool ign = true)
+        {
+            Ignore = ign;
+        }
+    }
 }
