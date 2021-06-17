@@ -771,7 +771,7 @@ namespace DataTables
         {
             var id = new List<string>();
 
-            for (int i = 0, ien = _pkey.Length; i<ien; i++)
+            for (int i = 0, ien = _pkey.Length; i < ien; i++)
             {
                 var column = _pkey[i];
                 string val = null;
@@ -804,7 +804,7 @@ namespace DataTables
                     throw new Exception("Primary key element is not available in data set.");
                 }
 
-                id.Add( val );
+                id.Add(val);
             }
 
             return string.Join(_pkeySeparator(), id);
@@ -819,7 +819,7 @@ namespace DataTables
         /// <param name="pkey">Primary key to use. Instance default will be used
         /// if not given</param>
         /// <returns>Field values that the id was made up of.</returns>
-        public Dictionary<string, object> PkeyToArray (string value, bool flat=false, string[] pkey=null)
+        public Dictionary<string, object> PkeyToArray(string value, bool flat = false, string[] pkey = null)
         {
             var arr = new Dictionary<string, object>();
 
@@ -829,7 +829,7 @@ namespace DataTables
             }
 
             value = value.Replace(IdPrefix(), "");
-            var idParts = value.Split(new[] {_pkeySeparator()}, StringSplitOptions.None);
+            var idParts = value.Split(new[] { _pkeySeparator() }, StringSplitOptions.None);
 
             if (pkey.Length != idParts.Length)
             {
@@ -904,7 +904,7 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(IEnumerable<KeyValuePair<string, string>> data = null, string culture=null)
+        public Editor Process(IEnumerable<KeyValuePair<string, string>> data = null, string culture = null)
         {
             return Process(new DtRequest(data, culture));
         }
@@ -916,7 +916,7 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Request type</returns>
-        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null, string culture=null)
+        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null, string culture = null)
         {
             return Process(new DtRequest(data, culture));
         }
@@ -929,7 +929,7 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(NameValueCollection data = null, string culture=null)
+        public Editor Process(NameValueCollection data = null, string culture = null)
         {
             var list = new List<KeyValuePair<string, string>>();
 
@@ -951,12 +951,13 @@ namespace DataTables
         /// <param name="request">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(HttpRequest request, string culture=null)
+        public Editor Process(HttpRequest request, string culture = null)
         {
             _request = request;
 
 #if NETCOREAPP
-            if ( request.HasFormContentType ) {
+            if (request.HasFormContentType)
+            {
                 _requestFiles = request.Form.Files;
                 return Process(request.Form);
             }
@@ -1130,7 +1131,8 @@ namespace DataTables
         /// Get the value of this._write
         /// </summary>
         /// <returns>bool the value of this._write</returns>
-        public bool Write(){
+        public bool Write()
+        {
             return this._write;
         }
 
@@ -1139,7 +1141,8 @@ namespace DataTables
         /// </summary>
         /// <param name="writeVal">The value that this._write is to be set to</param>
         /// <returns>Self for chaining</returns>
-        public Editor Write(bool writeVal) {
+        public Editor Write(bool writeVal)
+        {
             this._write = writeVal;
             return this;
         }
@@ -1234,7 +1237,7 @@ namespace DataTables
                     // Trigger pre events before validation, so validation could be added
                     var cancelResult = false;
                     var toRemove = new List<string>();
-                    
+
                     foreach (var pair in data.Data)
                     {
                         if (data.RequestType == DtRequest.RequestTypes.EditorCreate)
@@ -1286,7 +1289,7 @@ namespace DataTables
 
                     // Validate
                     var valid = Validate(_out, data);
-                        
+
                     if (valid)
                     {
                         foreach (var pair in data.Data)
@@ -1301,7 +1304,7 @@ namespace DataTables
                             }
                         }
 
-                    	_FileClean();
+                        _FileClean();
                     }
                 }
             }
@@ -1319,7 +1322,7 @@ namespace DataTables
             {
                 foreach (KeyValuePair<string, Type> pair in _userModelT)
                 {
-                    _FieldFromModel(pair.Value, pair.Key=="" ? pair.Key : pair.Key+".");
+                    _FieldFromModel(pair.Value, pair.Key == "" ? pair.Key : pair.Key + ".");
                 }
             }
         }
@@ -1413,7 +1416,7 @@ namespace DataTables
                 {
                     continue;
                 }
-                
+
                 if (field.Apply("get") && field.GetValue() == null)
                 {
                     query.Get(field.DbField());
@@ -1453,9 +1456,12 @@ namespace DataTables
                 // Create an array of fields to pass to SearchPaneOptions
                 Field[] fields = new Field[http.Columns.Count()];
                 int x = 0;
-                for(int i = 0; i < this._field.Count(); i++){
-                    for(int j = 0;  j < http.Columns.Count(); j++){
-                        if(this._field[i].Name() == http.Columns[j].Data){
+                for (int i = 0; i < this._field.Count(); i++)
+                {
+                    for (int j = 0; j < http.Columns.Count(); j++)
+                    {
+                        if (this._field[i].Name() == http.Columns[j].Data)
+                        {
                             fields[x] = this._field[i];
                             x++;
                         }
@@ -1472,14 +1478,14 @@ namespace DataTables
 
                     var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, http);
 
-                    if(spOpts != null)
+                    if (spOpts != null)
                     {
                         dtData.searchPanes.options.Add(field.Name(), spOpts);
                     }
                 }
             }
 
-            
+
 
             // Row based joins
             foreach (var mjoin in _mJoin)
@@ -1507,7 +1513,7 @@ namespace DataTables
             {
                 dtData.searchPanes = null;
             }
-            
+
             return dtData;
         }
 
@@ -1548,7 +1554,7 @@ namespace DataTables
             id = _pkey.Length > 1
                 ? PkeyToValue(all)
                 : _PkeySubmitMerge(id.ToString(), all);
-            
+
             // Row based joins
             foreach (var mjoin in _mJoin)
             {
@@ -1679,7 +1685,8 @@ namespace DataTables
             }
 
             // Remove from the left join tables
-            if ( _leftJoinRemove ) {
+            if (_leftJoinRemove)
+            {
                 for (int i = 0, ien = _leftJoin.Count(); i < ien; i++)
                 {
                     var join = _leftJoin[i];
@@ -1705,7 +1712,7 @@ namespace DataTables
                     // over multiple fields.
                     if (_pkey.Length == 1 && parentLink == _pkey[0])
                     {
-                        _RemoveTable(join.Table, ids, new[] {childLink});
+                        _RemoveTable(join.Table, ids, new[] { childLink });
                     }
                 }
             }
@@ -1803,7 +1810,7 @@ namespace DataTables
             }
             else
             {
-                _out.files = _FileData(upload.Table(), new object[] {res});
+                _out.files = _FileData(upload.Table(), new object[] { res });
                 _out.upload.id = res;
 
                 PostUpload?.Invoke(this, new PostUploadEventArgs
@@ -1821,7 +1828,8 @@ namespace DataTables
             string limitTable = null,
             ICollection<object> ids = null,
             List<Dictionary<string, object>> data = null
-        ) {
+        )
+        {
             var files = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
 
             // The fields in this instance
@@ -1834,19 +1842,19 @@ namespace DataTables
                 // un-nest it (i.e. get the array of joined data for each row)
                 List<Dictionary<string, object>> joinData = null;
 
-                if ( data != null )
+                if (data != null)
                 {
                     joinData = new List<Dictionary<string, object>>();
 
                     foreach (var row in data)
                     {
-                        if ( row.ContainsKey( join.Name() ) )
+                        if (row.ContainsKey(join.Name()))
                         {
                             var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
 
-                            if ( d != null )
+                            if (d != null)
                             {
-                                foreach (var i in d )
+                                foreach (var i in d)
                                 {
                                     joinData.Add(i);
                                 }
@@ -1893,28 +1901,30 @@ namespace DataTables
 
                 // Make a collection of the ids used in this data set to get a limited data set
                 // in return (security and performance)
-                if ( ids == null )
+                if (ids == null)
                 {
                     ids = new List<object>();
                 }
 
-                if ( data != null )
+                if (data != null)
                 {
                     foreach (var row in data)
                     {
                         var val = NestedData.ReadProp(field.Name(), row);
 
-                        if ( val != null )
+                        if (val != null)
                         {
                             ids.Add(val);
                         }
                     }
 
-                    if ( ids.Count == 0 ) {
+                    if (ids.Count == 0)
+                    {
                         // If no data to fetch, then don't bother
                         return;
                     }
-                    else if ( ids.Count > 1000 ) {
+                    else if (ids.Count > 1000)
+                    {
                         // Don't use whereIn for really large data sets
                         ids = new List<object>();
                     }
@@ -2160,7 +2170,7 @@ namespace DataTables
             // in the table (not the fields, just the columns submitted)
             if (http.Search.Value != "")
             {
-                query.Where(delegate(Query q)
+                query.Where(delegate (Query q)
                 {
                     for (int i = 0, ien = http.Columns.Count(); i < ien; i++)
                     {
@@ -2179,22 +2189,26 @@ namespace DataTables
                 });
             }
 
-            if(http.searchPanes != null){
+            if (http.searchPanes != null)
+            {
                 // Add the Where statements due to SearchPanes Selections
-                foreach(var field in this._field){
-                    if(http.searchPanes.ContainsKey(field.Name())){
+                foreach (var field in this._field)
+                {
+                    if (http.searchPanes.ContainsKey(field.Name()))
+                    {
                         query.Where(qu =>
+                        {
+                            for (int j = 0; j < http.searchPanes[field.Name()].Count(); j++)
                             {
-                                for(int j =0; j < http.searchPanes[field.Name()].Count(); j++){
-                                    qu.OrWhere(
-                                        field.Name(),
-                                        http.searchPanes_null.ContainsKey(field.Name()) && http.searchPanes_null[field.Name()][j] ?
-                                            null :
-                                            http.searchPanes[field.Name()][j],
-                                        "="
-                                    );
-                                }
-                            });
+                                qu.OrWhere(
+                                    field.Name(),
+                                    http.searchPanes_null.ContainsKey(field.Name()) && http.searchPanes_null[field.Name()][j] ?
+                                        null :
+                                        http.searchPanes[field.Name()][j],
+                                    "="
+                                );
+                            }
+                        });
                     }
                 }
             }
@@ -2333,16 +2347,22 @@ namespace DataTables
 
             foreach (var field in _field)
             {
+                string localTableAlias;
                 var tablePart = _Part(field.DbField());
 
                 if (_Part(field.DbField(), "db") != null)
                 {
                     tablePart = _Part(field.DbField(), "db") + "." + tablePart;
+                    localTableAlias = tableAlias;
+                }
+                else
+                {
+                    localTableAlias = tableAlias.Split('.').Last();
                 }
 
                 // Does this field apply to this table (only check when a join is
                 // being used)
-                if (_leftJoin.Any() && tablePart != tableAlias)
+                if (_leftJoin.Any() && tablePart != localTableAlias)
                 {
                     continue;
                 }
@@ -2364,7 +2384,8 @@ namespace DataTables
             }
 
             // If nothing to do, then do nothing!
-            if (runIt == false) {
+            if (runIt == false)
+            {
                 return null;
             }
 
@@ -2377,10 +2398,12 @@ namespace DataTables
         {
             foreach (var join in _leftJoin)
             {
-                if (join.Field2 == null && join.Operator == null ) {
+                if (join.Field2 == null && join.Operator == null)
+                {
                     q.Join(join.Table, join.Field1, "LEFT", false);
                 }
-                else {
+                else
+                {
                     q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
                 }
             }
@@ -2418,7 +2441,7 @@ namespace DataTables
 
             if (name.Contains("."))
             {
-                var a = name.Split(new [] {'.'});
+                var a = name.Split(new[] { '.' });
 
                 if (a.Count() == 3)
                 {
