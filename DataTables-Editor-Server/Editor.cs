@@ -1520,7 +1520,10 @@ namespace DataTables
 
             foreach (var field in _field)
             {
-                NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+			    if (field.Apply("set", values))
+                {
+                    NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+                }
             }
 
             // Only allow a composite insert if the values for the key are
