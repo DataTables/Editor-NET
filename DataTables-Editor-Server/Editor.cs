@@ -2202,6 +2202,15 @@ namespace DataTables
                 }
             }
 
+            
+            if(http.searchBuilder != null) {
+                void nestSB(Query q) {
+                    // This function constructs the nested where condition based on SearchBuilders current criteria
+                    this._constructSearchBuilderConditions(q, http.searchBuilder);
+                }
+                query.WhereGroup(nestSB);
+            }
+
             // Column filters
             for (int i = 0, ien = http.Columns.Count(); i < ien; i++)
             {
@@ -2215,6 +2224,167 @@ namespace DataTables
             }
         }
 
+        private Query _constructSearchBuilderConditions(Query query, SearchBuilderDetails data) {
+            Boolean first = true;
+
+            // Iterate over every group or criteria in the current group
+            foreach(SearchBuilderDetails crit in data.criteria) {
+                // If criteria is defined then this must be a group
+                if(crit.criteria.Count > 0) {
+                    void nestSB(Query q) {
+                        this._constructSearchBuilderConditions(q, crit);
+                    }
+                    // Check if this is the first, or if it is and logic
+                    if(data.logic == "AND" || first) {
+                        // Call the function for the next group
+                       query.WhereGroup(nestSB);
+                        // Set first to false so that in future only the logic is checked
+                        first = false;
+                    }
+                    else {
+                        query.WhereGroup(nestSB, "OR");
+                    }
+                }
+                else if (crit.condition != null && crit.value.Count > 0) {
+                    // Sometimes the structure of the object that is passed across is named in a strange way.
+                    // This conditional assignment solves that issue
+                    String val1 = crit.value[0];
+                    String val2 = "";
+
+                    if (crit.value.Count > 1) {
+                        val2 = crit.value[1]; 
+                    }
+
+                    // Switch on the condition that has been passed in
+                    switch(crit.condition) {
+                        case "=":
+                            // Check if this is the first, or if it is and logic
+                            if(data.logic == "AND" || first) {
+                                // Call the where function for this condition
+                                query.Where(crit.origData, val1, "=");
+                                // Set first to false so that in future only the logic is checked
+                                first = false;
+                            }
+                            else {
+                                // Call the or_where function - has to be or logic in this block
+                                query.OrWhere(crit.origData, val1, "!=");
+                            }
+                            break;
+                        case "!=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "!=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "!=");
+                            }
+                            break;
+                        case "contains":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1+"%", "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1+"%", "LIKE");
+                            }
+                            break;
+                        case "starts":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1+"%", "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1+"%", "LIKE");
+                            }
+                            break;
+                        case "ends":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1, "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1, "LIKE");
+                            }
+                            break;
+                        case "<":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "<");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "<");
+                            }
+                            break;
+                        case "<=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "<=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "<=");
+                            }
+                            break;
+                        case ">=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, ">=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, ">=");
+                            }
+                            break;
+                        case ">":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, ">");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, ">");
+                            }
+                            break;
+                        case "between":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                            }
+                            break;
+                        case "!between":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                            }
+                            break;
+                        case "empty":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "IS NULL");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "IS NULL");
+                            }
+                            break;
+                        case "!empty":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "IS NOT NULL");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "IS NOT NULL");
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            return query;
+        }
 
         private void _SspLimit(Query query, DtRequest http)
         {

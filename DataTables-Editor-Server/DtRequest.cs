@@ -197,6 +197,11 @@ namespace DataTables
         public Dictionary<string, bool[]> searchPanes_null = new Dictionary<string, bool[]>();
 
         /// <summary>
+        /// Information for searchBuilder
+        /// </summary>
+        public SearchBuilderDetails searchBuilder = new SearchBuilderDetails();
+
+        /// <summary>
         /// List of ids for Editor to operate on
         /// </summary>
         public List<string> Ids = new List<string>();
@@ -393,12 +398,45 @@ namespace DataTables
                             
                         }
                 }
+                //SearchBuilder
+                if(http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String)){
+                    searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
+                }
             }
             else
             {
                 // DataTables get request
                 RequestType = RequestTypes.DataTablesGet;
             }
+        }
+
+        private SearchBuilderDetails searchBuilderParse(Dictionary<String, object> data) {
+            var sb = new SearchBuilderDetails();
+            // If the logic key is present then it must be a group and different parsing needs to occur
+            if(data.ContainsKey("logic")) {
+                sb.logic = (string)data["logic"];
+                var criteria = (Dictionary<string, object>) data["criteria"];
+                var keyList = new List<string>(criteria.Keys);
+
+                foreach(var key in keyList) {
+                    // Specifically the items in this group also need to be parsed
+                    sb.criteria.Add( searchBuilderParse((Dictionary<string, object>)criteria[key]));
+                }
+            }
+            // Otherwise if all of the values required to cause a search are present then make a criteria
+            else if(data.ContainsKey("condition") && data.ContainsKey("origData") && data.ContainsKey("value")) {
+                sb.condition = (String)data["condition"];
+                sb.data = (String)data["data"];
+                sb.origData = (String)data["origData"];
+                
+                var values = (Dictionary<String, object>) data["value"];
+                var keyList = new List<String>(values.Keys);
+                foreach(var key in keyList) {
+                    sb.value.Add((String) values[key]);
+                } 
+            }
+
+            return sb;
         }
 
 
