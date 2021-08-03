@@ -2245,14 +2245,27 @@ namespace DataTables
                         query.WhereGroup(nestSB, "OR");
                     }
                 }
-                else if (crit.condition != null && crit.value.Count > 0) {
+                else if (crit.condition != null && (crit.value.Count > 0 || crit.condition == "null" || crit.condition == "!null")) {
                     // Sometimes the structure of the object that is passed across is named in a strange way.
                     // This conditional assignment solves that issue
-                    String val1 = crit.value[0];
+                    String val1 = "";
                     String val2 = "";
 
-                    if (crit.value.Count > 1) {
-                        val2 = crit.value[1]; 
+                    if(crit.value.Count > 0 && crit.value[0] != null) {
+                        val1 = crit.value[0];
+
+                        if(val1.Length == 0) {
+                            continue;
+                        }
+
+                        if (crit.value.Count > 1) {
+                            val2 = crit.value[1];
+
+                            if(val2.Length == 0) {
+                                continue;
+                            }
+                        }
+
                     }
 
                     // Switch on the condition that has been passed in
@@ -2360,22 +2373,35 @@ namespace DataTables
                                 query.OrWhere(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
                             }
                             break;
-                        case "empty":
+                        case "null":
                             if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "IS NULL");
+                                void func(Query q) {
+                                    q.Where(crit.origData, null, "=");
+                                    q.OrWhere(crit.origData, "", "=");
+                                }
+                                query.WhereGroup(func);
                                 first = false;
                             }
                             else {
-                                query.OrWhere(crit.origData, "IS NULL");
+                                void func(Query q) {
+                                    q.Where(crit.origData, null, "=");
+                                    q.OrWhere(crit.origData, "", "=");
+                                }
+                                query.WhereGroup(func, "OR");
                             }
                             break;
-                        case "!empty":
+                        case "!null":
                             if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "IS NOT NULL");
+                                query.Where(crit.origData, null, "!=");
+                                query.Where(crit.origData, "", "!=");
                                 first = false;
                             }
                             else {
-                                query.OrWhere(crit.origData, "IS NOT NULL");
+                                void func (Query q) {
+                                    q.Where(crit.origData, null, "!=");
+                                    q.Where(crit.origData, "", "!=");
+                                }
+                                query.WhereGroup(func, "OR");
                             }
                             break;
                         default:

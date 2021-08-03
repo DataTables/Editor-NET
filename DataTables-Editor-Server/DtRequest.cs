@@ -424,16 +424,18 @@ namespace DataTables
                 }
             }
             // Otherwise if all of the values required to cause a search are present then make a criteria
-            else if(data.ContainsKey("condition") && data.ContainsKey("origData") && data.ContainsKey("value")) {
+            else if(data.ContainsKey("condition") && data.ContainsKey("origData")) {
                 sb.condition = (String)data["condition"];
                 sb.data = (String)data["data"];
                 sb.origData = (String)data["origData"];
                 
-                var values = (Dictionary<String, object>) data["value"];
-                var keyList = new List<String>(values.Keys);
-                foreach(var key in keyList) {
-                    sb.value.Add((String) values[key]);
-                } 
+                if(data.ContainsKey("value")) {
+                    var values = (Dictionary<String, object>) data["value"];
+                    var keyList = new List<String>(values.Keys);
+                    foreach(var key in keyList) {
+                        sb.value.Add((String) values[key]);
+                    } 
+                }
             }
 
             return sb;
