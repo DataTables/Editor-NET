@@ -2365,20 +2365,32 @@ namespace DataTables
                             break;
                         case "between":
                             if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                }
+                                query.WhereGroup(func);
                                 first = false;
                             }
                             else {
-                                query.OrWhere(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                }
+                                query.WhereGroup(func, "OR");
                             }
                             break;
                         case "!between":
                             if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                }
+                                query.WhereGroup(func);
                                 first = false;
                             }
                             else {
-                                query.OrWhere(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                }
+                                query.WhereGroup(func, "OR");
                             }
                             break;
                         case "null":
