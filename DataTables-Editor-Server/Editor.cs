@@ -1368,6 +1368,24 @@ namespace DataTables
                 {
                     field.Name(name.Name);
                 }
+
+                var get = pi
+                    .GetCustomAttributes(typeof(EditorGetAttribute), false)
+                    .Cast<EditorGetAttribute>().FirstOrDefault();
+
+                if (get != null)
+                {
+                    field.Get(get.Get);
+                }
+
+                var set = pi
+                    .GetCustomAttributes(typeof(EditorSetAttribute), false)
+                    .Cast<EditorSetAttribute>().FirstOrDefault();
+
+                if (set != null)
+                {
+                    field.Set(set.Set);
+                }
             }
 
             // Add any nested classes and their properties
