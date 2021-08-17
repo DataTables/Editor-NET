@@ -430,6 +430,7 @@ namespace DataTables
                 sb.origData = (String)data["origData"];
                 sb.value1 = data.ContainsKey("value1") ? (String)data["value1"].ToString() : "";
                 sb.value2 = data.ContainsKey("value2") ? (String)data["value2"].ToString() : "";
+                sb.type = (String)data["type"];
             }
 
             return sb;

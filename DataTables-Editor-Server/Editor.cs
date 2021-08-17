@@ -2397,7 +2397,9 @@ namespace DataTables
                             if(data.logic == "AND" || first) {
                                 void func(Query q) {
                                     q.Where(crit.origData, null, "=");
-                                    q.OrWhere(crit.origData, "", "=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.OrWhere(crit.origData, "", "=");
+                                    }
                                 }
                                 query.WhereGroup(func);
                                 first = false;
@@ -2405,21 +2407,30 @@ namespace DataTables
                             else {
                                 void func(Query q) {
                                     q.Where(crit.origData, null, "=");
-                                    q.OrWhere(crit.origData, "", "=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.OrWhere(crit.origData, "", "=");
+                                    }
                                 }
                                 query.WhereGroup(func, "OR");
                             }
                             break;
                         case "!null":
                             if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, null, "!=");
-                                query.Where(crit.origData, "", "!=");
+                                void func (Query q) {
+                                    q.Where(crit.origData, null, "!=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.Where(crit.origData, "", "!=");
+                                    }
+                                }
+                                query.Where(func);
                                 first = false;
                             }
                             else {
                                 void func (Query q) {
                                     q.Where(crit.origData, null, "!=");
-                                    q.Where(crit.origData, "", "!=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.Where(crit.origData, "", "!=");
+                                    }
                                 }
                                 query.WhereGroup(func, "OR");
                             }

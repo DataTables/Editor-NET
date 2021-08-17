@@ -12,6 +12,8 @@ namespace DataTables
 
         public String origData = null;
 
+        public String type = null;
+
         public String value1 = null;
 
         public String value2 = null;
