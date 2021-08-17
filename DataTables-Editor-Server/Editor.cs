@@ -2245,27 +2245,17 @@ namespace DataTables
                         query.WhereGroup(nestSB, "OR");
                     }
                 }
-                else if (crit.condition != null && (crit.value.Count > 0 || crit.condition == "null" || crit.condition == "!null")) {
+                else if (crit.condition != null && (crit.value1 != null || crit.condition == "null" || crit.condition == "!null")) {
                     // Sometimes the structure of the object that is passed across is named in a strange way.
                     // This conditional assignment solves that issue
-                    String val1 = "";
-                    String val2 = "";
+                    String val1 = crit.value1;
+                    String val2 = crit.value2;
 
-                    if(crit.value.Count > 0 && crit.value[0] != null) {
-                        val1 = crit.value[0];
-
-                        if(val1.Length == 0) {
-                            continue;
-                        }
-
-                        if (crit.value.Count > 1) {
-                            val2 = crit.value[1];
-
-                            if(val2.Length == 0) {
-                                continue;
-                            }
-                        }
-
+                    if (
+                        (val1.Length == 0 && crit.condition != "null" && crit.condition != "!null") ||
+                        (val2.Length == 0 && (crit.condition == "between" || crit.condition == "!between"))
+                    ) {
+                        continue;
                     }
 
                     // Switch on the condition that has been passed in

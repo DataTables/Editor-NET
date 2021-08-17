@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/DataTables/Editor-NET</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>DataTables, Javascript, jQuery, Editor, CRUD</PackageTags>
-    <AssemblyVersion >2.0.4.1</AssemblyVersion>
+    <AssemblyVersion >2.0.4.0</AssemblyVersion>
     <PackageLicenseUrl>https://editor.datatables.net/license</PackageLicenseUrl>
     <Description>Editor is a Create, Read, Update and Delete (CRUD) plug-in for DataTables that provides the ability to easily add, edit and delete rows on a database that is displayed by a DataTable.
 

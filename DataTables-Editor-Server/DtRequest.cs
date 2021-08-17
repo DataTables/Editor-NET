@@ -428,14 +428,8 @@ namespace DataTables
                 sb.condition = (String)data["condition"];
                 sb.data = (String)data["data"];
                 sb.origData = (String)data["origData"];
-                
-                if(data.ContainsKey("value")) {
-                    var values = (Dictionary<String, object>) data["value"];
-                    var keyList = new List<String>(values.Keys);
-                    foreach(var key in keyList) {
-                        sb.value.Add((String) values[key]);
-                    } 
-                }
+                sb.value1 = data.ContainsKey("value1") ? (String)data["value1"].ToString() : "";
+                sb.value2 = data.ContainsKey("value2") ? (String)data["value2"].ToString() : "";
             }
 
             return sb;

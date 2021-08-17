@@ -12,7 +12,9 @@ namespace DataTables
 
         public String origData = null;
 
-        public List<String> value = new List<String>();
+        public String value1 = null;
+
+        public String value2 = null;
 
         public List<SearchBuilderDetails> criteria = new List<SearchBuilderDetails>();
     
