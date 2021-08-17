@@ -2288,7 +2288,7 @@ namespace DataTables
                             }
                             else {
                                 // Call the or_where function - has to be or logic in this block
-                                query.OrWhere(crit.origData, val1, "!=");
+                                query.OrWhere(crit.origData, val1, "=");
                             }
                             break;
                         case "!=":
