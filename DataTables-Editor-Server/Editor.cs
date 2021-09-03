@@ -1889,6 +1889,7 @@ namespace DataTables
             foreach (var field in fields)
             {
                 var upload = field.Upload();
+                var entries = new Dictionary<string, Dictionary<string, object>>();
 
                 if (upload == null)
                 {
@@ -1909,7 +1910,11 @@ namespace DataTables
 
                 if (files.ContainsKey(table))
                 {
-                    continue;
+                    entries = files[table];
+                }
+                else
+                {
+                    files.Add(table, entries);
                 }
 
                 // Make a collection of the ids used in this data set to get a limited data set
@@ -1945,7 +1950,10 @@ namespace DataTables
 
                 if (fileData != null)
                 {
-                    files.Add(table, fileData);
+                    foreach(var file in fileData)
+                    {
+                        entries.Add(file.Key, file.Value);
+                    }
                 }
             }
         }
