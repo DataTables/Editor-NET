@@ -1952,7 +1952,10 @@ namespace DataTables
                 {
                     foreach(var file in fileData)
                     {
-                        entries.Add(file.Key, file.Value);
+                        if (! entries.ContainsKey(file.Key))
+                        {
+                            entries.Add(file.Key, file.Value);
+                        }
                     }
                 }
             }
