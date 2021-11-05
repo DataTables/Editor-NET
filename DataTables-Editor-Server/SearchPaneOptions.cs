@@ -246,16 +246,24 @@ namespace DataTables
 
             var query = db.Query("select")
                 .Table(this._table);
+
+            // The last pane to have a selection runs a slightly different query
+            var queryLast = db.Query("select")
+                .Table(this._table);
             
             if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
                 query.Get(this._value + " as value")
                     .Get("COUNT(*) as count")
                     .GroupBy(this._value);
+                queryLast.Get(this._value + " as value")
+                    .Get("COUNT(*) as count")
+                    .GroupBy(this._value);
             }
+
             // Loop over fields - for cascade
             for(int i = 0; i < fields.Count(); i++) {
                 if (http.searchPanes.ContainsKey(fields[i].Name())) {
-		    // Apply Or where based upon searchPanes selections
+            // Apply Or where based upon searchPanes selections
                     query.Where(qu => {
                         for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
                             qu.OrWhere(
@@ -269,9 +277,35 @@ namespace DataTables
                     });
                 }
             }
+        
+            // If there is a last value set then a slightly different set of results is required for cascade
+		    // That panes results are based off of the results when only considering the selections of all of the others
+            if(http.searchPanesLast != null) {
+                // Loop over fields - for cascade
+                for(int i = 0; i < fields.Count(); i++) {
+                    if (http.searchPanes.ContainsKey(fields[i].Name()) && fields[i].Name() != http.searchPanesLast) {
+                        // Apply Or where based upon searchPanes selections
+                        queryLast.Where(qu => {
+                            for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
+                                qu.OrWhere(
+                                    fields[i].Name(),
+                                    http.searchPanes_null.ContainsKey(fields[i].Name()) && http.searchPanes_null[fields[i].Name()][j] ?
+                                        null :
+                                        http.searchPanes[fields[i].Name()][j],
+                                    "="
+                                );
+                            }
+                        });
+                    }
+                }
+            }
 
             _PerformLeftJoin(query);
+            _PerformLeftJoin(queryLast);
+
             var res = query.Exec()
+                .FetchAll();
+            var resLast = queryLast.Exec()
                 .FetchAll();
 
             var q = db.Query("select")
@@ -293,17 +327,35 @@ namespace DataTables
             List<Dictionary<string, object>> output = new List<Dictionary<string, object>>();
             for (int i=0, ien=rows.Count() ; i<ien ; i++ ) {
                 bool set = false;
-                for( int j=0 ; j<res.Count() ; j ++) {
-                    if(res[j]["value"].ToString() == rows[i]["value"].ToString()) {
-                        output.Add(new Dictionary<string, object>{
-                            {"label", formatter(
-                                (rows[i]["label"] is DBNull) ? null : rows[i]["label"].ToString()
-                                )},
-                            {"total", rows[i]["total"]},
-                            {"value", rows[i]["value"] is DBNull ? null : rows[i]["value"].ToString()},
-                            {"count", res[j]["count"]}
-                        });
-                        set = true;
+                // Send slightly different results if this is the last pane
+                if(http.searchPanesLast != null && fieldIn.Name() == http.searchPanesLast) {
+                    for( int j=0 ; j<resLast.Count() ; j ++) {
+                        if(resLast[j]["value"].ToString() == rows[i]["value"].ToString()) {
+                            output.Add(new Dictionary<string, object>{
+                                {"label", formatter(
+                                    (rows[i]["label"] is DBNull) ? null : rows[i]["label"].ToString()
+                                    )},
+                                {"total", rows[i]["total"]},
+                                {"value", rows[i]["value"] is DBNull ? null : rows[i]["value"].ToString()},
+                                {"count", resLast[j]["count"]}
+                            });
+                            set = true;
+                        }
+                    }
+                }
+                else {
+                    for( int j=0 ; j<res.Count() ; j ++) {
+                        if(res[j]["value"].ToString() == rows[i]["value"].ToString()) {
+                            output.Add(new Dictionary<string, object>{
+                                {"label", formatter(
+                                    (rows[i]["label"] is DBNull) ? null : rows[i]["label"].ToString()
+                                    )},
+                                {"total", rows[i]["total"]},
+                                {"value", rows[i]["value"] is DBNull ? null : rows[i]["value"].ToString()},
+                                {"count", res[j]["count"]}
+                            });
+                            set = true;
+                        }
                     }
                 }
 		// If it has not been set then there aren't any so set count to 0
