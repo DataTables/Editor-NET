@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.0.4";
+        public const string Version = "2.0.5";
 
         /// <summary>
         /// Create a new Editor instance
@@ -1371,6 +1371,24 @@ namespace DataTables
                 {
                     field.Name(name.Name);
                 }
+
+                var get = pi
+                    .GetCustomAttributes(typeof(EditorGetAttribute), false)
+                    .Cast<EditorGetAttribute>().FirstOrDefault();
+
+                if (get != null)
+                {
+                    field.Get(get.Get);
+                }
+
+                var set = pi
+                    .GetCustomAttributes(typeof(EditorSetAttribute), false)
+                    .Cast<EditorSetAttribute>().FirstOrDefault();
+
+                if (set != null)
+                {
+                    field.Set(set.Set);
+                }
             }
 
             // Add any nested classes and their properties
@@ -1526,7 +1544,10 @@ namespace DataTables
 
             foreach (var field in _field)
             {
-                NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+			    if (field.Apply("set", values))
+                {
+                    NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+                }
             }
 
             // Only allow a composite insert if the values for the key are
@@ -1876,6 +1897,7 @@ namespace DataTables
             foreach (var field in fields)
             {
                 var upload = field.Upload();
+                var entries = new Dictionary<string, Dictionary<string, object>>();
 
                 if (upload == null)
                 {
@@ -1896,7 +1918,11 @@ namespace DataTables
 
                 if (files.ContainsKey(table))
                 {
-                    continue;
+                    entries = files[table];
+                }
+                else
+                {
+                    files.Add(table, entries);
                 }
 
                 // Make a collection of the ids used in this data set to get a limited data set
@@ -1934,7 +1960,13 @@ namespace DataTables
 
                 if (fileData != null)
                 {
-                    files.Add(table, fileData);
+                    foreach(var file in fileData)
+                    {
+                        if (! entries.ContainsKey(file.Key))
+                        {
+                            entries.Add(file.Key, file.Value);
+                        }
+                    }
                 }
             }
         }
@@ -2213,6 +2245,15 @@ namespace DataTables
                 }
             }
 
+            
+            if(http.searchBuilder != null) {
+                void nestSB(Query q) {
+                    // This function constructs the nested where condition based on SearchBuilders current criteria
+                    this._constructSearchBuilderConditions(q, http.searchBuilder);
+                }
+                query.WhereGroup(nestSB);
+            }
+
             // Column filters
             for (int i = 0, ien = http.Columns.Count(); i < ien; i++)
             {
@@ -2226,6 +2267,206 @@ namespace DataTables
             }
         }
 
+        private Query _constructSearchBuilderConditions(Query query, SearchBuilderDetails data) {
+            Boolean first = true;
+
+            // Iterate over every group or criteria in the current group
+            foreach(SearchBuilderDetails crit in data.criteria) {
+                // If criteria is defined then this must be a group
+                if(crit.criteria.Count > 0) {
+                    void nestSB(Query q) {
+                        this._constructSearchBuilderConditions(q, crit);
+                    }
+                    // Check if this is the first, or if it is and logic
+                    if(data.logic == "AND" || first) {
+                        // Call the function for the next group
+                       query.WhereGroup(nestSB);
+                        // Set first to false so that in future only the logic is checked
+                        first = false;
+                    }
+                    else {
+                        query.WhereGroup(nestSB, "OR");
+                    }
+                }
+                else if (crit.condition != null && (crit.value1 != null || crit.condition == "null" || crit.condition == "!null")) {
+                    // Sometimes the structure of the object that is passed across is named in a strange way.
+                    // This conditional assignment solves that issue
+                    String val1 = crit.value1;
+                    String val2 = crit.value2;
+
+                    if (
+                        (val1.Length == 0 && crit.condition != "null" && crit.condition != "!null") ||
+                        (val2.Length == 0 && (crit.condition == "between" || crit.condition == "!between"))
+                    ) {
+                        continue;
+                    }
+
+                    // Switch on the condition that has been passed in
+                    switch(crit.condition) {
+                        case "=":
+                            // Check if this is the first, or if it is and logic
+                            if(data.logic == "AND" || first) {
+                                // Call the where function for this condition
+                                query.Where(crit.origData, val1, "=");
+                                // Set first to false so that in future only the logic is checked
+                                first = false;
+                            }
+                            else {
+                                // Call the or_where function - has to be or logic in this block
+                                query.OrWhere(crit.origData, val1, "=");
+                            }
+                            break;
+                        case "!=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "!=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "!=");
+                            }
+                            break;
+                        case "contains":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1+"%", "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1+"%", "LIKE");
+                            }
+                            break;
+                        case "starts":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1+"%", "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1+"%", "LIKE");
+                            }
+                            break;
+                        case "ends":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1, "LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1, "LIKE");
+                            }
+                            break;
+                        case "<":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "<");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "<");
+                            }
+                            break;
+                        case "<=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, "<=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, "<=");
+                            }
+                            break;
+                        case ">=":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, ">=");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, ">=");
+                            }
+                            break;
+                        case ">":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1, ">");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1, ">");
+                            }
+                            break;
+                        case "between":
+                            if(data.logic == "AND" || first) {
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                }
+                                query.WhereGroup(func);
+                                first = false;
+                            }
+                            else {
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                }
+                                query.WhereGroup(func, "OR");
+                            }
+                            break;
+                        case "!between":
+                            if(data.logic == "AND" || first) {
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                }
+                                query.WhereGroup(func);
+                                first = false;
+                            }
+                            else {
+                                void func(Query q) {
+                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                                }
+                                query.WhereGroup(func, "OR");
+                            }
+                            break;
+                        case "null":
+                            if(data.logic == "AND" || first) {
+                                void func(Query q) {
+                                    q.Where(crit.origData, null, "=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.OrWhere(crit.origData, "", "=");
+                                    }
+                                }
+                                query.WhereGroup(func);
+                                first = false;
+                            }
+                            else {
+                                void func(Query q) {
+                                    q.Where(crit.origData, null, "=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.OrWhere(crit.origData, "", "=");
+                                    }
+                                }
+                                query.WhereGroup(func, "OR");
+                            }
+                            break;
+                        case "!null":
+                            if(data.logic == "AND" || first) {
+                                void func (Query q) {
+                                    q.Where(crit.origData, null, "!=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.Where(crit.origData, "", "!=");
+                                    }
+                                }
+                                query.Where(func);
+                                first = false;
+                            }
+                            else {
+                                void func (Query q) {
+                                    q.Where(crit.origData, null, "!=");
+                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                        q.Where(crit.origData, "", "!=");
+                                    }
+                                }
+                                query.WhereGroup(func, "OR");
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            return query;
+        }
 
         private void _SspLimit(Query query, DtRequest http)
         {

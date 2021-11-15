@@ -75,4 +75,46 @@ namespace DataTables
             Ignore = ign;
         }
     }
+
+    /// <summary>
+    /// Get attribute
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class EditorGetAttribute : Attribute
+    {
+        /// <summary>
+        /// Field's get flag
+        /// </summary>
+        public bool Get = false;
+
+        /// <summary>
+        /// Constructor for a field attribute telling Editor the get state in a modal
+        /// </summary>
+        /// <param name="get">Get flag</param>
+        public EditorGetAttribute(bool get = true)
+        {
+            Get = get;
+        }
+    }
+
+    /// <summary>
+    /// Set attribute
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class EditorSetAttribute : Attribute
+    {
+        /// <summary>
+        /// Field's set flag
+        /// </summary>
+        public Field.SetType Set = Field.SetType.Both;
+
+        /// <summary>
+        /// Constructor for a field attribute telling Editor the set state in a modal
+        /// </summary>
+        /// <param name="set">Set flag</param>
+        public EditorSetAttribute(Field.SetType set = Field.SetType.Both)
+        {
+            Set = set;
+        }
+    }
 }

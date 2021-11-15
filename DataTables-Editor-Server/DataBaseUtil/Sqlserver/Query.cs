@@ -73,7 +73,7 @@ namespace DataTables.DatabaseUtil.Sqlserver
             if (_type == "insert")
             {
                 var pkeyCmd = provider.CreateCommand();
-                var parts = _table[0].Split('.');
+                var parts = _table[0].Split(new [] {'.'});
                 var schemaName = parts.Count() > 1 ? parts[0] : "";
                 var tableName = parts.Count() > 1 ? parts[1] : _table[0];
                 var schemaQuery = schemaName != "" ?

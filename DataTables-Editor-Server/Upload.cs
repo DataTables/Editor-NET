@@ -698,7 +698,7 @@ namespace DataTables
             // database schema is and don't want to prescribe that certain triggers
             // etc be created. It makes it a bit less efficient but much more
             // compatible
-            if (pathFields.Any())
+            if (pathFields.Any() && _actionStr != null)
             {
                 // For this to operate the action must be a string, which is
                 // validated in the `exec` method
