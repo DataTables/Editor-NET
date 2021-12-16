@@ -1085,7 +1085,7 @@ namespace DataTables
             var right = idl[1];
 
             // Dealing with a function or other expression? Just return immediately
-            if (identifier.Contains("(") || identifier.Contains("*") || identifier.Contains(" "))
+            if (identifier.Contains("(") || identifier.Contains("*"))
             {
                 return identifier;
             }
@@ -1093,9 +1093,15 @@ namespace DataTables
             // Going to be operating on the spaces in the string to
             // simplify the white space
             identifier = identifier.Replace('\t', ' ');
+            identifier = identifier.Replace(" as ", " ");
+
+            // If more than a single space, then return
+            if (identifier.Split(' ').Length > 2) {
+                return identifier;
+            }
 
             // Find if our identifier has an alias, so we don't escape that
-            var aliasIdx = identifier.IndexOf(" as ");
+            var aliasIdx = identifier.IndexOf(" ");
 
             if (aliasIdx != -1)
             {
