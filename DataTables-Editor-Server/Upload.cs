@@ -678,14 +678,11 @@ namespace DataTables
                         // Callable function - execute to get the value
                         var propFn = (Func<Database, IFormFile, dynamic>)prop;
 
-                        pathFields.Add(column, propFn(db, upload));
-                        q.Set(column, "-"); // Use a temporary value (as above)
+                        q.Set(column, propFn(db, upload));
                     }
                     catch (Exception)
                     {
-                        // Not a function, so use the value as it is given
-                        pathFields.Add(column, prop.ToString());
-                        q.Set(column, "-"); // Use a temporary value (as above)
+                        q.Set(column, prop.ToString());
                     }
                 }
             }
