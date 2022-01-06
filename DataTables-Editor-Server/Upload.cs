@@ -673,19 +673,23 @@ namespace DataTables
                 }
                 else
                 {
+                    dynamic val = prop;
+
                     try
                     {
                         // Callable function - execute to get the value
                         var propFn = (Func<Database, IFormFile, dynamic>)prop;
+                        val = propFn(db, upload);
+                    }
+                    catch (Exception) {}
 
-                        pathFields.Add(column, propFn(db, upload));
+                    if (val is string) {
+                        // Allow for replacement of __ID__, etc when the value is a string
+                        pathFields.Add(column, val);
                         q.Set(column, "-"); // Use a temporary value (as above)
                     }
-                    catch (Exception)
-                    {
-                        // Not a function, so use the value as it is given
-                        pathFields.Add(column, prop.ToString());
-                        q.Set(column, "-"); // Use a temporary value (as above)
+                    else {
+                        q.Set(column, val);
                     }
                 }
             }
