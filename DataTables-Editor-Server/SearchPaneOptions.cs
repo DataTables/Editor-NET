@@ -190,7 +190,12 @@ namespace DataTables
             {
                 foreach (var join in _leftJoin)
                 {
-                    q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
+                    if (join.Field2 == null && join.Operator == null ) {
+                        q.Join(join.Table, join.Field1, "LEFT", false);
+                    }
+                    else {
+                        q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
+                    }
                 }
             }
         }
