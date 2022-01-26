@@ -71,6 +71,10 @@ namespace DataTables.DatabaseUtil.Oracle
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
+            if (_db.CommandTimeout != -1) {
+                cmd.CommandTimeout = _db.CommandTimeout;
+            }
+
             // Need to reliably get the primary key value
             if (_type == "insert" && _pkey != null)
             {

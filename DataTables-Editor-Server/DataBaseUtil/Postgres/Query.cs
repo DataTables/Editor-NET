@@ -79,6 +79,10 @@ namespace DataTables.DatabaseUtil.Postgres
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
+            if (_db.CommandTimeout != -1) {
+                cmd.CommandTimeout = _db.CommandTimeout;
+            }
+
             // Bind values
             for (int i = 0, ien = _bindings.Count; i < ien; i++)
             {

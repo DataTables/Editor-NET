@@ -33,6 +33,14 @@ namespace DataTables
         public DbTransaction DbTransaction = null;
 
         /// <summary>
+        /// Command timeout (seconds). The next command executed will take the timeout of
+        /// this value. -1 indicates that it will not be applied (i.e. the system default
+        /// applied), 0 is no limit. See also:
+        /// https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand.commandtimeout
+        /// </summary>
+        public int CommandTimeout = -1;
+
+        /// <summary>
         /// Create a database connection
         /// </summary>
         /// <param name="dbType">Database type - this should be "sqlserver" or "mysql"</param>
