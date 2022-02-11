@@ -322,16 +322,20 @@ namespace DataTables
                     Regex = (Boolean)search["regex"]
                 };
 
-                foreach (var item in http["order"] as Dictionary<string, object>)
+                if (http.ContainsKey("order"))
                 {
-                    var order = item.Value as Dictionary<string, object>;
-
-                    Order.Add(new OrderT
+                    foreach (var item in http["order"] as Dictionary<string, object>)
                     {
-                        Column = (int)order["column"],
-                        Dir = order["dir"].ToString()
-                    });
+                        var order = item.Value as Dictionary<string, object>;
+
+                        Order.Add(new OrderT
+                        {
+                            Column = (int)order["column"],
+                            Dir = order["dir"].ToString()
+                        });
+                    }
                 }
+
                 foreach (var item in http["columns"] as Dictionary<string, object>)
                 {
                     var column = item.Value as Dictionary<string, object>;
@@ -350,6 +354,7 @@ namespace DataTables
                         }
                     });
                 }
+
                 // SearchPanes
                 if(http.ContainsKey("searchPanes")){
                         // Get the column names
@@ -373,6 +378,7 @@ namespace DataTables
                             
                         }
                 }
+
                 // SearchPanes_null
                 if(http.ContainsKey("searchPanes_null")){
                         // Get the column names
@@ -398,6 +404,7 @@ namespace DataTables
                             
                         }
                 }
+
                 //SearchBuilder
                 if(http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String)){
                     searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
