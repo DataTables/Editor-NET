@@ -197,6 +197,11 @@ namespace DataTables
         public Dictionary<string, bool[]> searchPanes_null = new Dictionary<string, bool[]>();
 
         /// <summary>
+        /// The last searchpane when dealing with cascade or viewTotal
+        /// </summary>
+        public String searchPanesLast = null;
+
+        /// <summary>
         /// Information for searchBuilder
         /// </summary>
         public SearchBuilderDetails searchBuilder = new SearchBuilderDetails();
@@ -404,7 +409,10 @@ namespace DataTables
                             
                         }
                 }
-
+                // searchPanesLast
+                if(http.ContainsKey("searchPanesLast")) {
+                    searchPanesLast = (string)http["searchPanesLast"];
+                }
                 //SearchBuilder
                 if(http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String)){
                     searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
