@@ -2574,16 +2574,22 @@ namespace DataTables
 
             foreach (var field in _field)
             {
+                string localTableAlias;
                 var tablePart = _Part(field.DbField());
 
                 if (_Part(field.DbField(), "db") != null)
                 {
-                    tablePart = _Part(field.DbField(), "db") + "." + tablePart;
+                    tablePart = _Part(field.DbField(), "db") + "." + tablePart; 
+                    localTableAlias = tableAlias;
+                }
+                else
+                {
+                    localTableAlias = tableAlias.Split('.').Last();
                 }
 
                 // Does this field apply to this table (only check when a join is
                 // being used)
-                if (_leftJoin.Any() && tablePart != tableAlias)
+                if (_leftJoin.Any() && tablePart != localTableAlias)
                 {
                     continue;
                 }
