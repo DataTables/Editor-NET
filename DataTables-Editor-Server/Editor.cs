@@ -2320,6 +2320,15 @@ namespace DataTables
                                 query.OrWhere(crit.origData, "%"+val1+"%", "LIKE");
                             }
                             break;
+                        case "!contains":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1+"%", "NOT LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1+"%", "NOT LIKE");
+                            }
+                            break;
                         case "starts":
                             if(data.logic == "AND" || first) {
                                 query.Where(crit.origData, val1+"%", "LIKE");
@@ -2329,6 +2338,15 @@ namespace DataTables
                                 query.OrWhere(crit.origData, val1+"%", "LIKE");
                             }
                             break;
+                        case "!starts":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, val1+"%", "NOT LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, val1+"%", "NOT LIKE");
+                            }
+                            break;
                         case "ends":
                             if(data.logic == "AND" || first) {
                                 query.Where(crit.origData, "%"+val1, "LIKE");
@@ -2336,6 +2354,15 @@ namespace DataTables
                             }
                             else {
                                 query.OrWhere(crit.origData, "%"+val1, "LIKE");
+                            }
+                            break;
+                        case "!ends":
+                            if(data.logic == "AND" || first) {
+                                query.Where(crit.origData, "%"+val1, "NOT LIKE");
+                                first = false;
+                            }
+                            else {
+                                query.OrWhere(crit.origData, "%"+val1, "NOT LIKE");
                             }
                             break;
                         case "<":
