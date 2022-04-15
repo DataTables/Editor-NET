@@ -2215,6 +2215,26 @@ namespace DataTables
                 // Add the Where statements due to SearchPanes Selections
                 foreach(var field in this._field){
                     if(http.searchPanes.ContainsKey(field.Name())){
+                        for(int i = 0; i < http.searchPanes[field.Name()].Count(); i++) {
+                            // Check the number of rows...
+                            Query q = this.Db()
+                                .Query("select")
+                                .Table(this._table)
+                                .Get("*");
+                            
+                            this._PerformLeftJoin(q);
+
+                            // ... where the selected option is present...
+                            q.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
+                            
+                            var r = q.Exec().Count();
+
+                            // ... If there are none then don't bother with this selection
+                            if(r == 0) {
+                                http.searchPanes[field.Name()] = http.searchPanes[field.Name()].Where(v => v != http.searchPanes[field.Name()][i]).ToArray();
+                                i--;
+                            }
+                        }
                         query.Where(qu =>
                             {
                                 for(int j =0; j < http.searchPanes[field.Name()].Count(); j++){

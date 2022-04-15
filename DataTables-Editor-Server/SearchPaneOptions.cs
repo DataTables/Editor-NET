@@ -249,6 +249,34 @@ namespace DataTables
                 this._leftJoin = leftJoinIn;
             }
 
+            if(http.searchPanes != null){
+                // Add the Where statements due to SearchPanes Selections
+                foreach(var field in fields){
+                    if(http.searchPanes.ContainsKey(field.Name())){
+                        for(int i = 0; i < http.searchPanes[field.Name()].Count(); i++) {
+                            // Check the number of rows...
+                            Query qu = db
+                                .Query("select")
+                                .Table(this._table)
+                                .Get("*");
+                            
+                            this._PerformLeftJoin(qu);
+
+                            // ... where the selected option is present...
+                            qu.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
+                            
+                            var r = qu.Exec().Count();
+
+                            // ... If there are none then don't bother with this selection
+                            if(r == 0) {
+                                http.searchPanes[field.Name()] = http.searchPanes[field.Name()].Where(v => v != http.searchPanes[field.Name()][i]).ToArray();
+                                i--;
+                            }
+                        }
+                    }
+                }
+            }
+
             var query = db.Query("select")
                 .Table(this._table);
 
