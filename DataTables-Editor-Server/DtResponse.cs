@@ -83,6 +83,12 @@ namespace DataTables
         /// <summary>
         /// Object containing a list of options from SearchPanes
         /// </summary>
+        public SearchBuilderReturn searchBuilder = 
+            new SearchBuilderReturn();
+
+        /// <summary>
+        /// Object containing a list of options from SearchPanes
+        /// </summary>
         public SearchPanesReturn searchPanes = 
             new SearchPanesReturn();
 
@@ -171,6 +177,14 @@ namespace DataTables
             }
             else if (b.searchPanes == null) {
                 this.searchPanes = null;
+            }
+
+            if (b.searchBuilder != null && b.searchBuilder.options != null && b.searchBuilder.options.Count() != 0)
+            {
+                this.searchBuilder.options = b.searchBuilder.options;
+            }
+            else if (b.searchBuilder == null) {
+                this.searchBuilder = null;
             }
 
             if (b.files.Count() != 0)

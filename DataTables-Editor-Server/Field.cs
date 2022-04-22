@@ -157,7 +157,9 @@ namespace DataTables
         private Func<List<Dictionary<string, object>>> _optsFn;
         private Options _opts;
         private SearchPaneOptions _spOpts;
+        private SearchBuilderOptions _sbOpts;
         private Func<Database, Editor, List<Dictionary<string, object>>> _spOptsFn;
+        private Func<Database, Editor, List<Dictionary<string, object>>> _sbOptsFn;
         private Upload _upload;
         private Func<string, string> _xss;
         private bool _xssFormat = true;
@@ -439,6 +441,39 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Get the SearchBuilderOptions object configured for this field
+        /// </summary>
+        /// <returns>SearchBuilderOptions object</returns>
+        public SearchBuilderOptions SearchBuilderOptions() {
+            return _sbOpts;
+        }
+
+        /// <summary>
+        /// Set a function that will retrieve a list of values that can be used
+        /// for the SearchBuilderOptions list in SearchBuilders for this field.
+        /// </summary>
+        /// <param name="fn">Delegate that will return a list of SearchBuilder options</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchBuilderOptions(Func<object, object, List<Dictionary<string, object>>> fn){
+            _sbOpts = null;
+            _sbOptsFn = fn;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set the SearchBuilderOptions for this field using a SearchBuilderOptions instance
+        /// </summary>
+        /// <param name="opts">Configured SearchBuilderOptions object</param>
+        /// <returns>Self for chaining</returns>
+        public Field SearchBuilderOptions(SearchBuilderOptions sbOpts){
+            _sbOpts = sbOpts;
+            _sbOptsFn = null;
+
+            return this;
+        }
+        
         /// <summary>
         /// Get the SearchPaneOptions object configured for this field
         /// </summary>
@@ -757,6 +792,26 @@ namespace DataTables
                 return _opts.Exec(db);
             }
 
+            return null;
+        }
+
+        /// <summary>
+        /// Execute the sbOpts to get the list of SearchBuilderOptions to return to the client-
+        /// side
+        /// </summary>
+        /// <param name="field">Field instance</param>
+        /// <param name="editor">Editor instance</param>
+        /// <param name="leftJoin">List of LeftJoins instance</param>
+        /// <param name="fields">Field[] instance</param>
+        /// <param name="http">DtRequest instance</param>
+        /// <returns>List of SearchBuilderOptions</returns>
+        internal List<Dictionary<string, object>> SearchBuilderOptionsExec(Field field, Editor editor, List<LeftJoin> leftJoin, Field[] fields, DtRequest http) {
+            if (_sbOptsFn != null){
+                return _sbOptsFn(editor.Db(), editor);
+            }
+            if(_sbOpts != null) {
+                return _sbOpts.Exec(field, editor, leftJoin, http, fields);
+            }
             return null;
         }
 

@@ -1494,6 +1494,13 @@ namespace DataTables
                     {
                         dtData.searchPanes.options.Add(field.Name(), spOpts);
                     }
+
+                    var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, http);
+
+                    if(sbOpts != null)
+                    {
+                        dtData.searchBuilder.options.Add(field.Name(), sbOpts);
+                    }
                 }
             }
 
@@ -1524,6 +1531,11 @@ namespace DataTables
             if (dtData.searchPanes.options.Count() == 0)
             {
                 dtData.searchPanes = null;
+            }
+
+            if (dtData.searchBuilder.options.Count() == 0)
+            {
+                dtData.searchBuilder = null;
             }
             
             return dtData;

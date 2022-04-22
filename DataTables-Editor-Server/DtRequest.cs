@@ -359,7 +359,7 @@ namespace DataTables
                         }
                     });
                 }
-
+                
                 // SearchPanes
                 if(http.ContainsKey("searchPanes")){
                         // Get the column names
