@@ -837,7 +837,7 @@ namespace DataTables
         {
             string output = "";
             if(this._groupBy != null){
-                output = " GROUP BY " + this._groupBy;
+                output = " GROUP BY " +_ProtectIdentifiers(this._groupBy);
             }
             return output;
         }
