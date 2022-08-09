@@ -64,6 +64,7 @@ namespace DataTables.DatabaseUtil.Sqlserver
         /// <param name="sql">SQL command</param>
         override protected void _Prepare(string sql)
         {
+            Console.WriteLine(sql);
             DbParameter param;
             var provider = DbProviderFactories.GetFactory(_db.Adapter());
             var cmd = provider.CreateCommand();
@@ -76,29 +77,60 @@ namespace DataTables.DatabaseUtil.Sqlserver
                 var parts = _table[0].Split(new [] {'.'});
                 var schemaName = parts.Count() > 1 ? parts[0] : "";
                 var tableName = parts.Count() > 1 ? parts[1] : _table[0];
-                var schemaQuery = schemaName != "" ?
-                    " KCU.TABLE_SCHEMA = @schema AND " :
-                    "";
+                var pkey = Pkey();
 
-                // We need to find out what the primary key column name and type is
-                pkeyCmd.CommandText = @"
-                    SELECT
-                        KCU.table_name as table_name,
-                        KCU.column_name as column_name,
-	                    C.DATA_TYPE as data_type,
-                        C.CHARACTER_MAXIMUM_LENGTH as data_length
-                    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
-                    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU ON
-                        TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND
-	                    TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND " +
-                        schemaQuery +
-	                    @"KCU.TABLE_NAME = @table
-                    JOIN
-                        INFORMATION_SCHEMA.COLUMNS as C ON
-	                        C.table_name = KCU.table_name AND
-	                        C.column_name = KCU.column_name
-                    ORDER BY KCU.TABLE_NAME, KCU.ORDINAL_POSITION
-                ";
+                if (pkey != null && pkey.Count() == 1) {
+                    // We've got a primary key name - we need to determine its data type
+                    var schemaQuery = schemaName != "" ?
+                        " TABLE_SCHEMA = @schema AND " :
+                        "";
+
+                    // Note that readin the column name is rather redundant here since we
+                    // already know it - but it means the code below can be used for both
+                    // the known and unknown state
+                    pkeyCmd.CommandText = @"
+                        SELECT
+                            DATA_TYPE as data_type,
+                            CHARACTER_MAXIMUM_LENGTH as data_length,
+                            COLUMN_NAME as column_name
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                        WHERE 
+                            " + schemaQuery + @"
+                            TABLE_NAME   = @table AND 
+                            COLUMN_NAME  = @column
+                    ";
+                    param = pkeyCmd.CreateParameter();
+                    param.ParameterName = "@column";
+                    param.Value = pkey[0];
+                    pkeyCmd.Parameters.Add(param);
+                }
+                else {
+                    // Don't have the primary key name - need to try and work out what it is
+                    var schemaQuery = schemaName != "" ?
+                        " KCU.TABLE_SCHEMA = @schema AND " :
+                        "";
+
+                    // We need to find out what the primary key column name and type is
+                    pkeyCmd.CommandText = @"
+                        SELECT
+                            KCU.table_name as table_name,
+                            KCU.column_name as column_name,
+                            C.DATA_TYPE as data_type,
+                            C.CHARACTER_MAXIMUM_LENGTH as data_length
+                        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
+                        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU ON
+                            TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND
+                            TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND " +
+                            schemaQuery +
+                            @"KCU.TABLE_NAME = @table
+                        JOIN
+                            INFORMATION_SCHEMA.COLUMNS as C ON
+                                C.table_name = KCU.table_name AND
+                                C.column_name = KCU.column_name
+                        ORDER BY KCU.TABLE_NAME, KCU.ORDINAL_POSITION
+                    ";
+                }
+
                 pkeyCmd.Connection = _db.Conn();
                 pkeyCmd.Transaction = _db.DbTransaction;
 
