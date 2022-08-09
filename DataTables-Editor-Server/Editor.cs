@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.0.8";
+        public const string Version = "2.0.5";
 
         /// <summary>
         /// Create a new Editor instance
@@ -2017,12 +2017,24 @@ namespace DataTables
             }
 
             // Check that there is a field which has a set option for this table
-            var count = _field.Count(
-                field => !field.DbField().Contains(".") || (
-                    _Part(field.DbField()) == tableMatch &&
-                    field.Set() != DataTables.Field.SetType.None
-                )
-            );
+            var count = _field.Count(field => {
+                // Need at least one field to be settable
+                if (field.Set() == DataTables.Field.SetType.None) {
+                    return false;
+                }
+
+                // If no db or schema prefix
+                if (!field.DbField().Contains(".")) {
+                    return true;
+                }
+
+                // And if db or schema prefix
+                if (field.DbField().StartsWith(tableMatch)) {
+                    return true;
+                }
+
+                return false;
+            });
 
             if (count > 0)
             {
