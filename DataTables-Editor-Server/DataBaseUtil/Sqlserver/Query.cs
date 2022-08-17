@@ -99,9 +99,17 @@ namespace DataTables.DatabaseUtil.Sqlserver
                             TABLE_NAME   = @table AND 
                             COLUMN_NAME  = @column
                     ";
+
+                    var column = pkey[0];
+
+                    if (column.Contains(".")) {
+                        var split = column.Split(new [] {'.'});
+                        column = split.Last();
+                    }
+
                     param = pkeyCmd.CreateParameter();
                     param.ParameterName = "@column";
-                    param.Value = pkey[0];
+                    param.Value = column;
                     pkeyCmd.Parameters.Add(param);
                 }
                 else {
@@ -162,6 +170,9 @@ namespace DataTables.DatabaseUtil.Sqlserver
                         sql = sql.Replace(" VALUES (",
                             " OUTPUT INSERTED." + dr["column_name"] + " as insert_id INTO @T VALUES (");
                         sql += "; SELECT insert_id FROM @T";
+                    }
+                    else {
+                        _db.DebugInfo("No pkey data found");
                     }
                 }
             }
