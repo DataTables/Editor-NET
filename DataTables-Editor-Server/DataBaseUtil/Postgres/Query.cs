@@ -93,36 +93,82 @@ namespace DataTables.DatabaseUtil.Postgres
                 param.Value = binding.Value ?? DBNull.Value;
                 param.DbType = System.Data.DbType.Object;
 
-                // Editor's type system is very weak, but Postgres is strong.
-                // Postgres requires that numeric looking data is actually numeric
-                try {
-                    var str = binding.Value.ToString();
-                    
-                    if ( str.IndexOf('-') > 0 || str.IndexOf('0') == 0 ) {
-                        // noop
+                if (binding.Type == null) {
+                    // No binding type specified, attempt to create the correct type for Postgres.
+                    // Editor's type system is very weak, but Postgres is strong.
+                    // Postgres requires that numeric looking data is actually numeric
+                    Type t = binding.Value.GetType();
+
+                    // Transform based on the model properties
+                    if (t.Name == "Decimal") {
+                        param.Value = Convert.ToDecimal(binding.Value);
+                        param.DbType = System.Data.DbType.Decimal;
+                    }
+                    else if (t.Name == "Int32") {
+                        param.Value = Convert.ToInt32(binding.Value);
+                        param.DbType = System.Data.DbType.Int32;
                     }
                     else {
-                        param.Value = Convert.ToInt32(binding.Value);
+                        // Really simple numbers should be treated as integers
+                        try {
+                            var str = binding.Value.ToString();
+
+                            if ( IsDigitsOnly(str) ) {
+                                param.Value = Convert.ToInt32(binding.Value);
+                                param.DbType = System.Data.DbType.Int32;
+                            }
+                        }
+                        catch {}
+
+                        // Attempt to auto detect date and time values by parsing the data
+                        try {
+                            var str = binding.Value.ToString();
+
+                            if (str.IndexOf(',') >= 0 || (str.IndexOf('/') == -1 && str.IndexOf('-') == -1)) {
+                                // noop
+                            }
+                            else {
+                                param.Value = DateTime.Parse(binding.Value);
+                                param.DbType = System.Data.DbType.DateTime;
+                            }
+                        }
+                        catch {}
                     }
                 }
-                catch {}
+                else {
+                    param.DbType = binding.Type;
 
-                // And DateTime
-                try {
-                    var str = binding.Value.ToString();
-
-                    if (str.IndexOf(',') >= 0) {
-                        // noop
-                    }
-                    else {
+                    if (
+                        binding.Type == System.Data.DbType.Date ||
+                        binding.Type == System.Data.DbType.DateTime ||
+                        binding.Type == System.Data.DbType.DateTime2
+                    ) {
                         param.Value = DateTime.Parse(binding.Value);
                     }
-                }
-                catch {}
-
-                if (binding.Type != null)
-                {
-                    param.DbType = binding.Type;
+                    else if (binding.Type == System.Data.DbType.Int16)
+                    {
+                        param.Value = Convert.ToInt16(binding.Value);
+                    }
+                    else if (binding.Type == System.Data.DbType.Int32)
+                    {
+                        param.Value = Convert.ToInt32(binding.Value);
+                    }
+                    else if (binding.Type == System.Data.DbType.Int64)
+                    {
+                        param.Value = Convert.ToInt64(binding.Value);
+                    }
+                    else if (binding.Type == System.Data.DbType.Decimal)
+                    {
+                        param.Value = Convert.ToDecimal(binding.Value);
+                    }
+                    else if (binding.Type == System.Data.DbType.Double)
+                    {
+                        param.Value = Convert.ToDouble(binding.Value);
+                    }
+                    else if (binding.Type == System.Data.DbType.AnsiString)
+                    {
+                        param.Value = binding.Value.ToString();
+                    }
                 }
 
                 cmd.Parameters.Add(param);
@@ -148,6 +194,17 @@ namespace DataTables.DatabaseUtil.Postgres
             }
 
             return new Postgres.Result(_db, dt, this);
+        }
+
+        private bool IsDigitsOnly(string str)
+        {
+            foreach (char c in str)
+            {
+                if (c < '0' || c > '9')
+                    return false;
+            }
+
+            return true;
         }
     }
 }
