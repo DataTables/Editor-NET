@@ -93,7 +93,10 @@ namespace DataTables.DatabaseUtil.Postgres
                 param.Value = binding.Value ?? DBNull.Value;
                 param.DbType = System.Data.DbType.Object;
 
-                if (binding.Type == null) {
+                if (binding.Value == null) {
+                    param.Value = DBNull.Value;
+                }
+                else if (binding.Type == null) {
                     // No binding type specified, attempt to create the correct type for Postgres.
                     // Editor's type system is very weak, but Postgres is strong.
                     // Postgres requires that numeric looking data is actually numeric
