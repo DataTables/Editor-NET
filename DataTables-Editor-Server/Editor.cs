@@ -1421,7 +1421,8 @@ namespace DataTables
             Query query = _db
                 .Query("select")
                 .Table(_ReadTable())
-                .Get(_pkey);
+                .Get(_pkey)
+                .LeftJoin(_leftJoin);
 
             // Add all fields that we need to get from the database
             foreach (var field in _field)
@@ -1439,7 +1440,6 @@ namespace DataTables
             }
 
             _GetWhere(query);
-            _PerformLeftJoin(query);
             var ssp = _SspQuery(query, http);
 
             if (id != null)
@@ -2145,10 +2145,10 @@ namespace DataTables
             var setCount = _db
                 .Query("select")
                 .Table(_ReadTable())
-                .Get("COUNT( " + _pkey[0] + " ) as cnt");
+                .Get("COUNT( " + _pkey[0] + " ) as cnt")
+                .LeftJoin(_leftJoin);
             _GetWhere(setCount);
             _SspFilter(setCount, http);
-            _PerformLeftJoin(setCount);
 
             var setCounted = Convert.ToInt32(setCount.Exec().Fetch()["cnt"]);
 
@@ -2163,7 +2163,7 @@ namespace DataTables
             // conditional items are the ones being joined in
             if (_where.Any())
             {
-                _PerformLeftJoin(fullCount);
+                fullCount.LeftJoin(_leftJoin);
             }
 
             var fullCounted = Convert.ToInt32(fullCount.Exec().Fetch()["cnt"]);
@@ -2244,9 +2244,8 @@ namespace DataTables
                             Query q = this.Db()
                                 .Query("select")
                                 .Table(this._table)
-                                .Get("*");
-                            
-                            this._PerformLeftJoin(q);
+                                .Get("*")
+                                .LeftJoin(_leftJoin);
 
                             // ... where the selected option is present...
                             q.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
@@ -2682,20 +2681,6 @@ namespace DataTables
 
             // Insert or update
             return query.Exec();
-        }
-
-
-        private void _PerformLeftJoin(Query q)
-        {
-            foreach (var join in _leftJoin)
-            {
-                if (join.Field2 == null && join.Operator == null ) {
-                    q.Join(join.Table, join.Field1, "LEFT", false);
-                }
-                else {
-                    q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
-                }
-            }
         }
 
 

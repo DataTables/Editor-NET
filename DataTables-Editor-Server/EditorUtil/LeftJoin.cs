@@ -4,7 +4,7 @@ namespace DataTables.EditorUtil
     /// <summary>
     /// Container class to hold information about join details
     /// </summary>
-    internal class LeftJoin
+    public class LeftJoin
     {
         /// <summary>
         /// Join table name

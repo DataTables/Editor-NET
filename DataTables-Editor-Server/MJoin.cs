@@ -43,6 +43,7 @@ namespace DataTables
         private readonly List<WhereCondition> _where = new List<WhereCondition>();
         private readonly List<Field> _fields = new List<Field>();
         private Type _userModelT;
+        private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
         private readonly List<string> _links = new List<string>();
         private string _linkTable;
         private string _hostField;
@@ -99,6 +100,23 @@ namespace DataTables
         public MJoin Get(bool flag)
         {
             _get = flag;
+            return this;
+        }
+
+        /// <summary>
+        /// Add a left join condition to the Mjoin instance, allowing it to operate
+        /// over multiple tables. Multiple <code>leftJoin()</code> calls can be made for a
+        /// single Mjoin instance to join multiple tables.
+        /// </summary>
+        /// <param name="table">Table name to do a join onto</param>
+        /// <param name="field1">Field from the parent table to use as the join link</param>
+        /// <param name="op">Join condition (`=`, '&lt;`, etc)</param>
+        /// <param name="field2">Field from the child table to use as the join link</param>
+        /// <returns>Self for chaining</returns>
+        public MJoin LeftJoin(string table, string field1, string op = null, string field2 = null)
+        {
+            _leftJoin.Add(new LeftJoin(table, field1, op, field2));
+
             return this;
         }
 
@@ -360,6 +378,7 @@ namespace DataTables
                 }
 
                 _ApplyWhere(query);
+                query.LeftJoin(_leftJoin);
 
                 foreach (var field in _fields.Where(field => field.Apply("get") && field.GetValue() == null))
                 {

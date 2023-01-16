@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataTables.EditorUtil;
 
 namespace DataTables
 {
@@ -21,6 +22,7 @@ namespace DataTables
         private Func<Dictionary<string, object>, object> _renderer;
         private Action<Query> _where;
         private string _order;
+        private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
         private int _limit=-1;
         private List<Dictionary<string, object>> _manualOpts = new List<Dictionary<string, object>>();
 
@@ -83,6 +85,22 @@ namespace DataTables
         public Options Label(IEnumerable<string> label)
         {
             _label = label;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add a left join condition to the Options instance, allowing it to operate
+        /// over multiple tables.
+        /// </summary>
+        /// <param name="table">Table name to do a join onto</param>
+        /// <param name="field1">Field from the parent table to use as the join link</param>
+        /// <param name="op">Join condition (`=`, '&lt;`, etc)</param>
+        /// <param name="field2">Field from the child table to use as the join link</param>
+        /// <returns>Self for chaining</returns>
+        public Options LeftJoin(string table, string field1, string op = null, string field2 = null)
+        {
+            _leftJoin.Add(new LeftJoin(table, field1, op, field2));
 
             return this;
         }
@@ -247,7 +265,8 @@ namespace DataTables
                 .Distinct(true)
                 .Table(_table)
                 .Get(fields)
-                .Where(_where);
+                .Where(_where)
+                .LeftJoin(_leftJoin);
 
             if (_order != null)
             {

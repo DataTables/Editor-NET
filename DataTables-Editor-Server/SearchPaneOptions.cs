@@ -168,36 +168,15 @@ namespace DataTables
         /// Set a function that will be used to apply a leftJoin to the SearchPanes select
         /// </summary>
         /// <param name="table">String representing the table for the leftJoin</param>
-	/// <param name="field1">String representing the first Field for the leftJoin</param>
-	/// <param name="op">String representing the operatore for the leftJoin</param>
-	/// <param name="field2">String representing the second Field for the leftJoin</param>
+        /// <param name="field1">String representing the first Field for the leftJoin</param>
+        /// <param name="op">String representing the operatore for the leftJoin</param>
+        /// <param name="field2">String representing the second Field for the leftJoin</param>
         /// <returns>Self for chaining</returns>
         public SearchPaneOptions LeftJoin(string table, string field1, string op, string field2)
         {
             _leftJoin.Add(new LeftJoin(table, field1, op, field2));
 
             return this;
-        }
-
-        /// <summary>
-	/// Applies the leftJoin to the query passed in as a parameter
-        /// </summary>
-        /// <param name="q">Query that the leftJoin is to be applied to</param>
-        /// <returns>Self for chaining</returns>
-        private void _PerformLeftJoin(Query q)
-        {
-            if (_leftJoin.Count() != 0)
-            {
-                foreach (var join in _leftJoin)
-                {
-                    if (join.Field2 == null && join.Operator == null ) {
-                        q.Join(join.Table, join.Field1, "LEFT", false);
-                    }
-                    else {
-                        q.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
-                    }
-                }
-            }
         }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -258,9 +237,8 @@ namespace DataTables
                             Query qu = db
                                 .Query("select")
                                 .Table(this._table)
-                                .Get("*");
-                            
-                            this._PerformLeftJoin(qu);
+                                .Get("*")
+                                .LeftJoin(_leftJoin);
 
                             // ... where the selected option is present...
                             qu.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
@@ -278,11 +256,13 @@ namespace DataTables
             }
 
             var query = db.Query("select")
-                .Table(this._table);
+                .Table(this._table)
+                .LeftJoin(_leftJoin);
 
             // The last pane to have a selection runs a slightly different query
             var queryLast = db.Query("select")
-                .Table(this._table);
+                .Table(this._table)
+                .LeftJoin(_leftJoin);
             
             if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
                 query.Get(this._value + " as value")
@@ -333,9 +313,6 @@ namespace DataTables
                 }
             }
 
-            _PerformLeftJoin(query);
-            _PerformLeftJoin(queryLast);
-
             var res = query.Exec()
                 .FetchAll();
             var resLast = queryLast.Exec()
@@ -348,9 +325,8 @@ namespace DataTables
                 .Get(this._value + " as value")
                 .Get("COUNT(*) as total")
                 .GroupBy(this._value)
-                .Where(this._where);
-
-            _PerformLeftJoin(q);
+                .Where(this._where)
+                .LeftJoin(_leftJoin);
 
             var rows = q
                 .Exec()

@@ -284,6 +284,26 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Add a collection of left joins to the query
+        /// </summary>
+        /// <param name="leftJoin">Left join list</param>
+        /// <returns>Query instance for chaining</returns>
+        public Query LeftJoin(List<LeftJoin> leftJoin)
+        {
+            foreach (var join in leftJoin)
+            {
+                if (join.Field2 == null && join.Operator == null ) {
+                    this.Join(join.Table, join.Field1, "LEFT", false);
+                }
+                else {
+                    this.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
         /// Limit the result set to a certain size
         /// </summary>
         /// <param name="lim">The number of records to limit the result to</param>
