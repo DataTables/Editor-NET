@@ -597,6 +597,7 @@ namespace DataTables
         {
             var db = editor.Db();
             var pathFields = new Dictionary<string, string>();
+            string insertedId = null;
 
             // Insert the details requested, for the columns requested
             var q = db.Query("insert")
@@ -683,6 +684,10 @@ namespace DataTables
                     }
                     catch (Exception) {}
 
+                    if (column == _dbPKey) {
+                        insertedId = val;
+                    }
+
                     if (val is string) {
                         // Allow for replacement of __ID__, etc when the value is a string
                         pathFields.Add(column, val);
@@ -695,7 +700,9 @@ namespace DataTables
             }
 
             var res = q.Exec();
-            var id = res.InsertId();
+            var id = insertedId != null
+                ? insertedId
+                : res.InsertId();
 
             // Update the newly inserted row with the path information. We have to
             // use a second statement here as we don't know in advance what the
