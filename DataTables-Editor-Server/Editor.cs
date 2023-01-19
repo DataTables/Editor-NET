@@ -861,6 +861,8 @@ namespace DataTables
         {
             if (_debug)
             {
+                _DebugInfo.Add("Editor .NET libraries - version " + Version);
+
                 _db.Debug((o) =>
                 {
                     _DebugInfo.Add(o);
