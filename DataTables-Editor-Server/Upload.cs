@@ -102,6 +102,7 @@ namespace DataTables
         private string _dbTable;
         private string _dbPKey;
         private Dictionary<string, object> _dbFields;
+        private Action<Dictionary<string, object>> _dbFormat;
         private string _error;
         private Func<List<Dictionary<string, object>>, bool> _dbCleanCallback;
         private string _dbCleanTableField;
@@ -212,11 +213,12 @@ namespace DataTables
         /// which will be written directly to the database, or a function which will be
         /// executed and the returned value written to the database.</param>
         /// <returns>Self for chanining</returns>
-        public Upload Db(string table, string pkey, Dictionary<string, object> fields)
+        public Upload Db(string table, string pkey, Dictionary<string, object> fields, Action<Dictionary<string, object>> format = null)
         {
             _dbTable = table;
             _dbPKey = pkey;
             _dbFields = fields;
+            _dbFormat = format;
 
             return this;
         }
@@ -348,6 +350,11 @@ namespace DataTables
 
             while ((row = result.Fetch()) != null)
             {
+                if (_dbFormat != null)
+                {
+                    _dbFormat(row);
+                }
+
                 outData.Add(row[_dbPKey].ToString(), row);
             }
 
