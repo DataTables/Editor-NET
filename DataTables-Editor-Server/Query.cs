@@ -206,6 +206,15 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Columns to get
+        /// </summary>
+        /// <returns>List of column names</returns>
+        public List<string> Get()
+        {
+            return _field;
+        }
+
+        /// <summary>
         /// A column name to get
         /// </summary>
         /// <param name="field">Column name to get</param>

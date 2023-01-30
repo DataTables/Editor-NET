@@ -197,6 +197,11 @@ namespace DataTables
         public Dictionary<string, bool[]> searchPanes_null = new Dictionary<string, bool[]>();
 
         /// <summary>
+        /// Information for searchPanes_null
+        /// </summary>
+        public SearchPanesOptions searchPanesOptions = new SearchPanesOptions();
+
+        /// <summary>
         /// The last searchpane when dealing with cascade or viewTotal
         /// </summary>
         public String searchPanesLast = null;
@@ -413,7 +418,16 @@ namespace DataTables
                 if(http.ContainsKey("searchPanesLast")) {
                     searchPanesLast = (string)http["searchPanesLast"];
                 }
-                //SearchBuilder
+
+                if (http.ContainsKey("searchPanes_options")) {
+                    var options = (Dictionary<String, object>)http["searchPanes_options"];
+
+                    searchPanesOptions.ViewCount = (Boolean)options["viewCount"];
+                    searchPanesOptions.ViewTotal = (Boolean)options["viewTotal"];
+                    searchPanesOptions.Cascade = (Boolean)options["cascade"];
+                }
+
+                // SearchBuilder
                 if(http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String)){
                     searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
                 }
@@ -518,6 +532,27 @@ namespace DataTables
             /// Search term
             /// </summary>
             public SearchT Search;
+        }
+
+        /// <summary>
+        /// Options for SearchPanes submitted by the client-side
+        /// </summary>
+        public class SearchPanesOptions
+        {
+            /// <summary>
+            /// View count flag
+            /// </summary>
+            public Boolean ViewCount = true;
+
+            /// <summary>
+            /// View total flag
+            /// </summary>
+            public Boolean ViewTotal = false;
+
+            /// <summary>
+            /// Cascade flag
+            /// </summary>
+            public Boolean Cascade = false;
         }
     }
 }
