@@ -179,10 +179,26 @@ namespace DataTables
             return this;
         }
 
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Private methods
+         */
+
+        /// <summary>
+        /// Add conditions to a query for cascade
+        /// </summary>
+        /// <param name="entriesQuery">Query to apply the condition to</param>
+        /// <param name="http">DTRequest Instance for where conditions</param>
+        /// <param name="fileName">Field name being added</param>
+        private void _QueryAddCondition(Query entriesQuery, DtRequest http, string fieldName, string fieldDb)
+        {
+        }
+        
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
          */
-        
+
         /// <summary>
         /// Execute the configuration, getting the SearchPaneOptions from the database and formatting
         /// for output.
@@ -286,7 +302,7 @@ namespace DataTables
                 var values = rows.Select(r => r["value"].ToString());
                 var selected = http.searchPanes[fieldIn.Name()];
 
-                http.searchPanes[fieldIn.Name()] = selected.Except(values).ToArray();
+                http.searchPanes[fieldIn.Name()] = selected.Intersect(values).ToArray();
             }
 
 	    	// Apply filters to cascade tables
@@ -312,44 +328,33 @@ namespace DataTables
                 }
 
                 // Construct the where queries based upon the options selected by the user
-			    // THIS IS TO GET THE SP OPTIONS, NOT THE TABLE ENTRIES
-                // If there is a last value set then a slightly different set of results is required for cascade
-                // That panes results are based off of the results when only considering the selections of all of the others
-                if(http.searchPanesLast != null) {
-                    // Loop over fields - for cascade
-                    for(int i = 0; i < fields.Count(); i++) {
-                        if (http.searchPanes.ContainsKey(fields[i].Name()) && fields[i].Name() != http.searchPanesLast) {
-                            // Apply Or where based upon searchPanes selections
-                            entriesQuery.Where(qu => {
-                                for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
-                                    qu.OrWhere(
-                                        fields[i].Name(),
-                                        http.searchPanes_null.ContainsKey(fields[i].Name()) && http.searchPanes_null[fields[i].Name()][j] ?
-                                            null :
-                                            http.searchPanes[fields[i].Name()][j],
-                                        "="
-                                    );
-                                }
-                            });
+                for(int i = 0; i < fields.Count(); i++) {
+                    var add = false;
+                    var fieldName = fields[i].Name();
+
+                    // If there is a last value set then a slightly different set of results is required for cascade
+                    // That panes results are based off of the results when only considering the selections of all of the others
+                    if (http.searchPanesLast != null && fieldIn.Name() == http.searchPanesLast) {
+                        if (http.searchPanes.ContainsKey(fieldName) && fieldName != http.searchPanesLast) {
+                           add = true;
                         }
                     }
-                }
-                else {
-                    for(int i = 0; i < fields.Count(); i++) {
-                        if (http.searchPanes.ContainsKey(fields[i].Name())) {
-                            // Apply Or where based upon searchPanes selections
-                            entriesQuery.Where(qu => {
-                                for(int j =0; j < http.searchPanes[fields[i].Name()].Count(); j++){
-                                    qu.OrWhere(
-                                        fields[i].Name(),
-                                        http.searchPanes_null.ContainsKey(fields[i].Name()) && http.searchPanes_null[fields[i].Name()][j] ?
-                                            null :
-                                            http.searchPanes[fields[i].Name()][j],
-                                        "="
-                                    );
-                                }
-                            });
-                        }
+                    else if (http.searchPanes != null && http.searchPanes.ContainsKey(fieldName)) {
+                        add = true;
+                    }
+
+                    if (add) {
+                        entriesQuery.Where(qu => {
+                            for(int j =0; j < http.searchPanes[fieldName].Count(); j++) {
+                                qu.OrWhere(
+                                    fields[i].DbField(),
+                                    http.searchPanes_null.ContainsKey(fieldName) && http.searchPanes_null[fieldName][j] ?
+                                        null :
+                                        http.searchPanes[fieldName][j],
+                                    "="
+                                );
+                            }
+                        });
                     }
                 }
 
@@ -361,7 +366,7 @@ namespace DataTables
                 entries = new Dictionary<string, object>();
 
                 foreach(var entry in entriesRows) {
-                    entries.Add(entry["Value"].ToString(), entry);
+                    entries.Add(entry["value"].ToString(), entry);
                 }
             }
 
@@ -393,8 +398,7 @@ namespace DataTables
             }
 
 		    // Only sort if there was no SQL order field
-            if (_order == null)
-            {
+            if (_order == null) {
                 string emptyStringA = "";
                 string emptyStringB = "";
 
