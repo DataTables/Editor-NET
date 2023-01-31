@@ -64,7 +64,6 @@ namespace DataTables.DatabaseUtil.Sqlserver
         /// <param name="sql">SQL command</param>
         override protected void _Prepare(string sql)
         {
-            Console.WriteLine(sql);
             DbParameter param;
             var provider = DbProviderFactories.GetFactory(_db.Adapter());
             var cmd = provider.CreateCommand();
