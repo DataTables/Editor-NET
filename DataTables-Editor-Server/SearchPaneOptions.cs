@@ -374,8 +374,8 @@ namespace DataTables
 
             foreach(var row in rows) {
                 var val = row["value"].ToString();
-                var total = row.ContainsKey("total") ? row["total"] : null;
-                var count = total;
+                Int64? total = row.ContainsKey("total") ? (Int64?)row["total"] : null;
+                Int64? count = total;
 
                 if (entries != null) {
                     count = 0;
@@ -383,7 +383,7 @@ namespace DataTables
                     if (entries.ContainsKey(val) && gettingCount) {
                         var diction = (Dictionary<string, object>)entries[val];
 
-                        count = diction["count"].ToString();
+                       count = (Int64?)diction["count"];
                     }
                 }
 
