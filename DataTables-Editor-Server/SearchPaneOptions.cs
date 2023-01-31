@@ -269,7 +269,7 @@ namespace DataTables
                 .Where(_where)
                 .LeftJoin(join);
 
-            if (viewTotal || (viewCount && ! cascade)) {
+            if (viewTotal) {
                 q.Get("COUNT(*) as total");
             }
 
@@ -306,7 +306,7 @@ namespace DataTables
             }
 
 	    	// Apply filters to cascade tables
-            if (cascade) {
+            if (viewCount || cascade) {
                 var entriesQuery = db.Query("select")
                     .Distinct(true)
                     .Table(table)
@@ -384,6 +384,12 @@ namespace DataTables
                         var diction = (Dictionary<string, object>)entries[val];
 
                        count = (Int64?)diction["count"];
+
+                        // For when viewCount is enabled and viewTotal is not
+                        // the total needs to be the same as the count!
+                        if (total == null) {
+                            total = count;
+                        }
                     }
                 }
 
