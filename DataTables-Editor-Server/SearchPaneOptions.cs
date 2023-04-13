@@ -383,7 +383,9 @@ namespace DataTables
                     if (entries.ContainsKey(val) && gettingCount) {
                         var diction = (Dictionary<string, object>)entries[val];
 
-                       count = (Int64?)diction["count"];
+                        count = diction.ContainsKey("count")
+                            ? Convert.ToInt64(diction["count"])
+                            : 0;
 
                         // For when viewCount is enabled and viewTotal is not
                         // the total needs to be the same as the count!
