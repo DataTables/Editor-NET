@@ -2449,14 +2449,18 @@ namespace DataTables
                         case "between":
                             if(data.logic == "AND" || first) {
                                 void func(Query q) {
-                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                    q
+                                        .Where(crit.origData, val1, ">=")
+                                        .Where(crit.origData, val2, "<=");
                                 }
                                 query.WhereGroup(func);
                                 first = false;
                             }
                             else {
                                 void func(Query q) {
-                                    q.Where(crit.origData, val1, ">").Where(crit.origData, val2, "<");
+                                    q
+                                        .Where(crit.origData, val1, ">=")
+                                        .Where(crit.origData, val2, "<=");
                                 }
                                 query.WhereGroup(func, "OR");
                             }
