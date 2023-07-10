@@ -19,7 +19,6 @@ The software available in this package, acts as server-side libraries for Editor
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -30,7 +29,6 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -41,7 +39,6 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net47'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -52,7 +49,6 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -72,7 +68,7 @@ The software available in this package, acts as server-side libraries for Editor
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
