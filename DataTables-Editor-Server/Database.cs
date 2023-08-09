@@ -127,7 +127,7 @@ namespace DataTables
         /// <param name="sql">Query</param>
         /// <param name="bindings">Bindings</param>
         /// <returns>Self for chaining</returns>
-        internal Database DebugInfo(string sql, List<Binding> bindings = null)
+        public Database DebugInfo(string sql, List<Binding> bindings = null)
         {
             if (_DebugCallback != null)
             {
