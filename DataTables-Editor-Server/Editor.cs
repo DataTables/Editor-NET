@@ -2250,7 +2250,13 @@ namespace DataTables
                                 .LeftJoin(_leftJoin);
 
                             // ... where the selected option is present...
-                            q.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
+                            q.Where(
+                                field.Name(),
+                                http.searchPanes_null.ContainsKey(field.Name()) && http.searchPanes_null[field.Name()][i] ?
+                                    null :
+                                    http.searchPanes[field.Name()][i],
+                                "="
+                            );
                             
                             var r = q.Exec().Count();
 
