@@ -843,9 +843,16 @@ namespace DataTables
                     }
                     else
                     {
+                        var fieldName = field;
+
+                        // If the field has the quoting character in it, it needs to be doubled up to escape
+                        if (field.Contains(_fieldQuote)) {
+                            fieldName = field.Replace(_fieldQuote, _fieldQuote + _fieldQuote);
+                        }
+
                         a.Add(
                             _ProtectIdentifiers(field) + " as " +
-                            _fieldQuote + field + _fieldQuote
+                            _fieldQuote + fieldName + _fieldQuote
                         );
                     }
                 }
