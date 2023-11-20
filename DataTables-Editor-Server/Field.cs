@@ -696,7 +696,7 @@ namespace DataTables
         /// This should be a function that takes a single argument (the value to be
         /// cleaned) and returns the cleaned value.
         /// 
-        /// Editor will use the Microsfot security librarie's `Encoder.HtmlEncode` 
+        /// Editor will use the Microsoft security library's `Encoder.HtmlEncode` 
         /// method by default for this operation, which is built into the software
         /// and no additional configuration is required, but a custom function can
         /// be used if you wish to use a different formatter such as HtmlSanitizer.
