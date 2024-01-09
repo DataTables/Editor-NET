@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace DataTables.EditorUtil
@@ -15,13 +16,21 @@ namespace DataTables.EditorUtil
             var underlyingType = Enum.GetUnderlyingType(typeof(T));
             if (useValueAsKey) {
                 return Enum.GetValues(typeof(T))
-                    .Cast<T>()
-                    .ToDictionary(e => Convert.ChangeType(e, underlyingType).ToString(), e => e.ToString());
+                    .Cast<object>()
+                    .ToDictionary(e => Convert.ChangeType(e, underlyingType).ToString(), e => GetEnumDescription((Enum)e));
             }
 
             return Enum.GetValues(typeof(T))
-                .Cast<T>()
-                .ToDictionary(e => e.ToString(), e => e.ToString());
+                .Cast<object>()
+                .ToDictionary(e => e.ToString(), e => GetEnumDescription((Enum)e));
+        }
+        private static string GetEnumDescription(Enum value)
+        {
+            var fieldInfo = value.GetType().GetField(value.ToString());
+            if (fieldInfo == null) return value.ToString();
+
+            var attribute = (DescriptionAttribute)Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute));
+            return attribute?.Description ?? value.ToString();
         }
     }
 }
