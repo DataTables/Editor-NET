@@ -338,10 +338,15 @@ namespace DataTables
                 {"label", formatter(row)}
             }).ToList();
 
-            _manualOpts.ToList().ForEach(opt =>
-            {
-                output.Add(opt);
-            });
+            if (_manualOpts.Count > 0) {
+                //Add manual options to the list from DB and then filter out duplicates by value.
+                _manualOpts.ToList().ForEach(opt => {
+                    output.Add(opt);
+                });
+                output = output.GroupBy(d => d["value"])
+                    .Select(g => g.First())
+                    .ToList();
+            }
 
             if (_order == null)
             {
