@@ -181,7 +181,7 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Set a function that will be used to apply an Enum to the SearchPanes select
+        /// Set an enum that will be used to apply items to the SearchPanes select
         /// </summary>
         /// <param name="useValueAsKey">Boolean to use the enum value as the key (default true)</param>
         /// <returns>Self for chaining</returns>
