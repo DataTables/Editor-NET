@@ -53,7 +53,34 @@ namespace DataTables
 
             return this;
         }
+        
+        /// <summary>
+        /// Add a manually defined option to the list from the database
+        /// </summary>
+        /// <param name="label">Label</param>
+        /// <param name="value">Value</param>
+        /// <returns>Self for chaining</returns>
+        public Options AddFromEnum<T>(bool useValueAsKey = true)
+        {
+            foreach (var pair in Enums.ConvertToStringDictionary<T>(useValueAsKey))
+            {
+                if (int.TryParse(pair.Key, out var valueInt)) {
+                    _manualOpts.Add(new Dictionary<string, object> {
+                        { "value", valueInt },
+                        { "label", pair.Value }
+                    });
+                }
+                else {
+                    _manualOpts.Add(new Dictionary<string, object> {
+                        { "value", pair.Key },
+                        { "label", pair.Value }
+                    });
+                }
+            }
 
+            return this;
+        }
+        
         /// <summary>
         /// Get the column name(s) for the options label
         /// </summary>
@@ -245,6 +272,17 @@ namespace DataTables
         /// <returns>List of options</returns>
         internal List<Dictionary<string, object>> Exec(Database db)
         {
+            //if no table provided, return only the manual options
+            if (_table == null) {
+                var manualOutput = new List<Dictionary<string, object>>();
+                _manualOpts.ToList().ForEach(opt => {
+                    manualOutput.Add(opt);
+                });
+
+                manualOutput.Sort((a, b) => a["label"].ToString().CompareTo(b["label"].ToString()));
+
+                return manualOutput.ToList();
+            }
             var formatter = _renderer ?? (row =>
             {
                 var list = new List<string>();
