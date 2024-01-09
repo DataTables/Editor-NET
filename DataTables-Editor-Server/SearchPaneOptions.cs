@@ -23,6 +23,7 @@ namespace DataTables
         private Action<Query> _where;
         private string _order;
         private List<LeftJoin> _leftJoin = new List<LeftJoin>();
+        private Dictionary<string, string> _fromEnum = new Dictionary<string, string>();
 
         /// <summary>
         /// Get the column name(s) for the options label
@@ -179,6 +180,17 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Set a function that will be used to apply an Enum to the SearchPanes select
+        /// </summary>
+        /// <param name="useValueAsKey">Boolean to use the enum value as the key (default true)</param>
+        /// <returns>Self for chaining</returns>
+        public SearchPaneOptions FromEnum<T>(bool useValueAsKey = true)
+        {
+            _fromEnum = Enums.ConvertToStringDictionary<T>(useValueAsKey);
+
+            return this;
+        }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
@@ -193,7 +205,7 @@ namespace DataTables
         private void _QueryAddCondition(Query entriesQuery, DtRequest http, string fieldName, string fieldDb)
         {
         }
-        
+
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -277,7 +289,7 @@ namespace DataTables
                 // For cases where we are ordering by a field which isn't included in the list
                 // of fields to display, we need to add the ordering field, due to the
                 // select distinct.
-                var orderFields = _order.Split(new[] {','});
+                var orderFields = _order.Split(new[] { ',' });
 
                 foreach(var orderField in orderFields) {
                     var clean = orderField.ToLower();
@@ -296,6 +308,13 @@ namespace DataTables
             var rows = q
                 .Exec()
                 .FetchAll();
+
+            // Replace labels from database with enum names, fall back on database values 
+            if (_fromEnum.Count > 0) {
+                foreach (var row in rows) {
+                    row["label"] = _fromEnum[row["label"].ToString()] ?? row["label"].ToString();
+                }
+            }
 
     		// Remove any filtering entries that don't exist in the database (values might have changed)
             if (http.searchPanes.ContainsKey(fieldIn.Name())) {
