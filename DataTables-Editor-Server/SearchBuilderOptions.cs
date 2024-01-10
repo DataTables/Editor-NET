@@ -23,6 +23,7 @@ namespace DataTables
         private Action<Query> _where;
         private string _order;
         private List<LeftJoin> _leftJoin = new List<LeftJoin>();
+        private Dictionary<string, string> _fromEnum = new Dictionary<string, string>();
 
         /// <summary>
         /// Get the column name(s) for the options label
@@ -179,6 +180,18 @@ namespace DataTables
             return this;
         }
 
+        /// <summary>
+        /// Set an enum that will be used to apply items to the SearchBuilder select
+        /// </summary>
+        /// <param name="useValueAsKey">Boolean to use the enum value as the key (default true)</param>
+        /// <returns>Self for chaining</returns>
+        public SearchBuilderOptions FromEnum<T>(bool useValueAsKey = true)
+        {
+            _fromEnum = Enums.ConvertToStringDictionary<T>(useValueAsKey);
+
+            return this;
+        }
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
          */
@@ -242,6 +255,12 @@ namespace DataTables
             var res = query.Exec()
                 .FetchAll();
 
+            // Replace labels from database with enum names, fall back on database values 
+            if (_fromEnum.Count > 0) {
+                foreach (var row in res) {
+                    row["label"] = _fromEnum[row["label"].ToString()] ?? row["label"].ToString();
+                }
+            }
 
     	    // Create output object with all of the SearchBuilderOptions
             List<Dictionary<string, object>> output = new List<Dictionary<string, object>>();
