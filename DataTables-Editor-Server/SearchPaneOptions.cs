@@ -280,6 +280,7 @@ namespace DataTables
                 .GroupBy(value)
                 .Where(_where)
                 .LeftJoin(join);
+            editor.GetGlobalWhere(q);
 
             if (viewTotal) {
                 q.Get("COUNT(*) as total");
@@ -330,6 +331,7 @@ namespace DataTables
                     .Distinct(true)
                     .Table(table)
                     .LeftJoin(join);
+                editor.GetGlobalWhere(entriesQuery);
 
                 if (fieldIn.Apply("get") && fieldIn.GetValue() == null) {
                     gettingCount = true;
