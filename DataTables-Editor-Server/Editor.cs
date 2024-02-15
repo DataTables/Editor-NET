@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.2.2";
+        public const string Version = "2.3.0";
 
         /// <summary>
         /// Create a new Editor instance
