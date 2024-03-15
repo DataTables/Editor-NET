@@ -1132,7 +1132,7 @@ namespace DataTables
             identifier = identifier.Replace(" as ", " ");
 
             // If more than a single space, then return
-            if (identifier.Split(' ').Length > 2) {
+            if (identifier.Split(new [] {' '}).Length > 2) {
                 return identifier;
             }
 
