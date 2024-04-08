@@ -29,23 +29,23 @@ namespace DataTables
         /// <summary>
         /// Draw counter for server-side processing requests
         /// </summary>
-        public int? draw;
+        public int? draw { get; set; }
 
         /// <summary>
         /// Data to draw the table with, for both client-side and server-side processing
         /// </summary>
-        public List<Dictionary<string, object>> data =
+        public List<Dictionary<string, object>> data { get; set; } =
             new List<Dictionary<string, object>>();
 
         /// <summary>
         /// Total record count for server-side processing requests
         /// </summary>
-        public int? recordsTotal;
+        public int? recordsTotal { get; set; }
 
         /// <summary>
         /// Record count in the filtered data set for server-side processing requests
         /// </summary>
-        public int? recordsFiltered;
+        public int? recordsFiltered { get; set; }
 
 
         /* Editor parameters */
@@ -53,67 +53,67 @@ namespace DataTables
         /// <summary>
         /// General error message if there is one
         /// </summary>
-        public string error;
+        public string error { get; set; }
 
         /// <summary>
         /// List of field errors if one or more fields are in an error state
         /// when validated
         /// </summary>
-        public List<FieldError> fieldErrors =
+        public List<FieldError> fieldErrors { get; set; } =
             new List<FieldError>();
 
         /// <summary>
         /// Id of the newly created row for the create action
         /// </summary>
-        public int? id;
+        public int? id { get; set; }
 
         /// <summary>
         /// Information that can be processes in the Ajax callback handlers can
         /// be added here. It is not actively used by the libraries.
         /// </summary>
-        public Dictionary<string, object> meta =
+        public Dictionary<string, object> meta { get; set; } =
             new Dictionary<string, object>();
 
         /// <summary>
         /// List of options for Editor `select`, `radio` and `checkbox` field types
         /// </summary>
-        public Dictionary<string, object> options =
+        public Dictionary<string, object> options { get; set; } =
             new Dictionary<string, object>();
 
         /// <summary>
         /// Object containing a list of options from SearchPanes
         /// </summary>
-        public SearchBuilderReturn searchBuilder = 
+        public SearchBuilderReturn searchBuilder { get; set; } = 
             new SearchBuilderReturn();
 
         /// <summary>
         /// Object containing a list of options from SearchPanes
         /// </summary>
-        public SearchPanesReturn searchPanes = 
+        public SearchPanesReturn searchPanes { get; set; } = 
             new SearchPanesReturn();
 
         /// <summary>
         /// File information for the upload input types
         /// </summary>
-        public Dictionary<string, Dictionary<string, Dictionary<string, object>>> files =
+        public Dictionary<string, Dictionary<string, Dictionary<string, object>>> files { get; set; } =
             new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
 
         /// <summary>
         /// Row data on update action
         /// </summary>
-        public ResponseUpload upload =
+        public ResponseUpload upload { get; set; } =
             new ResponseUpload();
 
         /// <summary>
         /// If debug mode is enabled, this property will be populated with information
         /// about the SQL statements Editor has run.
         /// </summary>
-        public List<object> debug;
+        public List<object> debug { get; set; }
 
         /// <summary>
         /// List of ids for row that have had their processing cancelled by the `pre*` events
         /// </summary>
-        public List<object> cancelled  = new List<object>();
+        public List<object> cancelled { get; set; } = new List<object>();
 
 
 
