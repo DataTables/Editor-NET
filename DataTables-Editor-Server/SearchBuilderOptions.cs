@@ -182,11 +182,11 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Apply the LeftJoins that were also applied to the wider Editor instance to the SearchBuilder select
+        /// Choose not to apply the LeftJoins that were also applied to the wider Editor instance to the SearchBuilder select
         /// </summary>
         /// <param name="applyEditorLeftJoins">Apply global LeftJoins.</param>
         /// <returns>Self for chaining</returns>
-        public SearchBuilderOptions ApplyEditorLeftJoins(bool applyEditorLeftJoins = false)
+        public SearchBuilderOptions OptOutEditorLeftJoins(bool applyEditorLeftJoins = false)
         {
             _applyEditorLeftJoins = applyEditorLeftJoins;
 
