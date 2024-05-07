@@ -378,7 +378,6 @@ namespace DataTables
                 }
 
                 _ApplyWhere(query);
-                query.LeftJoin(_leftJoin);
 
                 foreach (var field in _fields.Where(field => field.Apply("get") && field.GetValue() == null))
                 {
@@ -402,6 +401,9 @@ namespace DataTables
                 {
                     query.Join(_table, _childField + " = " + _hostField);
                 }
+
+                // apply user defined leftjoins after link joins
+                query.LeftJoin(_leftJoin);
 
                 var readField = "";
                 var joinFieldName = _hostField.Split(new[] { '.' }).Last();
