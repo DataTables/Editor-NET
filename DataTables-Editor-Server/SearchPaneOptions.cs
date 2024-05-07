@@ -277,7 +277,7 @@ namespace DataTables
                 .Table(table)
                 .Get(label + " as label")
                 .Get(value + " as value")
-                .GroupBy(value)
+                .GroupBy(value + ", " + label)
                 .Where(_where)
                 .LeftJoin(join);
 
