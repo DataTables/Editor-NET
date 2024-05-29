@@ -2200,6 +2200,13 @@ namespace DataTables
 
         private void _SspSort(Query query, DtRequest http)
         {
+            // Paging makes little sense without an ordering clause, so if there is
+            // no order to apply (possible in DT2 on the third click of a header)
+            // we apply the primary key as the ordering value.
+            if (http.Order.Count() == 0) {
+                query.Order(_pkey[0] + " asc");
+            }
+
             for (int i = 0, ien = http.Order.Count(); i < ien; i++)
             {
                 var order = http.Order[i];
