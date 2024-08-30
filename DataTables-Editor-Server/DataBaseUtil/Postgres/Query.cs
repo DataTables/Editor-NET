@@ -131,10 +131,7 @@ namespace DataTables.DatabaseUtil.Postgres
                                 // noop
                             }
                             else {
-                                param.Value = DateTime.SpecifyKind(
-                                    DateTime.Parse(binding.Value),
-                                    DateTimeKind.Utc
-                                );
+                                param.Value = DateTime.Parse(binding.Value);
                                 param.DbType = System.Data.DbType.DateTime;
                             }
                         }
