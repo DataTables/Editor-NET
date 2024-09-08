@@ -67,7 +67,7 @@ The software available in this package, acts as server-side libraries for Editor
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.5.0</Version>
