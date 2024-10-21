@@ -297,6 +297,7 @@ namespace DataTables
         private bool _debug = false;
         private List<object> _DebugInfo = new List<object>();
         private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validator = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
+        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validatorAfterFields = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
         private bool _leftJoinRemove = false;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1035,26 +1036,62 @@ namespace DataTables
                 }
             }
 
+            // Global validators to run _after_ field validation
+            foreach (var validator in _validatorAfterFields)
+            {
+                var ret = validator(this, request.RequestType, request);
+
+                if (ret != "")
+                {
+                    response.error = ret;
+
+                    return false;
+                }
+            }
+
             return !response.fieldErrors.Any();
         }
 
         /// <summary>
         /// Get the global validator
         /// </summary>
+        /// <param name="afterFields">Indicates if the validators for before (`false`, default) or after (`true`) field validation should be returned.</param>
         /// <returns>Validation functions set</returns>
-        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator()
+        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator(bool afterFields=false)
         {
-            return _validator;
+            return afterFields
+                ? _validatorAfterFields
+                : _validator;
         }
 
         /// <summary>
-        /// Set a global validator
+        /// Set a global validator to run before field validation has run
         /// </summary>
         /// <param name="validator">Validation function to set</param>
         /// <returns></returns>
         public Editor Validator(Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
         {
             _validator.Add(validator);
+            return this;
+        }
+
+        /// <summary>
+        /// Set a global validator to be run after field validation has run
+        /// </summary>
+        /// <param name="afterFields">`true` to run after field validation, `false` to run before.</param>
+        /// <param name="validator">Validation function to set</param>
+        /// <returns></returns>
+        public Editor Validator(bool afterFields, Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
+        {
+            if (afterFields == false)
+            {
+                _validator.Add(validator);
+            }
+            else
+            {
+                _validatorAfterFields.Add(validator);
+            }
+
             return this;
         }
 
