@@ -21,7 +21,8 @@ namespace DataTables
         private IEnumerable<string> _label;
         private Func<Dictionary<string, object>, object> _renderer;
         private Action<Query> _where;
-        private string _order;
+        private string _orderSql = null;
+        private bool _orderLocal = true;
         private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
         private int _limit=-1;
         private List<Dictionary<string, object>> _manualOpts = new List<Dictionary<string, object>>();
@@ -160,17 +161,38 @@ namespace DataTables
         /// <returns>Order by string</returns>
         public string Order()
         {
-            return _order;
+            return _orderSql;
         }
 
         /// <summary>
-        /// Set the order by clause for the options
+        /// Set the order by SQL clause for the options when getting from
+        /// the database.
         /// </summary>
         /// <param name="order">Order by SQL statement</param>
         /// <returns>Self for chaining</returns>
         public Options Order(string order)
         {
-            _order = order;
+            _orderSql = order;
+            _orderLocal = false;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Use local ordering rather than in the SQL database.
+        /// 
+        /// If this option is `true` (which it is by default) the ordering will
+        /// be based on the rendered output, either numerically or alphabetically
+        /// based on the data returned by the renderer. If `false` no ordering
+        /// will be performed and whatever is returned from the database will 
+        /// be used.
+        /// </summary>
+        /// <param name="order">Enable local sorting</param>
+        /// <returns>Self for chaining</returns>
+        public Options Order(bool order)
+        {
+            _orderSql = null;
+            _orderLocal = order;
 
             return this;
         }
@@ -306,11 +328,11 @@ namespace DataTables
                 .Where(_where)
                 .LeftJoin(_leftJoin);
 
-            if (_order != null)
+            if (_orderSql != null)
             {
                 // If ordering is used and the field specified isn't in the list to select,
                 // then the select distinct would throw an error. So we need to add it in.
-                foreach (var field in _order.Split(new [] {','}))
+                foreach (var field in _orderSql.Split(new [] {','}))
                 {
                     var col = field.ToLower().Replace(" asc", "").Replace(" desc", "");
 
@@ -320,7 +342,7 @@ namespace DataTables
                     }
                 }
                
-                q.Order(_order);
+                q.Order(_orderSql);
             }
 
             if (_limit != -1)
@@ -348,7 +370,7 @@ namespace DataTables
                     .ToList();
             }
 
-            if (_order == null)
+            if (_orderLocal == true)
             {
                 output.Sort((a, b) => a["label"].ToString().CompareTo(b["label"].ToString()));
             }
