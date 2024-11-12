@@ -1216,6 +1216,13 @@ namespace DataTables
             return _request;
         }
 
+        /// <summary>
+        /// Apply the global Where filter to the supplied Query
+        /// </summary>
+        internal void GetGlobalWhere(Query query)
+        {
+            _GetWhere(query);
+        }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
