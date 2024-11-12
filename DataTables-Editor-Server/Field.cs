@@ -739,7 +739,7 @@ namespace DataTables
         /// Called by the Editor / Join class instances - not expected for general
         /// consumption - internal.
         /// </summary>
-        /// <param name="action">Direction that the data is travelling  - 'get' is reading DB data, `create` and `edit` for writing to the DB</param>
+        /// <param name="action">Direction that the data is traveling  - 'get' is reading DB data, `create` and `edit` for writing to the DB</param>
         /// <param name="data">Data submitted from the client-side when setting.</param>
         /// <returns>true if the field should be used in the get / set.</returns>
         internal bool Apply(string action, Dictionary<string, object> data = null)
