@@ -483,6 +483,15 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Get the left joins that are used by this instance
+        /// </summary>
+        /// <returns>List of LeftJoin objects</returns>
+        public List<LeftJoin> LeftJoin()
+        {
+            return _leftJoin;
+        }
+
+        /// <summary>
         /// Add a left join condition to the Editor instance, allowing it to operate
         /// over multiple tables. Multiple <code>leftJoin()</code> calls can be made for a
         /// single Editor instance to join multiple tables.

@@ -359,18 +359,22 @@ namespace DataTables
                 {
                     throw new Exception("MJoin is not currently supported with a compound primary key for the main table.");
                 }
+                
+                var readField = "";
+                var joinFieldSplit = _hostField.Split(new[] { '.' });
+                var joinFieldTable = joinFieldSplit.First();
+                var joinFieldName = joinFieldSplit.Last();
 
                 // If the Editor primary key is join key, then it is read automatically
                 // and into Editor's primary key store
-                var pkeyIsJoin = _hostField == pkeyA[0] ||
-                                _hostField == editor.Table()[0];
+                var pkeyIsJoin = _hostField == pkeyA[0] || _hostField == editor.Table()[0];
 
                 // Build the basic query
                 var query = editor.Db()
                     .Query("select")
                     .Distinct(true)
                     .Get(_hostField + " as dteditor_pkey")
-                    .Table(editor.Table()[0]);
+                    .Table(joinFieldTable);
 
                 if (Order() != null)
                 {
@@ -403,8 +407,6 @@ namespace DataTables
                     query.Join(_table, _childField + " = " + _hostField);
                 }
 
-                var readField = "";
-                var joinFieldName = _hostField.Split(new[] { '.' }).Last();
                 if (NestedData.InData(_hostField, response.data[0]))
                 {
                     readField = _hostField;
@@ -692,7 +694,7 @@ namespace DataTables
         /// <summary>
         /// Complete initialisation once we have an Editor instance to work with
         /// </summary>
-        /// <param name="editor"></param>
+        /// <param name="editor">Host Editor instance</param>
         private void _Prepare(Editor editor)
         {
             _editor = editor;
@@ -702,6 +704,8 @@ namespace DataTables
             {
                 _PrepareModel();
             }
+
+            var hostTables = _ParentTables();
 
             // Resolve what field names belong to what varible for processing
             for (int i = 0, ien = _links.Count(); i < ien; i++)
@@ -714,7 +718,7 @@ namespace DataTables
                 {
                     _childField = _links[i];
                 }
-                else if (tableName == _editor.Table()[0])
+                else if (hostTables.Contains(tableName))
                 {
                     _hostField = _links[i];
                 }
@@ -805,6 +809,32 @@ namespace DataTables
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Get a list of table names that the host Editor instance can use
+        /// </summary>
+        /// <returns>List of tables</returns>
+        private List<string> _ParentTables ()
+        {
+            var resolved = new List<string>();
+            var i = 0;
+            var tables = _editor.Table();
+            var joins = _editor.LeftJoin();
+
+            // Main table(s)
+            for (i=0 ; i<tables.Count() ; i++)
+            {
+                resolved.Add(tables[i]);
+            }
+
+            // Left joined tables
+            for (i=0 ; i<joins.Count() ; i++)
+            {
+                resolved.Add(joins[i].Table);
+            }
+
+            return resolved;
         }
     }
 }
