@@ -755,6 +755,16 @@ namespace DataTables
         {
             foreach (var pi in _userModelT.GetProperties())
             {
+                // Check for ignore attribute
+                var ignAttr = pi
+                    .GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
+                    .Cast<EditorIgnoreAttribute>().FirstOrDefault();
+
+                if (ignAttr != null && ignAttr.Ignore)
+                {
+                    continue;
+                }
+
                 var field = _FindField(pi.Name, "name");
 
                 // If the field doesn't exist yet, create it
@@ -781,6 +791,24 @@ namespace DataTables
                 if (name != null)
                 {
                     field.Name(name.Name);
+                }
+
+                var get = pi
+                    .GetCustomAttributes(typeof(EditorGetAttribute), false)
+                    .Cast<EditorGetAttribute>().FirstOrDefault();
+
+                if (get != null)
+                {
+                    field.Get(get.Get);
+                }
+
+                var set = pi
+                    .GetCustomAttributes(typeof(EditorSetAttribute), false)
+                    .Cast<EditorSetAttribute>().FirstOrDefault();
+
+                if (set != null)
+                {
+                    field.Set(set.Set);
                 }
             }
         }
