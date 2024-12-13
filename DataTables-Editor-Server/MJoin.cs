@@ -489,17 +489,6 @@ namespace DataTables
                     );
                 }
             }
-
-            // Field options
-            foreach (var field in _fields)
-            {
-                var opts = field.OptionsExec(editor.Db());
-
-                if (opts != null)
-                {
-                    response.options.Add(_name + "[]." + field.Name(), opts);
-                }
-            }
         }
 
         /// <summary>
@@ -551,6 +540,31 @@ namespace DataTables
                     }
 
                     query.Exec();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the options for the fields in this join
+        /// </summary>
+        /// <param name="options">Options object</param>
+        /// <param name="db">Database connection object</param>
+        /// <param name="refresh">Refresh indication flag</param>
+        internal void Options(Dictionary<string, object> options, Database db, bool refresh)
+        {
+            // Field options
+            foreach (var field in _fields)
+            {
+                var optsInst = field.Options();
+
+                if (optsInst != null)
+                {
+                    var opts = optsInst.Exec(db, refresh);
+                    
+                    if (opts != null)
+                    {
+                        options.Add(_name + "[]." + field.Name(), opts);
+                    }
                 }
             }
         }

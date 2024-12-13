@@ -138,7 +138,12 @@ namespace DataTables
             /// <summary>
             /// Editor file upload request
             /// </summary>
-            EditorUpload
+            EditorUpload,
+
+            /// <summary>
+            /// Editor dropdown search request
+            /// </summary>
+            EditorSearch
         };
 
         /* Server-side processing parameters */
@@ -147,6 +152,21 @@ namespace DataTables
         /// DataTables draw counter for server-side processing
         /// </summary>
         public int Draw;
+
+        /// <summary>
+        /// Search term for a dropdown search operation
+        /// </summary>
+        public string DropdownSearch;
+
+        /// <summary>
+        /// Search value for a dropdown search operation
+        /// </summary>
+        public List<string> DropdownValues;
+
+        /// <summary>
+        /// Field name for a dropdown search operation
+        /// </summary>
+        public string Field;
 
         /// <summary>
         /// DataTables record start pointer for server-side processing
@@ -312,8 +332,27 @@ namespace DataTables
                 else if (Action == "upload")
                 {
                     RequestType = RequestTypes.EditorUpload;
-
                     UploadField = http["uploadField"] as string;
+                }
+                else if (Action == "search")
+                {
+                    RequestType = RequestTypes.EditorSearch;
+                    Field = http["field"] as string;
+
+                    if (http.ContainsKey("search"))
+                    {
+                        DropdownSearch = http["search"] as string;
+                    }
+
+                    if (http.ContainsKey("values"))
+                    {
+                        DropdownValues = new List<string>();
+
+                        foreach (var item in http["values"] as Dictionary<string, object>)
+                        {
+                            DropdownValues.Add(item.Value as string);
+                        }
+                    }
                 }
             }
             else if (http.ContainsKey("draw"))

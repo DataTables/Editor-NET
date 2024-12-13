@@ -1263,6 +1263,11 @@ namespace DataTables
                 {
                     // DataTable get request
                     _out.Merge(_Get(null, data));
+                    _Options(false);
+                }
+                else if (data.RequestType == DtRequest.RequestTypes.EditorSearch)
+                {
+                    _OptionsSearch(data);
                 }
                 else if (data.RequestType == DtRequest.RequestTypes.EditorUpload && this._write)
                 {
@@ -1273,6 +1278,7 @@ namespace DataTables
                 {
                     // Remove rows
                     _Remove(data);
+                    _Options(true);
                     _FileClean();
                 }
                 else if ((data.RequestType == DtRequest.RequestTypes.EditorCreate ||
@@ -1351,6 +1357,8 @@ namespace DataTables
 
                     	_FileClean();
                     }
+
+                    _Options(true);
                 }
             }
 
@@ -1513,47 +1521,6 @@ namespace DataTables
                 dtData.data.Add(inner);
             }
 
-            // Field options
-            if (id == null)
-            {
-                // Create an array of fields to pass to SearchPaneOptions
-                Field[] fields = new Field[http.Columns.Count()];
-                int x = 0;
-                for(int i = 0; i < this._field.Count(); i++){
-                    for(int j = 0;  j < http.Columns.Count(); j++){
-                        if(this._field[i].Name() == http.Columns[j].Data){
-                            fields[x] = this._field[i];
-                            x++;
-                        }
-                    }
-                }
-                foreach (var field in _field)
-                {
-                    var opts = field.OptionsExec(_db);
-
-                    if (opts != null)
-                    {
-                        dtData.options.Add(field.Name(), opts);
-                    }
-
-                    var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, http);
-
-                    if(spOpts != null)
-                    {
-                        dtData.searchPanes.options.Add(field.Name(), spOpts);
-                    }
-
-                    var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, http);
-
-                    if(sbOpts != null)
-                    {
-                        dtData.searchBuilder.options.Add(field.Name(), sbOpts);
-                    }
-                }
-            }
-
-            
-
             // Row based joins
             foreach (var mjoin in _mJoin)
             {
@@ -1576,16 +1543,6 @@ namespace DataTables
 
             dtData.Merge(ssp);
 
-            if (dtData.searchPanes.options.Count() == 0)
-            {
-                dtData.searchPanes = null;
-            }
-
-            if (dtData.searchBuilder.options.Count() == 0)
-            {
-                dtData.searchBuilder = null;
-            }
-            
             return dtData;
         }
 
@@ -2134,6 +2091,102 @@ namespace DataTables
                         "database table set explicity."
                     );
                 }
+            }
+        }
+
+        /// <summary>
+        /// Get option lists for select, radio, autocomplete, etc.
+        /// </summary>
+        /// <param name="refresh">false for initial load, true if after insert, update</param>
+        private void _Options(bool refresh)
+        {
+            // Create an array of fields to pass to SearchPaneOptions
+            Field[] fields = new Field[_processData.Columns.Count()];
+            int x = 0;
+
+            for(int i = 0; i < this._field.Count(); i++)
+            {
+                for(int j = 0;  j < _processData.Columns.Count(); j++)
+                {
+                    if(this._field[i].Name() == _processData.Columns[j].Data)
+                    {
+                        fields[x] = this._field[i];
+                        x++;
+                    }
+                }
+            }
+
+            foreach (var field in _field)
+            {
+                var options = field.Options();
+
+                if (options != null)
+                {
+                    var opts = options.Exec(_db, refresh);
+
+                    if (opts != null) {
+                        _out.options.Add(field.Name(), opts);
+                    }
+                }
+
+                var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, _processData);
+
+                if (spOpts != null)
+                {
+                    _out.searchPanes.options.Add(field.Name(), spOpts);
+                }
+
+                var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, _processData);
+
+                if (sbOpts != null)
+                {
+                    _out.searchBuilder.options.Add(field.Name(), sbOpts);
+                }
+            }
+
+            if (_out.searchPanes.options.Count() == 0)
+            {
+                _out.searchPanes = null;
+            }
+
+            if (_out.searchBuilder.options.Count() == 0)
+            {
+                _out.searchBuilder = null;
+            }
+
+            // Check the join's for a list of options
+            foreach (var join in _mJoin) {
+                join.Options(_out.options, _db, refresh);
+            }
+        }
+
+        /// <summary>
+        /// Perform a search action on a specific field for label/value pairs.
+        /// </summary>
+        /// <param name="http">DataTables HTTP request object</param>
+        private void _OptionsSearch(DtRequest http)
+        {
+            var field = _FindField(http.Field, "name");
+
+            if (field == null)
+            {
+                return;
+            }
+
+            var options = field.Options();
+
+            if (options == null)
+            {
+                return;
+            }
+
+            if (http.DropdownSearch != null)
+            {
+                _out.data = options.Search(_db, http.DropdownSearch);
+            }
+            else if (http.DropdownValues != null)
+            {
+                _out.data = options.Find(_db, http.DropdownValues);
             }
         }
 
