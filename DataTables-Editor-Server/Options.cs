@@ -19,6 +19,40 @@ namespace DataTables
     /// </summary>
     public class Options
     {
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Constructor
+         */
+
+        /// <summary>
+        /// Create a new Options instance, to be configured by its methods.
+        /// </summary>
+        public Options() {}
+
+        /// <summary>
+        /// Create a new Options instance, setting basic database lookup details
+        /// </summary>
+        /// <param name="table">Table name (`.Table()`)</param>
+        /// <param name="value">Value column name (`.Value()`)</param>
+        /// <param name="label">Label column name (`.Label()`)</param>
+        public Options(string table, string value, string label)
+        {
+            this.Table(table);
+            this.Value(value);
+            this.Label(label);
+        }
+
+        /// <summary>
+        /// Create a new Options instance, setting a custom function (`.Fn()`).
+        /// </summary>
+        /// <param name="fn">Custom function used to get options</param>
+        public Options(OptionsFunc fn)
+        {
+            this.Fn(fn);
+        }
+
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Private parameters
+         */
         private bool _alwaysRefresh = true;
         private OptionsFunc _customFn;
         private List<string> _includes = new List<string>();
