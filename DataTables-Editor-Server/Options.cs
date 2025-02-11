@@ -70,7 +70,22 @@ namespace DataTables
 
 
         /// <summary>
-        /// Add a manually defined option to the list from the database
+        /// Add a manually defined option to the list from the database. The object added should
+        /// contain the same keys that are provided by the database result and the option added _IS_
+        /// passed through the label renderer.
+        /// </summary>
+        /// <param name="Row"></param>
+        /// <returns>Self for chaining</returns>
+        public Options Add(Dictionary<string, object> row)
+        {
+            _manualOpts.Add(row);
+        }
+
+
+        /// <summary>
+        /// Add a manually defined option to the list from the database. Note that options added
+        /// with this method will not be passed through the label rendering. The label given will be
+        /// used for both the label and value as is.
         /// </summary>
         /// <param name="label">Label and value</param>
         /// <returns>Self for chaining</returns>
@@ -80,7 +95,9 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Add a manually defined option to the list from the database
+        /// Add a manually defined option to the list from the database. Note that options added
+        /// with this method will not be passed through the label rendering. The label and value
+        /// given will be used as is.
         /// </summary>
         /// <param name="label">Label</param>
         /// <param name="value">Value</param>
@@ -90,14 +107,17 @@ namespace DataTables
             _manualOpts.Add(new Dictionary<string, object>
             {
                 {"value", value},
-                {"label", label}
+                {"label", label},
+                {"_manual", true}
             });
 
             return this;
         }
 
         /// <summary>
-        /// Add a manually defined option to the list from the database
+        /// Add manually defined options to the list from the database. Note that options added
+        /// with this method will not be passed through the label rendering. The label and value
+        /// given will be used as is.
         /// </summary>
         /// <param name="label">Label</param>
         /// <param name="value">Value</param>
@@ -110,14 +130,16 @@ namespace DataTables
                 {
                     _manualOpts.Add(new Dictionary<string, object> {
                         { "value", valueInt },
-                        { "label", pair.Value }
+                        { "label", pair.Value },
+                        {"_manual", true}
                     });
                 }
                 else
                 {
                     _manualOpts.Add(new Dictionary<string, object> {
                         { "value", pair.Key },
-                        { "label", pair.Value }
+                        { "label", pair.Value },
+                        {"_manual", true}
                     });
                 }
             }
@@ -494,8 +516,12 @@ namespace DataTables
 
             foreach (var opt in options)
             {
-                var rowLabel = formatter(opt) as string;
-                var rowValue = opt[_value];
+                var rowLabel = opt.ContainsKey("_manual")
+                    ? opt["value"] as string
+                    : formatter(opt) as string;
+                var rowValue = opt.ContainsKey("_manual")
+                    ? opt["label"]
+                    : opt[_value];
 
                 // Apply the search to the rendered label. Need to do it here rather than in SQL since
                 // the label is rendered in script.
