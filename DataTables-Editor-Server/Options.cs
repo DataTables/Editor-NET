@@ -79,6 +79,8 @@ namespace DataTables
         public Options Add(Dictionary<string, object> row)
         {
             _manualOpts.Add(row);
+
+            return this;
         }
 
 
