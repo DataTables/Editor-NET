@@ -575,7 +575,12 @@ namespace DataTables
         /// <returns>List of found options</returns>
         internal List<Dictionary<string, object>> ExecDb(Database db, List<string> find)
         {
-            var fields = new List<string>(_label) { _value };
+            var fields = new List<string>(_label);
+
+            if (! fields.Contains(_value)) {
+                fields.Add(_value);
+            }
+
             var q = db.Query("select")
                 .Distinct(true)
                 .Table(_table)
