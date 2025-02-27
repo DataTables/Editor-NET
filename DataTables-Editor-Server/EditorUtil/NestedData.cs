@@ -154,7 +154,7 @@ namespace DataTables.EditorUtil
             }
             catch (Exception)
             {
-                throw new Exception("Unable to cast value to be " + type.Name);
+                throw new Exception("Unable to cast value to be " + type.Name + " from " + value.GetType());
             }
         }
     }
