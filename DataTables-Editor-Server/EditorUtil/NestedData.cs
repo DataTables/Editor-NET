@@ -141,15 +141,17 @@ namespace DataTables.EditorUtil
         {
             try
             {
-                if (value.GetType() == typeof(System.Guid)) {
+                if (value == null || value == System.DBNull.Value)
+                {
+                    outData.Add(name, null);
+                }
+                else if (value.GetType() == typeof(System.Guid))
+                {
                     outData.Add(name, value.ToString());
                 }
                 else
                 {
-                    outData.Add(name, value == null || value == System.DBNull.Value
-                        ? null
-                        : Convert.ChangeType(value, type)
-                    );
+                    outData.Add(name, Convert.ChangeType(value, type));
                 }
             }
             catch (Exception)
