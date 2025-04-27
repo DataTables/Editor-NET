@@ -245,11 +245,11 @@ namespace DataTables
                 .Table(this._table)
                 .LeftJoin(_leftJoin);
             
-            if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
+            if(fieldIn.Apply("get") && fieldIn.GetValue() == null) {
                 query
                     .Get(this._value + " as value")
                     .Get(_label + " as label")
-                    .GroupBy(this._value);
+                    .GroupBy(this._value + ", " + _label);
             }
 
             var res = query.Exec()
