@@ -244,7 +244,8 @@ namespace DataTables
             var query = db.Query("select")
                 .Table(this._table)
                 .LeftJoin(_leftJoin);
-            
+            editor.GetGlobalWhere(query);
+
             if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
                 query
                     .Get(this._value + " as value")
