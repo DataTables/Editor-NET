@@ -2244,9 +2244,9 @@ namespace DataTables
 
             // Get the nuber of rows in the result set
             var setCount = _db
-                .Query("select")
+                .Query("count")
                 .Table(_ReadTable())
-                .Get("COUNT( " + _pkey[0] + " ) as cnt")
+                .Get(_pkey[0])
                 .LeftJoin(_leftJoin);
             _GetWhere(setCount);
             _SspFilter(setCount, http);
@@ -2255,9 +2255,9 @@ namespace DataTables
 
             // Get the number of rows in the full set
             var fullCount = _db
-                .Query("select")
+                .Query("count")
                 .Table(_ReadTable())
-                .Get("COUNT( " + _pkey[0] + " ) as cnt");
+                .Get(_pkey[0]);
             _GetWhere(fullCount);
 
             // A left join is only needed if there is a where condition, incase the

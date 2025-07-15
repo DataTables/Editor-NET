@@ -197,6 +197,10 @@ namespace DataTables
             {
                 return _Delete();
             }
+            else if (type == "count")
+            {
+                return _Count();
+            }
             else if (type == "raw")
             {
                 return _Raw(sql);
@@ -1047,6 +1051,27 @@ namespace DataTables
             }
 
             return condition;
+        }
+
+        /// <summary>
+        /// Run a SELECT with a COUNT - returns in a `cnt` parameter for the selected row.
+        /// </summary>
+        /// <returns>Query result</returns>
+        virtual protected Result _Count()
+        {
+            var select = "SELECT COUNT(" + _BuildField() + ") " + _ProtectIdentifiers("cnt");
+
+            _Prepare(
+                select
+                + " FROM " + _BuildTable()
+                + _BuildJoin()
+                + _BuildWhere()
+                + _BuildGroupBy()
+                + _BuildOrder()
+                + _BuildLimit()
+            );
+            
+            return _Exec();
         }
 
         /// <summary>
