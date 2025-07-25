@@ -1503,6 +1503,22 @@ namespace DataTables
                 query.Where(PkeyToArray(id.ToString(), true));
             }
 
+            // Limit to specific ids submitted from the client-side
+            Debug("Read ids" + http.ReadIds.Count.ToString());
+            if (http.ReadIds.Count > 0)
+            {
+                query.Where(q =>
+                {
+                    foreach (var readId in http.ReadIds)
+                    {
+                        q.OrWhere(r =>
+                        {
+                            r.Where(PkeyToArray(readId, true));
+                        });
+                    }
+                });
+            }
+
             var res = query.Exec();
             Dictionary<string, object> row;
 

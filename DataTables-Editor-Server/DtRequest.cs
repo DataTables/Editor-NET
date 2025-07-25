@@ -169,6 +169,11 @@ namespace DataTables
         public string Field;
 
         /// <summary>
+        /// Row ids requested when doing row refresh
+        /// </summary>
+        public List<string> ReadIds = new List<string>();
+
+        /// <summary>
         /// DataTables record start pointer for server-side processing
         /// </summary>
         public int Start;
@@ -314,46 +319,58 @@ namespace DataTables
                 // Editor request
                 Action = http["action"] as string;
 
-                if (Action == "create")
+                if (Action == "read")
                 {
-                    RequestType = RequestTypes.EditorCreate;
-                    Data = http["data"] as Dictionary<string, object>;
-                }
-                else if (Action == "edit")
-                {
-                    RequestType = RequestTypes.EditorEdit;
-                    Data = http["data"] as Dictionary<string, object>;
-                }
-                else if (Action == "remove")
-                {
-                    RequestType = RequestTypes.EditorRemove;
-                    Data = http["data"] as Dictionary<string, object>;
-                }
-                else if (Action == "upload")
-                {
-                    RequestType = RequestTypes.EditorUpload;
-                    UploadField = http["uploadField"] as string;
-                }
-                else if (Action == "search")
-                {
-                    RequestType = RequestTypes.EditorSearch;
-                    Field = http["field"] as string;
+                    RequestType = RequestTypes.DataTablesGet;
 
-                    if (http.ContainsKey("search"))
+                    if (http.ContainsKey("ids"))
                     {
-                        DropdownSearch = http["search"] as string;
-                    }
-
-                    if (http.ContainsKey("values"))
-                    {
-                        DropdownValues = new List<string>();
-
-                        foreach (var item in http["values"] as Dictionary<string, object>)
+                        foreach (var id in http["ids"] as Dictionary<string, object>)
                         {
-                            DropdownValues.Add(item.Value as string);
+                            ReadIds.Add(id.Value as string);
                         }
                     }
                 }
+                    else if (Action == "create")
+                    {
+                        RequestType = RequestTypes.EditorCreate;
+                        Data = http["data"] as Dictionary<string, object>;
+                    }
+                    else if (Action == "edit")
+                    {
+                        RequestType = RequestTypes.EditorEdit;
+                        Data = http["data"] as Dictionary<string, object>;
+                    }
+                    else if (Action == "remove")
+                    {
+                        RequestType = RequestTypes.EditorRemove;
+                        Data = http["data"] as Dictionary<string, object>;
+                    }
+                    else if (Action == "upload")
+                    {
+                        RequestType = RequestTypes.EditorUpload;
+                        UploadField = http["uploadField"] as string;
+                    }
+                    else if (Action == "search")
+                    {
+                        RequestType = RequestTypes.EditorSearch;
+                        Field = http["field"] as string;
+
+                        if (http.ContainsKey("search"))
+                        {
+                            DropdownSearch = http["search"] as string;
+                        }
+
+                        if (http.ContainsKey("values"))
+                        {
+                            DropdownValues = new List<string>();
+
+                            foreach (var item in http["values"] as Dictionary<string, object>)
+                            {
+                                DropdownValues.Add(item.Value as string);
+                            }
+                        }
+                    }
             }
             else if (http.ContainsKey("draw"))
             {
