@@ -1504,7 +1504,6 @@ namespace DataTables
             }
 
             // Limit to specific ids submitted from the client-side
-            Debug("Read ids" + http.ReadIds.Count.ToString());
             if (http.ReadIds.Count > 0)
             {
                 query.Where(q =>
