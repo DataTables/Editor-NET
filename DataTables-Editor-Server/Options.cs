@@ -55,6 +55,7 @@ namespace DataTables
          */
         private bool _alwaysRefresh = true;
         private OptionsFunc _customFn;
+        private bool _get = true;
         private List<string> _includes = new List<string>();
         private List<string> _label;
         private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
@@ -189,6 +190,27 @@ namespace DataTables
         public Options Fn(OptionsFunc set)
         {
             _customFn = set;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Get the current "Get" flag
+        /// </summary>
+        /// <returns>Current value</returns>
+        public bool Get()
+        {
+            return _get;
+        }
+
+        /// <summary>
+        /// Set a flag to indicate if the options from this class should be obtained or not
+        /// </summary>
+        /// <param name="set">Flag to set</param>
+        /// <returns>Self for chaining</returns>
+        public Options Get(bool set)
+        {
+            _get = set;
 
             return this;
         }
@@ -469,6 +491,11 @@ namespace DataTables
             List<string> find = null
         )
         {
+		    // Local enablement
+            if (_get == false) {
+                return null;
+            }
+
             // If search only, and not a search action, then just return false
             if (_searchOnly && search == null && find == null)
             {
