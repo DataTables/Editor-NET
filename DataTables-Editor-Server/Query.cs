@@ -258,6 +258,15 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Determine if the query has any conditions applied to it.
+        /// </summary>
+        /// <returns>`true` if it has, `false` otherwise</returns>
+        public bool HasConditions()
+        {
+            return _where.Count == 0 ? false : true;
+        }
+
+        /// <summary>
         /// Perform a JOIN operation
         /// </summary>
         /// <param name="table">Table name to do the JOIN on</param>

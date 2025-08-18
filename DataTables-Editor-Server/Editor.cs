@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.4.3";
+        public const string Version = "2.5.0-dev";
 
         /// <summary>
         /// Create a new Editor instance
@@ -2267,22 +2267,26 @@ namespace DataTables
             _SspFilter(setCount, http);
 
             var setCounted = Convert.ToInt32(setCount.Exec().Fetch()["cnt"]);
+            var fullCounted = setCounted;
 
             // Get the number of rows in the full set
-            var fullCount = _db
-                .Query("count")
-                .Table(_ReadTable())
-                .Get(_pkey[0]);
-            _GetWhere(fullCount);
-
-            // A left join is only needed if there is a where condition, incase the
-            // conditional items are the ones being joined in
-            if (_where.Any())
+            if (setCount.HasConditions())
             {
-                fullCount.LeftJoin(_leftJoin);
-            }
+                var fullCount = _db
+                    .Query("count")
+                    .Table(_ReadTable())
+                    .Get(_pkey[0]);
+                _GetWhere(fullCount);
 
-            var fullCounted = Convert.ToInt32(fullCount.Exec().Fetch()["cnt"]);
+                // A left join is only needed if there is a where condition, incase the
+                // conditional items are the ones being joined in
+                if (_where.Any())
+                {
+                    fullCount.LeftJoin(_leftJoin);
+                }
+
+                fullCounted = Convert.ToInt32(fullCount.Exec().Fetch()["cnt"]);
+            }
 
             ssp.draw = http.Draw;
             ssp.recordsTotal = fullCounted;
