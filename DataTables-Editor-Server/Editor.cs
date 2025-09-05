@@ -2157,6 +2157,17 @@ namespace DataTables
                 {
                     _out.searchBuilder.options.Add(field.Name(), sbOpts);
                 }
+
+                var cc = field.ColumnControl();
+
+                if (cc != null)
+                {
+                    var opts = cc.Exec(_db, false);
+
+                    if (opts != null) {
+                        _out.columnControl.Add(field.Name(), opts);
+                    }
+                }
             }
 
             if (_out.searchPanes.options.Count() == 0)
@@ -2415,6 +2426,8 @@ namespace DataTables
                 }
                 query.WhereGroup(nestSB);
             }
+
+            ColumnControl.Ssp(this, query, http);
 
             // Column filters
             for (int i = 0, ien = http.Columns.Count(); i < ien; i++)

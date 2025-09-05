@@ -532,8 +532,6 @@ namespace DataTables
             // Get database data
             var options = ExecDb(db, find);
 
-            Console.WriteLine("options Count " + options.Count.ToString());
-
             // Manually added options
             foreach (var opt in _manualOpts)
             {

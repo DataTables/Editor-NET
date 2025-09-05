@@ -115,6 +115,12 @@ namespace DataTables
         /// </summary>
         public List<object> cancelled  = new List<object>();
 
+        /// <summary>
+        /// ColumnControl options
+        /// </summary>
+        public Dictionary<string, object> columnControl =
+            new Dictionary<string, object>();
+
 
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

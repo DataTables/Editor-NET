@@ -164,11 +164,33 @@ namespace DataTables
         private Upload _upload;
         private Func<string, string> _xss;
         private bool _xssFormat = true;
+        private Options _columnControl = null;
 
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
          */
+
+        /// <summary>
+        /// Get the options class for the options to get for ColumnControl
+        /// </summary>
+        /// <returns>Options or null if not set</returns>
+        public Options ColumnControl()
+        {
+            return _columnControl;
+        }
+
+        /// <summary>
+        /// Set the options class for the options to get for ColumnControl
+        /// </summary>
+        /// <param name="opts">Options configuration for ColumnControl</param>
+        /// <returns>Self for chaining</returns>
+        public Field ColumnControl(Options opts)
+        {
+            _columnControl = opts;
+
+            return this;
+        }
 
         /// <summary>
         /// Set the DB field name.

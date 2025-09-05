@@ -43,8 +43,9 @@ namespace DataTables
         {
             var dataOut = new Dictionary<string, object>();
             CultureInfo culture = null;
-            
-            if (cultureStr != null) {
+
+            if (cultureStr != null)
+            {
                 culture = CultureInfo.CreateSpecificCulture(cultureStr);
             }
 
@@ -56,13 +57,13 @@ namespace DataTables
 
                     if (pair.Key.Contains("["))
                     {
-                        var keys = pair.Key.Split(new[] {'['});
+                        var keys = pair.Key.Split(new[] { '[' });
                         var innerDic = dataOut;
                         string key;
 
                         for (int i = 0, ien = keys.Count() - 1; i < ien; i++)
                         {
-                            key = keys[i].TrimEnd(new[] {']'});
+                            key = keys[i].TrimEnd(new[] { ']' });
                             if (key == "")
                             {
                                 // If the key is empty it is an array index value
@@ -76,7 +77,7 @@ namespace DataTables
                             innerDic = innerDic[key] as Dictionary<string, object>;
                         }
 
-                        key = keys.Last().TrimEnd(new[] {']'});
+                        key = keys.Last().TrimEnd(new[] { ']' });
                         if (key == "")
                         {
                             key = innerDic.Count().ToString();
@@ -263,7 +264,7 @@ namespace DataTables
         /// DtRequest object
         /// </summary>
         /// <param name="rawHttp">Data from the client-side</param>
-        public DtRequest(IEnumerable<KeyValuePair<string, string>> rawHttp, string culture=null)
+        public DtRequest(IEnumerable<KeyValuePair<string, string>> rawHttp, string culture = null)
         {
             _Build(rawHttp, culture);
         }
@@ -286,30 +287,30 @@ namespace DataTables
             }
 
             // Numeric looking data, but with leading zero
-            if (dataIn.Length > 1 && (dataIn.IndexOf('0') == 0 || dataIn.IndexOf('-') == dataIn.Length-1 || dataIn.IndexOf(',') != -1 || dataIn.IndexOf('+') == 0))
-			{
+            if (dataIn.Length > 1 && (dataIn.IndexOf('0') == 0 || dataIn.IndexOf('-') == dataIn.Length - 1 || dataIn.IndexOf(',') != -1 || dataIn.IndexOf('+') == 0))
+            {
                 return dataIn;
             }
 
-			int test;
-			var res = Int32.TryParse(dataIn, out test);
+            int test;
+            var res = Int32.TryParse(dataIn, out test);
             if (res)
-			{
-				return test;
-			}
+            {
+                return test;
+            }
 
-			decimal testDec;
-			var resDec = culture != null
+            decimal testDec;
+            var resDec = culture != null
                 ? Decimal.TryParse(dataIn, NumberStyles.AllowDecimalPoint, culture, out testDec)
                 : Decimal.TryParse(dataIn, out testDec);
-			if (resDec)
-			{
-				return testDec;
-			}
+            if (resDec)
+            {
+                return testDec;
+            }
 
             return dataIn;
         }
-        
+
         private void _Build(IEnumerable<KeyValuePair<string, string>> rawHttp, string culture)
         {
             var http = HttpData(rawHttp, culture);
@@ -331,46 +332,46 @@ namespace DataTables
                         }
                     }
                 }
-                    else if (Action == "create")
-                    {
-                        RequestType = RequestTypes.EditorCreate;
-                        Data = http["data"] as Dictionary<string, object>;
-                    }
-                    else if (Action == "edit")
-                    {
-                        RequestType = RequestTypes.EditorEdit;
-                        Data = http["data"] as Dictionary<string, object>;
-                    }
-                    else if (Action == "remove")
-                    {
-                        RequestType = RequestTypes.EditorRemove;
-                        Data = http["data"] as Dictionary<string, object>;
-                    }
-                    else if (Action == "upload")
-                    {
-                        RequestType = RequestTypes.EditorUpload;
-                        UploadField = http["uploadField"] as string;
-                    }
-                    else if (Action == "search")
-                    {
-                        RequestType = RequestTypes.EditorSearch;
-                        Field = http["field"] as string;
+                else if (Action == "create")
+                {
+                    RequestType = RequestTypes.EditorCreate;
+                    Data = http["data"] as Dictionary<string, object>;
+                }
+                else if (Action == "edit")
+                {
+                    RequestType = RequestTypes.EditorEdit;
+                    Data = http["data"] as Dictionary<string, object>;
+                }
+                else if (Action == "remove")
+                {
+                    RequestType = RequestTypes.EditorRemove;
+                    Data = http["data"] as Dictionary<string, object>;
+                }
+                else if (Action == "upload")
+                {
+                    RequestType = RequestTypes.EditorUpload;
+                    UploadField = http["uploadField"] as string;
+                }
+                else if (Action == "search")
+                {
+                    RequestType = RequestTypes.EditorSearch;
+                    Field = http["field"] as string;
 
-                        if (http.ContainsKey("search"))
+                    if (http.ContainsKey("search"))
+                    {
+                        DropdownSearch = http["search"] as string;
+                    }
+
+                    if (http.ContainsKey("values"))
+                    {
+                        DropdownValues = new List<string>();
+
+                        foreach (var item in http["values"] as Dictionary<string, object>)
                         {
-                            DropdownSearch = http["search"] as string;
-                        }
-
-                        if (http.ContainsKey("values"))
-                        {
-                            DropdownValues = new List<string>();
-
-                            foreach (var item in http["values"] as Dictionary<string, object>)
-                            {
-                                DropdownValues.Add(item.Value as string);
-                            }
+                            DropdownValues.Add(item.Value as string);
                         }
                     }
+                }
             }
             else if (http.ContainsKey("draw"))
             {
@@ -406,9 +407,8 @@ namespace DataTables
                 {
                     var column = item.Value as Dictionary<string, object>;
                     var colSearch = column["search"] as Dictionary<string, object>;
-                    Columns.Add(new ColumnT
+                    var col = new ColumnT
                     {
-                        // TODO
                         Name = column["name"].ToString(),
                         Data = column["data"].ToString(),
                         Searchable = (Boolean)column["searchable"],
@@ -418,64 +418,117 @@ namespace DataTables
                             Value = colSearch["value"].ToString(),
                             Regex = (Boolean)colSearch["regex"],
                         }
-                    });
-                }
-                
-                // SearchPanes
-                if(http.ContainsKey("searchPanes")){
-                        // Get the column names
-                        Dictionary<string, object> httpSP = (Dictionary<string, object>) http["searchPanes"];
-                        List<string> keyList = new List<string>(httpSP.Keys);
+                    };
 
-                        foreach(var key in keyList){
-                            Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
-                            List<string> keykeyList = new List<string>(httpSPKey.Keys);
-                            string[] values = new string[keykeyList.Count()];
-                            int count = 0;
-                            foreach(var keykey in keykeyList){
-                                values[count] = httpSPKey[keykey].ToString();
-                                count++;
-                            }
+                    // Parse ColumnControl, if any is given
+                    if (column.ContainsKey("columnControl"))
+                    {
+                        var cc = new ColumnControlT();
+                        var submitted = column["columnControl"] as Dictionary<string, object>;
 
-                            // Don't add multiple selections for one column
-                            if(!searchPanes.ContainsKey(key)){
-                                searchPanes.Add(key, values);
+                        // Text based inputs
+                        if (submitted.ContainsKey("search"))
+                        {
+                            var ccSearch = submitted["search"] as Dictionary<string, object>;
+
+                            // Common to all input types
+                            cc.Search = new ColumnControlSearchT
+                            {
+                                Logic = ccSearch["logic"].ToString(),
+                                Type = ccSearch["type"].ToString(),
+                                Value = ccSearch["value"].ToString(),
+                            };
+
+                            // Mask is only submitted for date/time input
+                            if (ccSearch.ContainsKey("mask"))
+                            {
+                                cc.Search.Mask = ccSearch["mask"].ToString();
                             }
-                            
                         }
+
+                        // Search list
+                        if (submitted.ContainsKey("list"))
+                        {
+                            cc.List = new List<string>();
+
+                            foreach (var option in submitted["list"] as Dictionary<string, object>)
+                            {
+                                cc.List.Add(option.Value as string);
+                            }
+                        }
+
+                        col.ColumnControl = cc;
+                    }
+                    
+                    Columns.Add(col);
+                }
+
+                // SearchPanes
+                if (http.ContainsKey("searchPanes"))
+                {
+                    // Get the column names
+                    Dictionary<string, object> httpSP = (Dictionary<string, object>)http["searchPanes"];
+                    List<string> keyList = new List<string>(httpSP.Keys);
+
+                    foreach (var key in keyList)
+                    {
+                        Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                        List<string> keykeyList = new List<string>(httpSPKey.Keys);
+                        string[] values = new string[keykeyList.Count()];
+                        int count = 0;
+                        foreach (var keykey in keykeyList)
+                        {
+                            values[count] = httpSPKey[keykey].ToString();
+                            count++;
+                        }
+
+                        // Don't add multiple selections for one column
+                        if (!searchPanes.ContainsKey(key))
+                        {
+                            searchPanes.Add(key, values);
+                        }
+
+                    }
                 }
 
                 // SearchPanes_null
-                if(http.ContainsKey("searchPanes_null")){
-                        // Get the column names
-                        Dictionary<string, object> httpSP = (Dictionary<string, object>) http["searchPanes_null"];
-                        List<string> keyList = new List<string>(httpSP.Keys);
+                if (http.ContainsKey("searchPanes_null"))
+                {
+                    // Get the column names
+                    Dictionary<string, object> httpSP = (Dictionary<string, object>)http["searchPanes_null"];
+                    List<string> keyList = new List<string>(httpSP.Keys);
 
-                        foreach(var key in keyList){
-                            Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
-                            List<string> keykeyList = new List<string>(httpSPKey.Keys);
-                            bool[] values = new bool[keykeyList.Count()];
-                            int count = 0;
-                            foreach(var keykey in keykeyList){
-                                if(httpSPKey[keykey] is bool) {
-                                    values[count] = (bool) httpSPKey[keykey];
-                                    count++;
-                                }
+                    foreach (var key in keyList)
+                    {
+                        Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                        List<string> keykeyList = new List<string>(httpSPKey.Keys);
+                        bool[] values = new bool[keykeyList.Count()];
+                        int count = 0;
+                        foreach (var keykey in keykeyList)
+                        {
+                            if (httpSPKey[keykey] is bool)
+                            {
+                                values[count] = (bool)httpSPKey[keykey];
+                                count++;
                             }
-
-                            // Don't add multiple selections for one column
-                            if(!searchPanes_null.ContainsKey(key)){
-                                searchPanes_null.Add(key, values);
-                            }
-                            
                         }
+
+                        // Don't add multiple selections for one column
+                        if (!searchPanes_null.ContainsKey(key))
+                        {
+                            searchPanes_null.Add(key, values);
+                        }
+
+                    }
                 }
                 // searchPanesLast
-                if(http.ContainsKey("searchPanesLast")) {
+                if (http.ContainsKey("searchPanesLast"))
+                {
                     searchPanesLast = (string)http["searchPanesLast"];
                 }
 
-                if (http.ContainsKey("searchPanes_options")) {
+                if (http.ContainsKey("searchPanes_options"))
+                {
                     var options = (Dictionary<String, object>)http["searchPanes_options"];
 
                     searchPanesOptions.ViewCount = (Boolean)options["viewCount"];
@@ -484,7 +537,8 @@ namespace DataTables
                 }
 
                 // SearchBuilder
-                if(http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String)){
+                if (http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String))
+                {
                     searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
                 }
             }
@@ -495,21 +549,25 @@ namespace DataTables
             }
         }
 
-        private SearchBuilderDetails searchBuilderParse(Dictionary<String, object> data) {
+        private SearchBuilderDetails searchBuilderParse(Dictionary<String, object> data)
+        {
             var sb = new SearchBuilderDetails();
             // If the logic key is present then it must be a group and different parsing needs to occur
-            if(data.ContainsKey("logic")) {
+            if (data.ContainsKey("logic"))
+            {
                 sb.logic = (string)data["logic"];
-                var criteria = (Dictionary<string, object>) data["criteria"];
+                var criteria = (Dictionary<string, object>)data["criteria"];
                 var keyList = new List<string>(criteria.Keys);
 
-                foreach(var key in keyList) {
+                foreach (var key in keyList)
+                {
                     // Specifically the items in this group also need to be parsed
-                    sb.criteria.Add( searchBuilderParse((Dictionary<string, object>)criteria[key]));
+                    sb.criteria.Add(searchBuilderParse((Dictionary<string, object>)criteria[key]));
                 }
             }
             // Otherwise if all of the values required to cause a search are present then make a criteria
-            else if(data.ContainsKey("condition") && data.ContainsKey("origData")) {
+            else if (data.ContainsKey("condition") && data.ContainsKey("origData"))
+            {
                 sb.condition = (String)data["condition"];
                 sb.data = (String)data["data"];
                 sb.origData = (String)data["origData"];
@@ -588,6 +646,11 @@ namespace DataTables
             /// Search term
             /// </summary>
             public SearchT Search;
+
+            /// <summary>
+            /// ColumnControl search information
+            /// </summary>
+            public ColumnControlT ColumnControl;
         }
 
         /// <summary>
@@ -609,6 +672,48 @@ namespace DataTables
             /// Cascade flag
             /// </summary>
             public Boolean Cascade = false;
+        }
+
+        /// <summary>
+        /// ColumnControl structured search information
+        /// </summary>
+        public class ColumnControlT
+        {
+            /// <summary>
+            /// ColumnControl Search details
+            /// </summary>
+            public ColumnControlSearchT Search = null;
+
+            /// <summary>
+            /// ColumnControl list of search terms
+            /// </summary>
+            public List<string> List = null;
+        }
+
+        /// <summary>
+        /// ColumnControl's input search type information
+        /// </summary>
+        public class ColumnControlSearchT
+        {
+            /// <summary>
+            /// Search logic operator
+            /// </summary>
+            public string Logic = null;
+
+            /// <summary>
+            /// Date / time Mask
+            /// </summary>
+            public string Mask = null;
+
+            /// <summary>
+            /// Search type
+            /// </summary>
+            public string Type = null;
+
+            /// <summary>
+            /// Search value
+            /// </summary>
+            public string Value = null;
         }
     }
 }
