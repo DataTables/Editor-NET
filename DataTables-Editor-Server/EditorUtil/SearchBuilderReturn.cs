@@ -9,7 +9,7 @@ namespace DataTables.EditorUtil
         /// <summary>
         /// Join table name
         /// </summary>
-        public Dictionary<string, object> options;
+        public Dictionary<string, object> options { get; set; }
 
         /// <summary>
         /// Left join information container
@@ -20,7 +20,7 @@ namespace DataTables.EditorUtil
         /// <param name="field2">Table 2 field</param>
         internal SearchBuilderReturn()
         {
-            this.options = new Dictionary<string, object>();
+            options = new Dictionary<string, object>();
         }
     }
 }
