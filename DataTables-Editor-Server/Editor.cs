@@ -1518,22 +1518,25 @@ namespace DataTables
                 });
             }
 
-            var res = query.Exec();
-            Dictionary<string, object> row;
-
-            while ((row = res.Fetch()) != null)
+            if (ssp.recordsTotal != 0)
             {
-                var inner = new Dictionary<string, object> { { "DT_RowId", _idPrefix + PkeyToValue(row, true) } };
+                var res = query.Exec();
+                Dictionary<string, object> row;
 
-                foreach (var field in _field)
+                while ((row = res.Fetch()) != null)
                 {
-                    if (field.Apply("get"))
-                    {
-                        field.Write(inner, row);
-                    }
-                }
+                    var inner = new Dictionary<string, object> { { "DT_RowId", _idPrefix + PkeyToValue(row, true) } };
 
-                dtData.data.Add(inner);
+                    foreach (var field in _field)
+                    {
+                        if (field.Apply("get"))
+                        {
+                            field.Write(inner, row);
+                        }
+                    }
+
+                    dtData.data.Add(inner);
+                }
             }
 
             // Row based joins
