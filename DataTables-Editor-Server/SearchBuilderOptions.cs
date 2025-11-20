@@ -23,6 +23,7 @@ namespace DataTables
         private Action<Query> _where;
         private string _order;
         private List<LeftJoin> _leftJoin = new List<LeftJoin>();
+        private bool _applyEditorLeftJoins = true;
         private Dictionary<string, string> _fromEnum = new Dictionary<string, string>();
 
         /// <summary>
@@ -181,6 +182,18 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Choose not to apply the LeftJoins that were also applied to the wider Editor instance to the SearchBuilder select
+        /// </summary>
+        /// <param name="applyEditorLeftJoins">Apply global LeftJoins.</param>
+        /// <returns>Self for chaining</returns>
+        public SearchBuilderOptions ApplyEditorLeftJoins(bool applyEditorLeftJoins = true)
+        {
+            _applyEditorLeftJoins = applyEditorLeftJoins;
+
+            return this;
+        }
+
+        /// <summary>
         /// Set an enum that will be used to apply items to the SearchBuilder select
         /// </summary>
         /// <param name="useValueAsKey">Boolean to use the enum value as the key (default true)</param>
@@ -237,7 +250,7 @@ namespace DataTables
                 return str;
             });
 
-            if(leftJoinIn.Count() > 0){
+            if(leftJoinIn.Count() > 0 && _applyEditorLeftJoins){
                 this._leftJoin = leftJoinIn;
             }
 
