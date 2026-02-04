@@ -544,10 +544,10 @@ namespace DataTables
             foreach (var opt in options)
             {
                 var rowLabel = opt.ContainsKey("_manual")
-                    ? opt["value"] as string
+                    ? opt["label"] as string
                     : formatter(opt) as string;
                 var rowValue = opt.ContainsKey("_manual")
-                    ? opt["label"]
+                    ? opt["value"]
                     : opt[_value];
 
                 // Apply the search to the rendered label. Need to do it here rather than in SQL since
