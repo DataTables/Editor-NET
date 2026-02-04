@@ -600,6 +600,9 @@ namespace DataTables
         /// <returns>List of found options</returns>
         internal List<Dictionary<string, object>> ExecDb(Database db, List<string> find)
         {
+            if (_table is null  || _value is null|| _label is null || _label.Count == 0) 
+                return new List<Dictionary<string, object>>();
+            
             var fields = new List<string>(_label);
 
             if (! fields.Contains(_value)) {
