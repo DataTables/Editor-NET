@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.2.2";
+        public const string Version = "2.5.2";
 
         /// <summary>
         /// Create a new Editor instance
@@ -297,6 +297,7 @@ namespace DataTables
         private bool _debug = false;
         private List<object> _DebugInfo = new List<object>();
         private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validator = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
+        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validatorAfterFields = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
         private bool _leftJoinRemove = false;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -479,6 +480,15 @@ namespace DataTables
         public DtRequest InData()
         {
             return _processData;
+        }
+
+        /// <summary>
+        /// Get the left joins that are used by this instance
+        /// </summary>
+        /// <returns>List of LeftJoin objects</returns>
+        public List<LeftJoin> LeftJoin()
+        {
+            return _leftJoin;
         }
 
         /// <summary>
@@ -1035,26 +1045,62 @@ namespace DataTables
                 }
             }
 
+            // Global validators to run _after_ field validation
+            foreach (var validator in _validatorAfterFields)
+            {
+                var ret = validator(this, request.RequestType, request);
+
+                if (ret != "")
+                {
+                    response.error = ret;
+
+                    return false;
+                }
+            }
+
             return !response.fieldErrors.Any();
         }
 
         /// <summary>
         /// Get the global validator
         /// </summary>
+        /// <param name="afterFields">Indicates if the validators for before (`false`, default) or after (`true`) field validation should be returned.</param>
         /// <returns>Validation functions set</returns>
-        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator()
+        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator(bool afterFields=false)
         {
-            return _validator;
+            return afterFields
+                ? _validatorAfterFields
+                : _validator;
         }
 
         /// <summary>
-        /// Set a global validator
+        /// Set a global validator to run before field validation has run
         /// </summary>
         /// <param name="validator">Validation function to set</param>
         /// <returns></returns>
         public Editor Validator(Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
         {
             _validator.Add(validator);
+            return this;
+        }
+
+        /// <summary>
+        /// Set a global validator to be run after field validation has run
+        /// </summary>
+        /// <param name="afterFields">`true` to run after field validation, `false` to run before.</param>
+        /// <param name="validator">Validation function to set</param>
+        /// <returns></returns>
+        public Editor Validator(bool afterFields, Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
+        {
+            if (afterFields == false)
+            {
+                _validator.Add(validator);
+            }
+            else
+            {
+                _validatorAfterFields.Add(validator);
+            }
+
             return this;
         }
 
@@ -1224,6 +1270,11 @@ namespace DataTables
                 {
                     // DataTable get request
                     _out.Merge(_Get(null, data));
+                    _Options(false);
+                }
+                else if (data.RequestType == DtRequest.RequestTypes.EditorSearch)
+                {
+                    _OptionsSearch(data);
                 }
                 else if (data.RequestType == DtRequest.RequestTypes.EditorUpload && this._write)
                 {
@@ -1234,6 +1285,7 @@ namespace DataTables
                 {
                     // Remove rows
                     _Remove(data);
+                    _Options(true);
                     _FileClean();
                 }
                 else if ((data.RequestType == DtRequest.RequestTypes.EditorCreate ||
@@ -1312,6 +1364,8 @@ namespace DataTables
 
                     	_FileClean();
                     }
+
+                    _Options(true);
                 }
             }
 
@@ -1456,64 +1510,41 @@ namespace DataTables
                 query.Where(PkeyToArray(id.ToString(), true));
             }
 
-            var res = query.Exec();
-            Dictionary<string, object> row;
-
-            while ((row = res.Fetch()) != null)
+            // Limit to specific ids submitted from the client-side
+            if (http != null && http.ReadIds != null && http.ReadIds.Count > 0)
             {
-                var inner = new Dictionary<string, object> { { "DT_RowId", _idPrefix + PkeyToValue(row, true) } };
-
-                foreach (var field in _field)
+                query.Where(q =>
                 {
-                    if (field.Apply("get"))
+                    foreach (var readId in http.ReadIds)
                     {
-                        field.Write(inner, row);
+                        q.OrWhere(r =>
+                        {
+                            r.Where(PkeyToArray(readId, true));
+                        });
                     }
-                }
-
-                dtData.data.Add(inner);
+                });
             }
 
-            // Field options
-            if (id == null)
+            if (ssp.recordsTotal != 0)
             {
-                // Create an array of fields to pass to SearchPaneOptions
-                Field[] fields = new Field[http.Columns.Count()];
-                int x = 0;
-                for(int i = 0; i < this._field.Count(); i++){
-                    for(int j = 0;  j < http.Columns.Count(); j++){
-                        if(this._field[i].Name() == http.Columns[j].Data){
-                            fields[x] = this._field[i];
-                            x++;
+                var res = query.Exec();
+                Dictionary<string, object> row;
+
+                while ((row = res.Fetch()) != null)
+                {
+                    var inner = new Dictionary<string, object> { { "DT_RowId", _idPrefix + PkeyToValue(row, true) } };
+
+                    foreach (var field in _field)
+                    {
+                        if (field.Apply("get"))
+                        {
+                            field.Write(inner, row);
                         }
                     }
-                }
-                foreach (var field in _field)
-                {
-                    var opts = field.OptionsExec(_db);
 
-                    if (opts != null)
-                    {
-                        dtData.options.Add(field.Name(), opts);
-                    }
-
-                    var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, http);
-
-                    if(spOpts != null)
-                    {
-                        dtData.searchPanes.options.Add(field.Name(), spOpts);
-                    }
-
-                    var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, http);
-
-                    if(sbOpts != null)
-                    {
-                        dtData.searchBuilder.options.Add(field.Name(), sbOpts);
-                    }
+                    dtData.data.Add(inner);
                 }
             }
-
-            
 
             // Row based joins
             foreach (var mjoin in _mJoin)
@@ -1537,16 +1568,6 @@ namespace DataTables
 
             dtData.Merge(ssp);
 
-            if (dtData.searchPanes.options.Count() == 0)
-            {
-                dtData.searchPanes = null;
-            }
-
-            if (dtData.searchBuilder.options.Count() == 0)
-            {
-                dtData.searchBuilder = null;
-            }
-            
             return dtData;
         }
 
@@ -2098,6 +2119,113 @@ namespace DataTables
             }
         }
 
+        /// <summary>
+        /// Get option lists for select, radio, autocomplete, etc.
+        /// </summary>
+        /// <param name="refresh">false for initial load, true if after insert, update</param>
+        private void _Options(bool refresh)
+        {
+            // Create an array of fields to pass to SearchPaneOptions
+            Field[] fields = new Field[_processData.Columns.Count()];
+            int x = 0;
+
+            for(int i = 0; i < this._field.Count(); i++)
+            {
+                for(int j = 0;  j < _processData.Columns.Count(); j++)
+                {
+                    if(this._field[i].Name() == _processData.Columns[j].Data)
+                    {
+                        fields[x] = this._field[i];
+                        x++;
+                    }
+                }
+            }
+
+            foreach (var field in _field)
+            {
+                var options = field.Options();
+
+                if (options != null)
+                {
+                    var opts = options.Exec(_db, refresh);
+
+                    if (opts != null) {
+                        _out.options.Add(field.Name(), opts);
+                    }
+                }
+
+                var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, _processData);
+
+                if (spOpts != null)
+                {
+                    _out.searchPanes.options.Add(field.Name(), spOpts);
+                }
+
+                var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, _processData);
+
+                if (sbOpts != null)
+                {
+                    _out.searchBuilder.options.Add(field.Name(), sbOpts);
+                }
+
+                var cc = field.ColumnControl();
+
+                if (cc != null)
+                {
+                    var opts = cc.Exec(_db, false);
+
+                    if (opts != null) {
+                        _out.columnControl.Add(field.Name(), opts);
+                    }
+                }
+            }
+
+            if (_out.searchPanes.options.Count() == 0)
+            {
+                _out.searchPanes = null;
+            }
+
+            if (_out.searchBuilder.options.Count() == 0)
+            {
+                _out.searchBuilder = null;
+            }
+
+            // Check the join's for a list of options
+            foreach (var join in _mJoin) {
+                join.Options(_out.options, _db, refresh);
+            }
+        }
+
+        /// <summary>
+        /// Perform a search action on a specific field for label/value pairs.
+        /// </summary>
+        /// <param name="http">DataTables HTTP request object</param>
+        private void _OptionsSearch(DtRequest http)
+        {
+            var field = _FindField(http.Field, "name");
+
+            if (field == null)
+            {
+                return;
+            }
+
+            var options = field.Options();
+
+            if (options == null)
+            {
+                return;
+            }
+
+            if (http.DropdownSearch != null)
+            {
+                _out.data = options.Search(_db, http.DropdownSearch);
+            }
+            else if (http.DropdownValues != null)
+            {
+                _out.data = options.Find(_db, http.DropdownValues);
+            }
+        }
+
 
         private Field _FindField(string name, string type)
         {
@@ -2152,30 +2280,34 @@ namespace DataTables
 
             // Get the nuber of rows in the result set
             var setCount = _db
-                .Query("select")
+                .Query("count")
                 .Table(_ReadTable())
-                .Get("COUNT( " + _pkey[0] + " ) as cnt")
+                .Get(_pkey[0])
                 .LeftJoin(_leftJoin);
             _GetWhere(setCount);
             _SspFilter(setCount, http);
 
             var setCounted = Convert.ToInt32(setCount.Exec().Fetch()["cnt"]);
+            var fullCounted = setCounted;
 
             // Get the number of rows in the full set
-            var fullCount = _db
-                .Query("select")
-                .Table(_ReadTable())
-                .Get("COUNT( " + _pkey[0] + " ) as cnt");
-            _GetWhere(fullCount);
-
-            // A left join is only needed if there is a where condition, incase the
-            // conditional items are the ones being joined in
-            if (_where.Any())
+            if (setCount.HasConditions())
             {
-                fullCount.LeftJoin(_leftJoin);
-            }
+                var fullCount = _db
+                    .Query("count")
+                    .Table(_ReadTable())
+                    .Get(_pkey[0]);
+                _GetWhere(fullCount);
 
-            var fullCounted = Convert.ToInt32(fullCount.Exec().Fetch()["cnt"]);
+                // A left join is only needed if there is a where condition, incase the
+                // conditional items are the ones being joined in
+                if (_where.Any())
+                {
+                    fullCount.LeftJoin(_leftJoin);
+                }
+
+                fullCounted = Convert.ToInt32(fullCount.Exec().Fetch()["cnt"]);
+            }
 
             ssp.draw = http.Draw;
             ssp.recordsTotal = fullCounted;
@@ -2207,6 +2339,13 @@ namespace DataTables
 
         private void _SspSort(Query query, DtRequest http)
         {
+            // Paging makes little sense without an ordering clause, so if there is
+            // no order to apply (possible in DT2 on the third click of a header)
+            // we apply the primary key as the ordering value.
+            if (http.Order.Count() == 0) {
+                query.Order(_pkey[0] + " asc");
+            }
+
             for (int i = 0, ien = http.Order.Count(); i < ien; i++)
             {
                 var order = http.Order[i];
@@ -2297,6 +2436,8 @@ namespace DataTables
                 }
                 query.WhereGroup(nestSB);
             }
+
+            ColumnControl.Ssp(this, query, http);
 
             // Column filters
             for (int i = 0, ien = http.Columns.Count(); i < ien; i++)

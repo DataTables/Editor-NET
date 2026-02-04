@@ -141,14 +141,22 @@ namespace DataTables.EditorUtil
         {
             try
             {
-                outData.Add(name, value == null || value == System.DBNull.Value
-                    ? null
-                    : Convert.ChangeType(value, type)
-                );
+                if (value == null || value == System.DBNull.Value)
+                {
+                    outData.Add(name, null);
+                }
+                else if (value.GetType() == typeof(System.Guid))
+                {
+                    outData.Add(name, value.ToString());
+                }
+                else
+                {
+                    outData.Add(name, Convert.ChangeType(value, type));
+                }
             }
             catch (Exception)
             {
-                throw new Exception("Unable to cast value to be " + type.Name);
+                throw new Exception("Unable to cast value to be " + type.Name + " from " + value.GetType());
             }
         }
     }

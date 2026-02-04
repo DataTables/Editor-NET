@@ -159,6 +159,15 @@ namespace DataTables
 
             return this;
         }
+        
+        /// <summary>
+        /// Generate a unique name for binding values.
+        /// </summary>
+        /// <returns></returns>
+        public string BindName()
+        {
+            return _bindChar + "binding_" + _bindings.Count;
+        }
 
         /// <summary>
         /// Set a distinct flag for a `select` query. Note that this has no
@@ -196,6 +205,10 @@ namespace DataTables
             else if (type == "delete")
             {
                 return _Delete();
+            }
+            else if (type == "count")
+            {
+                return _Count();
             }
             else if (type == "raw")
             {
@@ -251,6 +264,15 @@ namespace DataTables
             this._groupBy = groupBy;
 
             return this;
+        }
+
+        /// <summary>
+        /// Determine if the query has any conditions applied to it.
+        /// </summary>
+        /// <returns>`true` if it has, `false` otherwise</returns>
+        public bool HasConditions()
+        {
+            return _where.Count == 0 ? false : true;
         }
 
         /// <summary>
@@ -783,7 +805,7 @@ namespace DataTables
         /// <param name="values">Values to bind</param>
         /// <param name="op">Conditional operator to use to join to the preceding condition.</param>
         /// <returns></returns>
-        public Query WhereIn(string field, ICollection<object> values, string op = "AND")
+        public Query WhereIn<T>(string field, ICollection<T> values, string op = "AND")
         {
             if ( values.Count == 0 ) {
                 return this;
@@ -812,16 +834,15 @@ namespace DataTables
         }
 
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Protected methods
          */
 
-        /// <summary>
-        /// Create a comma separated field list
-        /// </summary>
-        /// <param name="addAlias">Indicate if the fields should have an `as` alias added automatically (true) or not</param>
-        /// <returns>SQL list of fields</returns>
+            /// <summary>
+            /// Create a comma separated field list
+            /// </summary>
+            /// <param name="addAlias">Indicate if the fields should have an `as` alias added automatically (true) or not</param>
+            /// <returns>SQL list of fields</returns>
         virtual protected string _BuildField(Boolean addAlias = false)
         {
             List<string> a = new List<string>();
@@ -835,7 +856,7 @@ namespace DataTables
                 {
                     if (field.IndexOf(" as ") != -1)
                     {
-                        var split = field.Split(new[] {" as "}, StringSplitOptions.None);
+                        var split = field.Split(new[] { " as " }, StringSplitOptions.None);
                         a.Add(
                             _ProtectIdentifiers(split[0]) + " as " +
                             _fieldQuote + split[1] + _fieldQuote
@@ -846,7 +867,8 @@ namespace DataTables
                         var fieldName = field;
 
                         // If the field has the quoting character in it, it needs to be doubled up to escape
-                        if (field.Contains(_fieldQuote)) {
+                        if (field.Contains(_fieldQuote))
+                        {
                             fieldName = field.Replace(_fieldQuote, _fieldQuote + _fieldQuote);
                         }
 
@@ -1050,6 +1072,27 @@ namespace DataTables
         }
 
         /// <summary>
+        /// Run a SELECT with a COUNT - returns in a `cnt` parameter for the selected row.
+        /// </summary>
+        /// <returns>Query result</returns>
+        virtual protected Result _Count()
+        {
+            var select = "SELECT COUNT(" + _BuildField() + ") " + _ProtectIdentifiers("cnt");
+
+            _Prepare(
+                select
+                + " FROM " + _BuildTable()
+                + _BuildJoin()
+                + _BuildWhere()
+                + _BuildGroupBy()
+                + _BuildOrder()
+                + _BuildLimit()
+            );
+            
+            return _Exec();
+        }
+
+        /// <summary>
         /// Execute a DELETE statement from the current configuration
         /// </summary>
         /// <returns>Query result</returns>
@@ -1132,7 +1175,7 @@ namespace DataTables
             identifier = identifier.Replace(" as ", " ");
 
             // If more than a single space, then return
-            if (identifier.Split(' ').Length > 2) {
+            if (identifier.Split(new [] {' '}).Length > 2) {
                 return identifier;
             }
 

@@ -60,9 +60,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
             };
         }
@@ -78,9 +78,9 @@ namespace DataTables
             opts.Empty = false;
             opts.Optional = false;
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
             };
         }
@@ -95,9 +95,9 @@ namespace DataTables
             var opts = ValidationOpts.Select(cfg);
             opts.Empty = false;
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
             };
         }
@@ -112,9 +112,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -148,7 +148,7 @@ namespace DataTables
 
             return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -172,13 +172,13 @@ namespace DataTables
         /// <param name="culture">Numeric conversion culture</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(decimal min, string culture="en-US", ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(decimal min, string culture = "en-US", ValidationOpts cfg = null)
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -222,7 +222,7 @@ namespace DataTables
 
             return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -266,7 +266,7 @@ namespace DataTables
 
             return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -313,9 +313,9 @@ namespace DataTables
         {
             ValidationOpts opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -343,9 +343,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -368,9 +368,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -394,9 +394,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -418,9 +418,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -443,9 +443,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -469,9 +469,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -499,9 +499,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -524,9 +524,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -561,9 +561,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -633,9 +633,9 @@ namespace DataTables
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -698,7 +698,7 @@ namespace DataTables
         /// <param name="size">Max file size in bytes</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>File validation delegate</returns>
-        public static Func<IFormFile, string> FileSize(int size, string msg="Uploaded file is too large.")
+        public static Func<IFormFile, string> FileSize(int size, string msg = "Uploaded file is too large.")
         {
 #if NETCOREAPP
             return file => file.Length > size
@@ -719,7 +719,7 @@ namespace DataTables
         /// <returns>File validation delegate</returns>
         public static Func<IFormFile, string> FileExtensions(IEnumerable<string> extensions, string msg = "Invalid file type.")
         {
-            return delegate(IFormFile file)
+            return delegate (IFormFile file)
             {
                 var extn = Path.GetExtension(file.FileName).Replace(".", "");
                 return extensions.Contains(extn, StringComparer.InvariantCultureIgnoreCase)
@@ -742,7 +742,7 @@ namespace DataTables
         /// <returns>Mjoin validation delegate</returns>
         public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMinCount(int count, string msg = "Too few items")
         {
-            return delegate(Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            return delegate (Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
             {
                 return data.Count < count
                     ? msg
@@ -759,9 +759,9 @@ namespace DataTables
         /// <returns>Mjoin validation delegate</returns>
         public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMaxCount(int count, string msg = "Too many items")
         {
-            return delegate(Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            return delegate (Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
             {
-                return data.Count > count 
+                return data.Count > count
                     ? msg
                     : null;
             };
@@ -772,13 +772,13 @@ namespace DataTables
          * Private methods
          */
 
-        private static Func<object, Dictionary<string, object>, ValidationHost, string> _Unique(ValidationOpts cfg = null, string column = null, string table = null, Database db = null, Type t=null)
+        private static Func<object, Dictionary<string, object>, ValidationHost, string> _Unique(ValidationOpts cfg = null, string column = null, string table = null, Database db = null, Type t = null)
         {
             var opts = ValidationOpts.Select(cfg);
 
             return delegate (object val, Dictionary<string, object> data, ValidationHost host)
             {
-                var common = _Common(val, opts);
+                var common = _Common(val, opts, data, host);
                 if (common != null)
                 {
                     return common == false ? opts.Message : null;
@@ -830,15 +830,30 @@ namespace DataTables
         /// </summary>
         /// <param name="val">Value</param>
         /// <param name="opts">Validation options</param>
+        /// <param name="data">Row's submitted data</param>
+        /// <param name="host">Host information</param>
         /// <returns>null for invalid, true if immediately valid and false if invalid</returns>
-        private static Boolean? _Common(object val, ValidationOpts opts)
+        private static Boolean? _Common(
+            object val,
+            ValidationOpts opts,
+            Dictionary<string, object> data,
+            ValidationHost host
+        )
         {
-            // Error state tests
-            if (!opts.Optional && val == null)
+            // Check if the validator should be applied. If not, then it will pass (i.e. as if
+            // there was no validator). If the validator should apply, fall through to the actual
+            // validator function.
+            if (_Condition(val, opts, data, host) == false)
             {
-                // Value must be given
-                return false;
+                return true;
             }
+
+            // Error state tests
+                if (!opts.Optional && val == null)
+                {
+                    // Value must be given
+                    return false;
+                }
 
             if (val != null && opts.Empty == false && val.ToString() == "")
             {
@@ -859,6 +874,30 @@ namespace DataTables
 
             // Have the specific validation funciton perform its tests
             return null;
+        }
+
+        /// <summary>
+        /// During validation, check if the validator is conditional.
+        /// </summary>
+        /// <param name="val">Field's value to validate</param>
+        /// <param name="opts">Validation options</param>
+        /// <param name="data">Row's submitted data</param>
+        /// <param name="host">Host information</param>
+        /// <returns>`true` if there is no condition, or if there is one and the condition
+        /// matches, or `false` if there is a condition and it doesn't match.</returns>
+        private static bool _Condition(
+            object val,
+            ValidationOpts opts,
+            Dictionary<string, object> data,
+            ValidationHost host)
+        {
+            if (opts == null)
+            {
+                // No options, so there can be no condition
+                return true;
+            }
+
+            return opts.RunDepends(val, data, host);
         }
     }
 }

@@ -12,6 +12,8 @@ using System.Web;
 
 namespace DataTables
 {
+    using OptionsFunc = Func<Database, string, List<Dictionary<string, object>>>;
+
     /// <summary>
     /// Field definitions for the DataTables Editor.
     ///
@@ -154,7 +156,6 @@ namespace DataTables
         private dynamic _setValue;
         private readonly List<Func<object, Dictionary<string, object>, ValidationHost, string>> _validators =
             new List<Func<object, Dictionary<string, object>, ValidationHost, string>>();
-        private Func<List<Dictionary<string, object>>> _optsFn;
         private Options _opts;
         private SearchPaneOptions _spOpts;
         private SearchBuilderOptions _sbOpts;
@@ -163,11 +164,33 @@ namespace DataTables
         private Upload _upload;
         private Func<string, string> _xss;
         private bool _xssFormat = true;
+        private Options _columnControl = null;
 
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
          */
+
+        /// <summary>
+        /// Get the options class for the options to get for ColumnControl
+        /// </summary>
+        /// <returns>Options or null if not set</returns>
+        public Options ColumnControl()
+        {
+            return _columnControl;
+        }
+
+        /// <summary>
+        /// Set the options class for the options to get for ColumnControl
+        /// </summary>
+        /// <param name="opts">Options configuration for ColumnControl</param>
+        /// <returns>Self for chaining</returns>
+        public Field ColumnControl(Options opts)
+        {
+            _columnControl = opts;
+
+            return this;
+        }
 
         /// <summary>
         /// Set the DB field name.
@@ -346,10 +369,9 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of options</param>
         /// <returns>Self for chaining</returns>
-        public Field Options(Func<List<Dictionary<string, object>>> fn)
+        public Field Options(OptionsFunc fn)
         {
-            _opts = null;
-            _optsFn = fn;
+            _opts = new Options().Fn(fn);
 
             return this;
         }
@@ -362,7 +384,6 @@ namespace DataTables
         public Field Options(Options opts)
         {
             _opts = opts;
-            _optsFn = null;
 
             return this;
         }
@@ -398,7 +419,6 @@ namespace DataTables
                 opts.Render(format);
             }
 
-            _optsFn = null;
             _opts = opts;
 
             return this;
@@ -435,7 +455,6 @@ namespace DataTables
                 opts.Render(format);
             }
 
-            _optsFn = null;
             _opts = opts;
 
             return this;
@@ -773,26 +792,6 @@ namespace DataTables
 
             // In the data set, so use it
             return true;
-        }
-
-        /// <summary>
-        /// Execute the ipOpts to get the list of options to return to the client-
-        /// side
-        /// </summary>
-        /// <param name="db">Database instance</param>
-        /// <returns>List of options</returns>
-        internal List<Dictionary<string, object>> OptionsExec(Database db)
-        {
-            if (_optsFn != null)
-            {
-                return _optsFn();
-            }
-            if (_opts != null)
-            {
-                return _opts.Exec(db);
-            }
-
-            return null;
         }
 
         /// <summary>
