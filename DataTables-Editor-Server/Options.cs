@@ -544,10 +544,10 @@ namespace DataTables
             foreach (var opt in options)
             {
                 var rowLabel = opt.ContainsKey("_manual")
-                    ? opt["value"] as string
+                    ? opt["label"] as string
                     : formatter(opt) as string;
                 var rowValue = opt.ContainsKey("_manual")
-                    ? opt["label"]
+                    ? opt["value"]
                     : opt[_value];
 
                 // Apply the search to the rendered label. Need to do it here rather than in SQL since
@@ -589,6 +589,12 @@ namespace DataTables
                 output.Sort((a, b) => a["label"].ToString().CompareTo(b["label"].ToString()));
             }
 
+            // Remove duplicate key/value pairs when manual entries have been added
+            if (_manualOpts.Count > 0)
+            {
+                output = DistinctByAllPairs(output);
+            }
+            
             return output;
         }
 
@@ -600,6 +606,9 @@ namespace DataTables
         /// <returns>List of found options</returns>
         internal List<Dictionary<string, object>> ExecDb(Database db, List<string> find)
         {
+            if (_table is null  || _value is null|| _label is null || _label.Count == 0) 
+                return new List<Dictionary<string, object>>();
+            
             var fields = new List<string>(_label);
 
             if (! fields.Contains(_value)) {
@@ -661,6 +670,38 @@ namespace DataTables
         public List<Dictionary<string, object>> Search(Database db, string term)
         {
             return Exec(db, false, term);
+        }
+        
+        /// <summary>
+        /// Removes duplicate dictionaries from <paramref name="items"/> by comparing their full set of
+        /// key/value pairs (order independent), returning the first occurence of each unique set. Values
+        /// are compared by their case-insensitive string representation.
+        /// </summary>
+        /// <param name="items">The dictionaries to de-duplicate.</param>
+        /// <returns>A new list containing only distinct dictionaries</returns>
+        internal static List<Dictionary<string, object>> DistinctByAllPairs(
+            List<Dictionary<string, object>> items
+        )
+        {
+            static string Fingerprint(Dictionary<string, object> d) =>
+                string.Join("|",
+                    d.OrderBy(kvp => kvp.Key, StringComparer.Ordinal )
+                        .Select(kvp => $"{kvp.Key}={kvp.Value}")
+                );
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var result = new List<Dictionary<string, object>>(items.Count);
+
+            foreach (var d in items)
+            {
+                if (d is null) continue;
+
+                var fp = Fingerprint(d);
+                if (seen.Add(fp))
+                    result.Add(d);
+            }
+
+            return result;
         }
     }
 }
