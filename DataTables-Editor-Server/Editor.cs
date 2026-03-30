@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.5.2";
+        public const string Version = "2.5.1";
 
         /// <summary>
         /// Create a new Editor instance
@@ -2389,13 +2389,20 @@ namespace DataTables
                                 .LeftJoin(_leftJoin);
 
                             // ... where the selected option is present...
-                            q.Where(
-                                field.Name(),
-                                http.searchPanes_null.ContainsKey(field.Name()) && http.searchPanes_null[field.Name()][i] ?
-                                    null :
+                            if (
+                                http.searchPanes_null.ContainsKey(field.Name()) &&
+                                http.searchPanes_null[field.Name()][i]
+                            ) {
+                                q.Where(field.Name(), null, "=");
+                                q.OrWhere(field.Name(), "", "=");
+                            }
+                            else {
+                                q.Where(
+                                    field.Name(),
                                     http.searchPanes[field.Name()][i],
-                                "="
-                            );
+                                    "="
+                                );
+                            }
                             
                             var r = q.Exec().Count();
 
@@ -2405,16 +2412,24 @@ namespace DataTables
                                 i--;
                             }
                         }
+
                         query.Where(qu =>
                             {
                                 for(int j =0; j < http.searchPanes[field.Name()].Count(); j++){
-                                    qu.OrWhere(
-                                        field.Name(),
-                                        http.searchPanes_null.ContainsKey(field.Name()) && http.searchPanes_null[field.Name()][j] ?
-                                            null :
+                                    if (
+                                        http.searchPanes_null.ContainsKey(field.Name()) &&
+                                        http.searchPanes_null[field.Name()][j]
+                                    ) {
+                                        qu.OrWhere(field.Name(), null, "=");
+                                        qu.OrWhere(field.Name(), "", "=");
+                                    }
+                                    else {
+                                        qu.OrWhere(
+                                            field.Name(),
                                             http.searchPanes[field.Name()][j],
-                                        "="
-                                    );
+                                            "="
+                                        );
+                                    }
                                 }
                             });
                     }
