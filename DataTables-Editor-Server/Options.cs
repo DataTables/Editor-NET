@@ -662,7 +662,7 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Do a search for data on the ousrce
+        /// Do a search for data on the source
         /// </summary>
         /// <param name="db">Database connection</param>
         /// <param name="term">Search term</param>
@@ -673,9 +673,10 @@ namespace DataTables
         }
         
         /// <summary>
-        /// Removes duplicate dictionaries from <paramref name="items"/> by comparing their full set of
-        /// key/value pairs (order independent), returning the first occurence of each unique set. Values
-        /// are compared by their case-insensitive string representation.
+        /// Removes duplicate dictionaries from <paramref name="items"/> by
+        /// comparing their full set of key/value pairs (order independent),
+        /// returning the first occurence of each unique set. Values are
+        /// compared by their case-insensitive string representation.
         /// </summary>
         /// <param name="items">The dictionaries to de-duplicate.</param>
         /// <returns>A new list containing only distinct dictionaries</returns>
@@ -683,25 +684,38 @@ namespace DataTables
             List<Dictionary<string, object>> items
         )
         {
-            static string Fingerprint(Dictionary<string, object> d) =>
-                string.Join("|",
-                    d.OrderBy(kvp => kvp.Key, StringComparer.Ordinal )
-                        .Select(kvp => $"{kvp.Key}={kvp.Value}")
-                );
-
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var result = new List<Dictionary<string, object>>(items.Count);
 
             foreach (var d in items)
             {
-                if (d is null) continue;
+                if (d is null)
+                {
+                    continue;
+                }
 
-                var fp = Fingerprint(d);
+                var fp = Options.Fingerprint(d);
+
                 if (seen.Add(fp))
+                {
                     result.Add(d);
+                }
             }
 
             return result;
+        }
+        
+        /// <summary>
+        /// Fingerprint a key/value list
+        /// </summary>
+        /// <param name="d">The key value list</param>
+        /// <returns>LFingerprint</returns>
+        internal static string Fingerprint(Dictionary<string, object> d)
+        {
+            return string.Join("|",
+                d.OrderBy(kvp => kvp.Key, StringComparer.Ordinal )
+                    .Select(kvp => $"{kvp.Key}={kvp.Value}")
+            );
         }
     }
 }
