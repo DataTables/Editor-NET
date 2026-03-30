@@ -709,7 +709,7 @@ namespace DataTables
         /// Fingerprint a key/value list
         /// </summary>
         /// <param name="d">The key value list</param>
-        /// <returns>LFingerprint</returns>
+        /// <returns>Fingerprint</returns>
         internal static string Fingerprint(Dictionary<string, object> d)
         {
             return string.Join("|",
