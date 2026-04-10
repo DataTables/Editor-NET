@@ -171,10 +171,10 @@ namespace DataTables
 
                 case "azure":
                 case "sqlserver":
-                    return "System.Data.SqlClient";
+                    return "Microsoft.Data.SqlClient";
 
                 default:
-                    throw new Exception("Uknown database type specified");
+                    throw new Exception("Unknown database type specified");
             }
         }
 
