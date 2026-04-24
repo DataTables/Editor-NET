@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.5.1";
+        public const string Version = "3.0.0-dev";
 
         /// <summary>
         /// Create a new Editor instance
@@ -2031,12 +2031,17 @@ namespace DataTables
                 pkey = _pkey;
             }
 
-            var tableMatch = table;
+            var tableAlias = _Alias(table, "alias");
+            var tableOrig = _Alias(table, "orig");
 
-            if (table.Contains(" as "))
-            {
-                var split = table.Split(new[] { " as " }, StringSplitOptions.None);
-                tableMatch = split[1];
+            // If using an alias we need to replace the alias'ed table name in
+            // our pkey with the real table name
+            for (var i = 0; i < pkey.Count(); i++) {
+                var a = pkey[i].Split(new [] {'.'});
+
+                if (a.Count() > 1 && a[0] == tableAlias) {
+                    pkey[i] = tableOrig + "." + a[1];
+                }
             }
 
             // Check that there is a field which has a set option for this table
@@ -2052,7 +2057,7 @@ namespace DataTables
                 }
 
                 // And if db or schema prefix
-                if (field.DbField().StartsWith(tableMatch)) {
+                if (field.DbField().StartsWith(tableAlias)) {
                     return true;
                 }
 
@@ -2062,7 +2067,7 @@ namespace DataTables
             if (count > 0)
             {
                 var q = _db.Query("delete")
-                    .Table(table);
+                    .Table(tableOrig);
 
                 foreach (var id in ids)
                 {
