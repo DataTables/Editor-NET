@@ -431,6 +431,7 @@ namespace DataTables
         /// </summary>
         /// <param name="fields">Collection of fields to add</param>
         /// <returns>Self for chaining</returns>
+        /// <deprecated>Use `Fields()` for the plural</deprecated>
         public Editor Field(IEnumerable<Field> fields)
         {
             foreach (var f in fields)
