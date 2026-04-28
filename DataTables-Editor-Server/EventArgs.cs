@@ -26,7 +26,6 @@ namespace DataTables
         public bool Cancel = false;
     }
 
-
     /// <summary>
     /// Arguments for the 'PostGet' Editor event
     /// </summary>
@@ -42,7 +41,7 @@ namespace DataTables
         /// rows will be selected
         /// </summary>
         public object Id;
-  
+
         /// <summary>
         /// Data read from the database
         /// </summary>
@@ -93,7 +92,6 @@ namespace DataTables
         public bool Cancel = false;
     }
 
-
     /// <summary>
     /// Arguments for the 'WriteCreate' Editor event
     /// </summary>
@@ -114,7 +112,6 @@ namespace DataTables
         /// </summary>
         public Dictionary<string, object> Values;
     }
-
 
     /// <summary>
     /// Arguments for the 'PostCreate' Editor event
@@ -142,7 +139,6 @@ namespace DataTables
         public Dictionary<string, object> Data;
     }
 
-
     /// <summary>
     /// Arguments for the 'WriteEdit' Editor event
     /// </summary>
@@ -163,7 +159,6 @@ namespace DataTables
         /// </summary>
         public Dictionary<string, object> Values;
     }
-
 
     /// <summary>
     /// Arguments for the 'PreEdit' Editor event
@@ -192,7 +187,6 @@ namespace DataTables
         public bool Cancel = false;
     }
 
-
     /// <summary>
     /// Arguments for the 'ValidatedEdit' Editor event
     /// </summary>
@@ -220,7 +214,6 @@ namespace DataTables
         public bool Cancel = false;
     }
 
-
     /// <summary>
     /// Arguments for the 'PostEdit' event
     /// </summary>
@@ -246,7 +239,6 @@ namespace DataTables
         /// </summary>
         public Dictionary<string, object> Data;
     }
-
 
     /// <summary>
     /// Arguments for the 'PreRemove' Editor event
@@ -275,7 +267,6 @@ namespace DataTables
         public bool Cancel = false;
     }
 
-
     /// <summary>
     /// Arguments for the 'PostRemove' Editor event
     /// </summary>
@@ -296,7 +287,6 @@ namespace DataTables
         /// </summary>
         public Dictionary<string, object> Values;
     }
-
 
     /// <summary>
     /// Arguments for the 'PreUpload' Editor event
@@ -319,7 +309,6 @@ namespace DataTables
         /// </summary>
         public bool Cancel = false;
     }
-
 
     /// <summary>
     /// Arguments for the 'PostUpload' Editor event

@@ -19,7 +19,7 @@ namespace DataTables
         public String value2 = null;
 
         public List<SearchBuilderDetails> criteria = new List<SearchBuilderDetails>();
-    
+
         public String logic = null;
     }
 }

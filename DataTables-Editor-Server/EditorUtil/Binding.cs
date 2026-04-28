@@ -1,4 +1,3 @@
-
 namespace DataTables.EditorUtil
 {
     /// <summary>

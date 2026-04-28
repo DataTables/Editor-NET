@@ -41,7 +41,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public SearchBuilderOptions Label(string label)
         {
-            var list = new List<string> {label};
+            var list = new List<string> { label };
 
             _label = list;
 
@@ -195,7 +195,7 @@ namespace DataTables
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
          */
-        
+
         /// <summary>
         /// Execute the configuration, getting the SearchBuilderOptions from the database and formatting
         /// for output.
@@ -206,84 +206,105 @@ namespace DataTables
         /// <param name="http">DTRequest Instance for where conditions</param>
         /// <param name="fields">Array of all of the other fields</param>
         /// <returns>List of SearchBuilderOptions</returns>
-        internal List<Dictionary<string, object>> Exec(Field fieldIn, Editor editor, List<LeftJoin> leftJoinIn, DtRequest http, Field[] fields)
+        internal List<Dictionary<string, object>> Exec(
+            Field fieldIn,
+            Editor editor,
+            List<LeftJoin> leftJoinIn,
+            DtRequest http,
+            Field[] fields
+        )
         {
             var db = editor.Db();
             string _label;
 
-            if(this._value == null){
+            if (this._value == null)
+            {
                 this._value = fieldIn.DbField();
             }
 
-            if(this._table == null){
+            if (this._table == null)
+            {
                 var readTable = editor.ReadTable();
-                if(readTable.Count() == 0) {
+                if (readTable.Count() == 0)
+                {
                     this._table = editor.Table()[0].ToString();
                 }
-                else {
+                else
+                {
                     this._table = readTable[0];
                 }
             }
-            if(this._label == null){
+            if (this._label == null)
+            {
                 _label = this._value;
             }
-            else {
+            else
+            {
                 _label = this._label.First();
             }
 
             // Just return the label if no default renderer
-            var formatter = _renderer ?? (str =>
-            {
-                return str;
-            });
+            var formatter =
+                _renderer
+                ?? (
+                    str =>
+                    {
+                        return str;
+                    }
+                );
 
-            if(leftJoinIn.Count() > 0){
+            if (leftJoinIn.Count() > 0)
+            {
                 this._leftJoin = leftJoinIn;
             }
 
-            var query = db.Query("select")
-                .Table(this._table)
-                .LeftJoin(_leftJoin);
-            
-            if(fieldIn.Apply("get") && fieldIn.GetValue() == null){
-                query
-                    .Get(this._value + " as value")
-                    .Get(_label + " as label")
-                    .GroupBy(this._value);
+            var query = db.Query("select").Table(this._table).LeftJoin(_leftJoin);
+
+            if (fieldIn.Apply("get") && fieldIn.GetValue() == null)
+            {
+                query.Get(this._value + " as value").Get(_label + " as label").GroupBy(this._value);
             }
 
-            var res = query.Exec()
-                .FetchAll();
+            var res = query.Exec().FetchAll();
 
-            // Replace labels from database with enum names, fall back on database values 
-            if (_fromEnum.Count > 0) {
-                foreach (var row in res) {
+            // Replace labels from database with enum names, fall back on database values
+            if (_fromEnum.Count > 0)
+            {
+                foreach (var row in res)
+                {
                     row["label"] = _fromEnum[row["label"].ToString()] ?? row["label"].ToString();
                 }
             }
 
-    	    // Create output object with all of the SearchBuilderOptions
+            // Create output object with all of the SearchBuilderOptions
             List<Dictionary<string, object>> output = new List<Dictionary<string, object>>();
-            for (int i=0, ien=res.Count() ; i<ien ; i++ ) {
-                output.Add(new Dictionary<string, object>{
-                    {"label", formatter(
-                        (res[i]["label"] is DBNull) ? null : res[i]["label"].ToString()
-                    )},
-                    {"value", res[i]["value"] is DBNull ? null : res[i]["value"].ToString()}
-                });
+            for (int i = 0, ien = res.Count(); i < ien; i++)
+            {
+                output.Add(
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "label",
+                            formatter(
+                                (res[i]["label"] is DBNull) ? null : res[i]["label"].ToString()
+                            )
+                        },
+                        { "value", res[i]["value"] is DBNull ? null : res[i]["value"].ToString() },
+                    }
+                );
             }
 
             if (_order == null)
             {
                 string emptyStringa = "";
                 string emptyStringb = "";
-                output.Sort((a, b) => (a["label"] == null && b["label"] == null) ?
-                    emptyStringa.CompareTo(emptyStringb) :
-                    (a["label"] == null) ?
-                        emptyStringa.CompareTo(b["label"].ToString()) :
-                        (b["label"] == null) ?
-                            a["label"].ToString().CompareTo(emptyStringb) :
-                            a["label"].ToString().CompareTo(b["label"].ToString())
+                output.Sort(
+                    (a, b) =>
+                        (a["label"] == null && b["label"] == null)
+                            ? emptyStringa.CompareTo(emptyStringb)
+                        : (a["label"] == null) ? emptyStringa.CompareTo(b["label"].ToString())
+                        : (b["label"] == null) ? a["label"].ToString().CompareTo(emptyStringb)
+                        : a["label"].ToString().CompareTo(b["label"].ToString())
                 );
             }
 

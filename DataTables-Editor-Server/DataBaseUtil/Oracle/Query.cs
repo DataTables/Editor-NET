@@ -36,9 +36,7 @@ namespace DataTables.DatabaseUtil.Oracle
         /// <param name="db">Host database</param>
         /// <param name="type">Query type</param>
         public Query(Database db, string type)
-            : base(db, type)
-        {
-        }
+            : base(db, type) { }
 
         internal override string _bindChar => ":";
 
@@ -54,12 +52,12 @@ namespace DataTables.DatabaseUtil.Oracle
         {
             var provider = DbProviderFactories.GetFactory(_db.Adapter());
             var cmd = provider.CreateCommand();
-            
+
             // Oracle.DataAccess.Client (and managed) bind by position by default(!)
             // So we need to force it to bind by name if used
             var bindByName = cmd.GetType().GetProperty("BindByName");
             bindByName?.SetValue(cmd, true, null);
-            
+
             // Need to reliably get the primary key value
             if (_type == "insert" && _pkey != null)
             {
@@ -71,7 +69,8 @@ namespace DataTables.DatabaseUtil.Oracle
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
-            if (_db.CommandTimeout != -1) {
+            if (_db.CommandTimeout != -1)
+            {
                 cmd.CommandTimeout = _db.CommandTimeout;
             }
 
@@ -80,7 +79,8 @@ namespace DataTables.DatabaseUtil.Oracle
             {
                 // Determine the parameter type
                 var pkeyCmd = provider.CreateCommand();
-                pkeyCmd.CommandText = "SELECT data_type, data_length FROM all_tab_columns WHERE table_name = upper(:t) AND column_name = upper(:c)";
+                pkeyCmd.CommandText =
+                    "SELECT data_type, data_length FROM all_tab_columns WHERE table_name = upper(:t) AND column_name = upper(:c)";
                 pkeyCmd.Connection = _db.Conn();
                 pkeyCmd.Transaction = _db.DbTransaction;
 
@@ -96,7 +96,7 @@ namespace DataTables.DatabaseUtil.Oracle
                 pkeyParam.ParameterName = ":c";
                 pkeyParam.Value = _pkey[0];
                 pkeyCmd.Parameters.Add(pkeyParam);
-                
+
                 using (var dr = pkeyCmd.ExecuteReader())
                 {
                     // If the table doesn't have a primary key field, we can't get
@@ -185,32 +185,32 @@ namespace DataTables.DatabaseUtil.Oracle
             {
                 dt.Load(dr);
             }
-            
+
             return new Result(_db, dt, this);
         }
-        
-        /// <summary>	
-        /// Oracle table statement	
-        /// </summary>	
-        /// <returns>SQL for the table</returns>	
-        protected override string _BuildTable()	
-        {	
-            var tablesOut = new List<string>();	
 
-             foreach (var t in _table)	
-            {	
-                if (t.Contains(" as "))	
-                {	
-                    var a = t.Split(new[] { " as " }, StringSplitOptions.None);	
-                    tablesOut.Add(a[0] + " " + a[1]);	
-                }	
-                else	
-                {	
-                    tablesOut.Add(t);	
-                }	
-            }	
+        /// <summary>
+        /// Oracle table statement
+        /// </summary>
+        /// <returns>SQL for the table</returns>
+        protected override string _BuildTable()
+        {
+            var tablesOut = new List<string>();
 
-             return " " + string.Join(", ", tablesOut.ToArray()) + " ";	
+            foreach (var t in _table)
+            {
+                if (t.Contains(" as "))
+                {
+                    var a = t.Split(new[] { " as " }, StringSplitOptions.None);
+                    tablesOut.Add(a[0] + " " + a[1]);
+                }
+                else
+                {
+                    tablesOut.Add(t);
+                }
+            }
+
+            return " " + string.Join(", ", tablesOut.ToArray()) + " ";
         }
 
         /// <summary>

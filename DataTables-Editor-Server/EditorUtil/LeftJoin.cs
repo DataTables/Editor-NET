@@ -1,4 +1,3 @@
-
 namespace DataTables.EditorUtil
 {
     /// <summary>
@@ -25,7 +24,6 @@ namespace DataTables.EditorUtil
         /// Join logic operator
         /// </summary>
         internal string Operator;
-
 
         /// <summary>
         /// Left join information container

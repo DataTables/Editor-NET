@@ -2,53 +2,53 @@
 // DataTable class for reading tables
 // </summary>
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using DataTables.EditorUtil;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 #else
 using System.Web;
 #endif
-using DataTables.EditorUtil;
 
 namespace DataTables
 {
-	/// <summary>
-	/// This class let's you define the structure of a database, in order for it
-	/// to be read and the data returned to DataTables.
-	/// 
-	/// Typically you will:
-	/// 
-	/// * Create the instance
-	/// * Define the columns
-	/// * Process the request
-	/// * Return JSON to the client-side
-	/// 
-	/// You may also wish to add query conditions, or provide extra pre-column
-	/// options for features such as ColumnControl.
-	/// </summary>
+    /// <summary>
+    /// This class let's you define the structure of a database, in order for it
+    /// to be read and the data returned to DataTables.
+    ///
+    /// Typically you will:
+    ///
+    /// * Create the instance
+    /// * Define the columns
+    /// * Process the request
+    /// * Return JSON to the client-side
+    ///
+    /// You may also wish to add query conditions, or provide extra pre-column
+    /// options for features such as ColumnControl.
+    /// </summary>
     public class DataTable
-	{
-		/// <summary>
-		/// Library version
-		/// </summary>
+    {
+        /// <summary>
+        /// Library version
+        /// </summary>
         public const string Version = Editor.Version;
 
-		/// <summary>
-		/// Editor instance used for the processing of the inbound data.
-		/// </summary>
-		private Editor _editor;
+        /// <summary>
+        /// Editor instance used for the processing of the inbound data.
+        /// </summary>
+        private Editor _editor;
 
         /// <summary>
         /// List of columns for this instance
         /// </summary>
-		private List<Column> _columns = new List<Column>();
+        private List<Column> _columns = new List<Column>();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructors
@@ -62,8 +62,8 @@ namespace DataTables
         /// <param name="pkey">Primary key column name in the table given. Can also be set with the <code>PKey()</code> method.</param>
         public DataTable(Database db = null, string table = null, string pkey = null)
         {
-			_editor = new Editor(db, table, pkey);
-			_editor.Write(false);
+            _editor = new Editor(db, table, pkey);
+            _editor.Write(false);
         }
 
         /// <summary>
@@ -74,22 +74,22 @@ namespace DataTables
         /// <param name="pkey">Primary key column names in the table given. Can also be set with the <code>PKey()</code> method.</param>
         public DataTable(Database db, string table, string[] pkey)
         {
-			_editor = new Editor(db, table, pkey);
-			_editor.Write(false);
+            _editor = new Editor(db, table, pkey);
+            _editor.Write(false);
         }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
          */
 
-		/// <summary>
-		/// Get a column instance that has already been added
-		/// </summary>
-		/// <param name="name">Column name to get</param>
-		/// <returns>Colum instance</returns>
-		/// <exception cref="Exception">Unknown column name</exception>
-		public Column Column(string name)
-		{
+        /// <summary>
+        /// Get a column instance that has already been added
+        /// </summary>
+        /// <param name="name">Column name to get</param>
+        /// <returns>Colum instance</returns>
+        /// <exception cref="Exception">Unknown column name</exception>
+        public Column Column(string name)
+        {
             for (var i = 0; i < _columns.Count(); i++)
             {
                 if (_columns[i].Name() == name)
@@ -99,45 +99,45 @@ namespace DataTables
             }
 
             throw new Exception("Unknown column: " + name);
-		}
+        }
 
-		/// <summary>
-		/// Add a single column
-		/// </summary>
-		/// <param name="column">Column instance</param>
-		/// <returns>Self for chaining</returns>
-		public DataTable Column(Column column)
-		{
-			_columns.Add(column);
+        /// <summary>
+        /// Add a single column
+        /// </summary>
+        /// <param name="column">Column instance</param>
+        /// <returns>Self for chaining</returns>
+        public DataTable Column(Column column)
+        {
+            _columns.Add(column);
             _editor.Field(column.Field());
 
-			return this;
-		}
+            return this;
+        }
 
-		/// <summary>
-		/// Add a single column
-		/// </summary>
-		/// <param name="column">Column instance</param>
-		/// <returns>Self for chaining</returns>
-		public DataTable Columns(IEnumerable<Column> columns)
-		{
+        /// <summary>
+        /// Add a single column
+        /// </summary>
+        /// <param name="column">Column instance</param>
+        /// <returns>Self for chaining</returns>
+        public DataTable Columns(IEnumerable<Column> columns)
+        {
             foreach (var c in columns)
             {
                 Column(c);
             }
 
-			return this;
-		}
+            return this;
+        }
 
         /// <summary>
         /// Get the response object that has been created by this instance. This
         /// is only useful after <code>process()</code> has been called.
         /// </summary>
         /// <returns>The response object as populated by this instance</returns>
-		public DtResponse Data()
-		{
-			return _editor.Data();
-		}
+        public DtResponse Data()
+        {
+            return _editor.Data();
+        }
 
         /// <summary>
         /// Get the database instance used by this instance
@@ -205,25 +205,25 @@ namespace DataTables
 
         /// <summary>
         /// Get the DOM prefix.
-        /// 
+        ///
         /// Typically primary keys are numeric and this is not a valid ID value in an
         /// HTML document - is also increases the likelihood of an ID clash if multiple
-        /// tables are used on a single page. As such, a prefix is assigned to the 
+        /// tables are used on a single page. As such, a prefix is assigned to the
         /// primary key value for each row, and this is used as the DOM ID, so Editor
         /// can track individual rows.
         /// </summary>
         /// <returns>DOM prefix</returns>
         public string IdPrefix()
         {
-			return _editor.IdPrefix();
+            return _editor.IdPrefix();
         }
 
         /// <summary>
         /// Set the DOM prefix.
-        /// 
+        ///
         /// Typically primary keys are numeric and this is not a valid ID value in an
         /// HTML document - is also increases the likelihood of an ID clash if multiple
-        /// tables are used on a single page. As such, a prefix is assigned to the 
+        /// tables are used on a single page. As such, a prefix is assigned to the
         /// primary key value for each row, and this is used as the DOM ID, so Editor
         /// can track individual rows.
         /// </summary>
@@ -231,7 +231,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable IdPrefix(string prefix)
         {
-			_editor.IdPrefix(prefix);
+            _editor.IdPrefix(prefix);
 
             return this;
         }
@@ -242,7 +242,7 @@ namespace DataTables
         /// <returns>List of LeftJoin objects</returns>
         public List<LeftJoin> LeftJoin()
         {
-			return _editor.LeftJoin();
+            return _editor.LeftJoin();
         }
 
         /// <summary>
@@ -259,9 +259,14 @@ namespace DataTables
         /// <param name="op">Join condition (`=`, '&lt;`, etc)</param>
         /// <param name="field2">Field from the child table to use as the join link</param>
         /// <returns>Self for chaining</returns>
-        public DataTable LeftJoin(string table, string field1, string op = null, string field2 = null)
+        public DataTable LeftJoin(
+            string table,
+            string field1,
+            string op = null,
+            string field2 = null
+        )
         {
-			_editor.LeftJoin(table, field1, op, field2);
+            _editor.LeftJoin(table, field1, op, field2);
 
             return this;
         }
@@ -294,7 +299,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Model<T>()
         {
-			_editor.Model<T>();
+            _editor.Model<T>();
 
             return this;
         }
@@ -306,28 +311,28 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Model<T>(string tableName)
         {
-			_editor.Model<T>(tableName);
+            _editor.Model<T>(tableName);
 
             return this;
         }
 
         /// <summary>
         /// Get the primary key field that has been configured.
-        /// 
+        ///
         /// The primary key must be known to Editor so it will know which rows are being
         /// edited / deleted upon those actions. The default value is 'id'.
         /// </summary>
         /// <returns>Primary key</returns>
         public string[] Pkey()
         {
-			return _editor.Pkey();
+            return _editor.Pkey();
         }
 
         /// <summary>
         /// Set the primary key field to use. Please note that at this time
         /// Editor does not support composite primary keys in a table, only a
         /// single field primary key is supported.
-        /// 
+        ///
         /// The primary key must be known to Editor so it will know which rows are being
         /// edited / deleted upon those actions. The default value is 'id'.
         /// </summary>
@@ -335,7 +340,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Pkey(string id)
         {
-			_editor.Pkey(id);
+            _editor.Pkey(id);
 
             return this;
         }
@@ -347,22 +352,22 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Pkey(string[] id)
         {
-			_editor.Pkey(id);
+            _editor.Pkey(id);
 
             return this;
         }
-	
+
         /// <summary>
         /// Process a request from the DataTable client-side to get data.
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
         /// <returns>Self for chaining</returns>
         public DataTable Process(DtRequest data)
-		{
-			_editor.Process(data);
+        {
+            _editor.Process(data);
 
-			return this;
-		}
+            return this;
+        }
 
         /// <summary>
         /// Process a request from the Editor client-side to get / set data.
@@ -371,11 +376,14 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public DataTable Process(IEnumerable<KeyValuePair<string, string>> data = null, string culture=null)
+        public DataTable Process(
+            IEnumerable<KeyValuePair<string, string>> data = null,
+            string culture = null
+        )
         {
-			_editor.Process(data, culture);
+            _editor.Process(data, culture);
 
-			return this;
+            return this;
         }
 
 #if NETCOREAPP
@@ -385,11 +393,14 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Request type</returns>
-        public DataTable Process(IEnumerable<KeyValuePair<String, StringValues>> data = null, string culture=null)
+        public DataTable Process(
+            IEnumerable<KeyValuePair<String, StringValues>> data = null,
+            string culture = null
+        )
         {
-			_editor.Process(data, culture);
+            _editor.Process(data, culture);
 
-			return this;
+            return this;
         }
 #endif
 
@@ -400,11 +411,11 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public DataTable Process(NameValueCollection data = null, string culture=null)
+        public DataTable Process(NameValueCollection data = null, string culture = null)
         {
-			_editor.Process(data, culture);
+            _editor.Process(data, culture);
 
-			return this;
+            return this;
         }
 
         /// <summary>
@@ -414,11 +425,11 @@ namespace DataTables
         /// <param name="request">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public DataTable Process(HttpRequest request, string culture=null)
+        public DataTable Process(HttpRequest request, string culture = null)
         {
-			_editor.Process(request, culture);
+            _editor.Process(request, culture);
 
-			return this;
+            return this;
         }
 
 #if NETFRAMEWORK
@@ -429,11 +440,11 @@ namespace DataTables
         /// <param name="request">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public DataTable Process(UnvalidatedRequestValues request, string culture=null)
+        public DataTable Process(UnvalidatedRequestValues request, string culture = null)
         {
-			_editor.Process(request, culture);
+            _editor.Process(request, culture);
 
-			return this;
+            return this;
         }
 #endif
 
@@ -443,7 +454,7 @@ namespace DataTables
         /// <returns>Table name</returns>
         public List<string> Table()
         {
-			return _editor.Table();
+            return _editor.Table();
         }
 
         /// <summary>
@@ -453,7 +464,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Table(string t)
         {
-			 _editor.Table(t);
+            _editor.Table(t);
 
             return this;
         }
@@ -465,7 +476,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Table(IEnumerable<string> tables)
         {
-			 _editor.Table(tables);
+            _editor.Table(tables);
 
             return this;
         }
@@ -473,9 +484,9 @@ namespace DataTables
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -495,17 +506,17 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Where(Action<Query> fn)
         {
-			_editor.Where(fn);
+            _editor.Where(fn);
 
-			return this;
+            return this;
         }
 
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -527,9 +538,9 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public DataTable Where(string key, object value, string op = "=")
         {
-			_editor.Where(key, value, op);
+            _editor.Where(key, value, op);
 
-			return this;
+            return this;
         }
-	}
+    }
 }

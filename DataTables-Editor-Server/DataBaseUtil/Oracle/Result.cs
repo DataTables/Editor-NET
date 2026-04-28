@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
 using DataTables.DatabaseUtil;
 
 namespace DataTables.DatabaseUtil.Oracle
@@ -14,13 +14,11 @@ namespace DataTables.DatabaseUtil.Oracle
     class Result : DataTables.Result
     {
         public Result(Database db, System.Data.DataTable dt, Query q)
-            : base(db, dt, q)
-        {
-        }
+            : base(db, dt, q) { }
 
-        override public string InsertId()
+        public override string InsertId()
         {
-            // The Query will have set up a 
+            // The Query will have set up a
             return _query._stmt.Parameters[":dtvalue"].Value.ToString();
         }
     }

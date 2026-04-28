@@ -54,14 +54,14 @@ namespace DataTables
         /// </summary>
         public const string DATE_USA = "MM-dd-yyyy";
 
-
-
         /// <summary>
         /// Convert from SQL date / date time format (ISO8601) to a format given by the options parameter.
         /// </summary>
         /// <param name="format">Value to convert from SQL date format</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> DateSqlToFormat(string format)
+        public static Func<object, Dictionary<string, object>, object> DateSqlToFormat(
+            string format
+        )
         {
             return DateTime("yyyy-MM-dd", format);
         }
@@ -71,7 +71,9 @@ namespace DataTables
         /// </summary>
         /// <param name="format">Value to convert to SQL date format</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> DateFormatToSql(string format)
+        public static Func<object, Dictionary<string, object>, object> DateFormatToSql(
+            string format
+        )
         {
             return DateTime(format, "yyyy-MM-dd");
         }
@@ -82,7 +84,10 @@ namespace DataTables
         /// <param name="from">From format</param>
         /// <param name="to">To format</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> DateTime(string from, string to = null)
+        public static Func<object, Dictionary<string, object>, object> DateTime(
+            string from,
+            string to = null
+        )
         {
             // In cases where we are reading from the database we get an object that
             // doesn't need a from formatter (e.g. a DateTime or Time)
@@ -115,12 +120,20 @@ namespace DataTables
 
                     try
                     {
-                        dt = System.DateTime.ParseExact(str, from, System.Globalization.CultureInfo.InvariantCulture);
+                        dt = System.DateTime.ParseExact(
+                            str,
+                            from,
+                            System.Globalization.CultureInfo.InvariantCulture
+                        );
                     }
                     catch (Exception)
                     {
                         // Give it a best shot (sqlite with ISO8601 for example)
-                        dt = System.DateTime.Parse(str, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                        dt = System.DateTime.Parse(
+                            str,
+                            null,
+                            System.Globalization.DateTimeStyles.RoundtripKind
+                        );
                     }
                 }
 
@@ -133,11 +146,14 @@ namespace DataTables
         /// </summary>
         /// <param name="delimiter">Delimiter to split on</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> Explode(string delimiter = "|")
+        public static Func<object, Dictionary<string, object>, object> Explode(
+            string delimiter = "|"
+        )
         {
             return delegate(object val, Dictionary<string, object> data)
             {
-                if (val == null) {
+                if (val == null)
+                {
                     return null;
                 }
 
@@ -152,11 +168,14 @@ namespace DataTables
         /// </summary>
         /// <param name="delimiter">Delimiter to join on</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> Implode(string delimiter = "|")
+        public static Func<object, Dictionary<string, object>, object> Implode(
+            string delimiter = "|"
+        )
         {
             return delegate(object val, Dictionary<string, object> data)
             {
-                if (val == null) {
+                if (val == null)
+                {
                     return null;
                 }
 
@@ -174,9 +193,7 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> NullEmpty()
         {
-            return (val, data) => val == null || val.ToString() == ""
-                ? null
-                : val;
+            return (val, data) => val == null || val.ToString() == "" ? null : val;
         }
 
         /// <summary>
@@ -189,37 +206,33 @@ namespace DataTables
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> IfEmpty(object emptyValue)
         {
-            return (val, data) => val == null || val.ToString() == ""
-                ? emptyValue
-                : val;
+            return (val, data) => val == null || val.ToString() == "" ? emptyValue : val;
         }
 
         /// <summary>
         /// Convert a number from using any character other than a period (dot) to
-	    /// one which does use a period.This is useful for allowing numeric user
+        /// one which does use a period.This is useful for allowing numeric user
         /// input in regions where a comma is used as the decimal character. Use with
-	    /// a set formatter.
+        /// a set formatter.
         /// </summary>
         /// <param name="dec">Decimal place character</param>
         /// <returns>Formatter delegate</returns>
-        public static Func<object, Dictionary<string, object>, object> FromDecimalChar(char dec = ',')
+        public static Func<object, Dictionary<string, object>, object> FromDecimalChar(
+            char dec = ','
+        )
         {
-            return (val, data) => val != null
-                ? val.ToString().Replace(dec, '.')
-                : null;
+            return (val, data) => val != null ? val.ToString().Replace(dec, '.') : null;
         }
 
         /// <summary>
         /// Convert a number with a period (dot) as the decimal character to use
-	    /// a different character(typically a comma). Use with a get formatter.
+        /// a different character(typically a comma). Use with a get formatter.
         /// </summary>
         /// <param name="dec">Decimal place character</param>
         /// <returns>Formatter delegate</returns>
         public static Func<object, Dictionary<string, object>, object> ToDecimalChar(char dec = ',')
         {
-            return (val, data) => val != null
-                ? val.ToString().Replace('.', dec)
-                : null;
+            return (val, data) => val != null ? val.ToString().Replace('.', dec) : null;
         }
     }
 }

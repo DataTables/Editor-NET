@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
 
 namespace DataTables.DatabaseUtil.Sqlite
 {
@@ -19,11 +19,9 @@ namespace DataTables.DatabaseUtil.Sqlite
         /// <param name="dt">DataTable containing the results</param>
         /// <param name="q">Source query</param>
         public Result(Database db, System.Data.DataTable dt, Query q)
-            : base(db, dt, q)
-        {
-        }
+            : base(db, dt, q) { }
 
-        override public string InsertId()
+        public override string InsertId()
         {
             var provider = DbProviderFactories.GetFactory(_db.Adapter());
             var cmd = provider.CreateCommand();

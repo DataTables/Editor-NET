@@ -18,7 +18,6 @@ namespace DataTables.DatabaseUtil
         private string _operator = null;
         private string _query = null;
 
-
         public string Field()
         {
             return _field;
@@ -29,7 +28,6 @@ namespace DataTables.DatabaseUtil
             _field = value;
             return this;
         }
-
 
         public string Group()
         {
@@ -42,7 +40,6 @@ namespace DataTables.DatabaseUtil
             return this;
         }
 
-
         public string Operator()
         {
             return _operator;
@@ -53,7 +50,6 @@ namespace DataTables.DatabaseUtil
             _operator = value;
             return this;
         }
-
 
         public string Query()
         {

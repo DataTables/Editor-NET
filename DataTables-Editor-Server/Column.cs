@@ -2,26 +2,26 @@
 // Column class for reading tables
 // </summary>
 using System;
-using System.Data;
 using System.Collections.Generic;
+using System.Data;
 
 namespace DataTables
 {
     using OptionsFunc = Func<Database, string, List<Dictionary<string, object>>>;
 
-	/// <summary>
-	/// Column configuration object. This is used to define how a column should
-	/// be read from a database table.
-	///
-	/// This class is largely a proxy to `Field`, exposing only the read aspects
-	/// of the class, and not being writable.
-	/// </summary>
+    /// <summary>
+    /// Column configuration object. This is used to define how a column should
+    /// be read from a database table.
+    ///
+    /// This class is largely a proxy to `Field`, exposing only the read aspects
+    /// of the class, and not being writable.
+    /// </summary>
     public class Column
-	{
-		/// <summary>
-		/// The field instance that this instance acts as a proxy for.
-		/// </summary>
-		private Field _field;
+    {
+        /// <summary>
+        /// The field instance that this instance acts as a proxy for.
+        /// </summary>
+        private Field _field;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructors
@@ -33,8 +33,8 @@ namespace DataTables
         /// <param name="dbField">Database name for the column. This is also used as the HTTP name for the column</param>
         public Column(string dbField)
         {
-			_field = new Field(dbField);
-			_field.Set(false);
+            _field = new Field(dbField);
+            _field.Set(false);
         }
 
         /// <summary>
@@ -44,8 +44,8 @@ namespace DataTables
         /// <param name="name">HTTP name (JSON data and form submit)</param>
         public Column(string dbField, string name)
         {
-			_field = new Field(dbField, name);
-			_field.Set(false);
+            _field = new Field(dbField, name);
+            _field.Set(false);
         }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -79,12 +79,12 @@ namespace DataTables
         /// <returns>Database field name</returns>
         public string DbField()
         {
-			return _field.DbField();
+            return _field.DbField();
         }
-		
+
         /// <summary>
         /// Set the DB field name.
-        /// 
+        ///
         /// Note that when used as a setter, an alias can be given for the field
         /// using the SQL `as` keyword - for example: `firstName as name`. In this
         /// situation the dbField is set to the field name before the `as`, and the
@@ -100,28 +100,28 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column DbField(string field)
         {
-			_field.DbField(field);
+            _field.DbField(field);
 
-			return this;
+            return this;
         }
 
-		/// <summary>
-		/// Get the database type for the column
-		/// </summary>
-		/// <returns>The DB type</returns>
+        /// <summary>
+        /// Get the database type for the column
+        /// </summary>
+        /// <returns>The DB type</returns>
         public DbType? DbType()
         {
-			return _field.DbType();
+            return _field.DbType();
         }
 
-		/// <summary>
-		/// Set the database type for the column
-		/// </summary>
+        /// <summary>
+        /// Set the database type for the column
+        /// </summary>
         /// <param name="type">DB type to set</param>
-		/// <returns>Self for chaining</returns>
+        /// <returns>Self for chaining</returns>
         public Column DbType(DbType? type)
         {
-			_field.DbType(type);
+            _field.DbType(type);
 
             return this;
         }
@@ -141,7 +141,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column GetFormatter(Func<object, Dictionary<string, object>, object> fn)
         {
-			_field.GetFormatter(fn);
+            _field.GetFormatter(fn);
 
             return this;
         }
@@ -152,7 +152,7 @@ namespace DataTables
         /// <returns>Get value</returns>
         public dynamic GetValue()
         {
-			return _field.GetValue();
+            return _field.GetValue();
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column GetValue(object val)
         {
-			_field.GetValue(val);
+            _field.GetValue(val);
 
             return this;
         }
@@ -179,14 +179,14 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column GetValue(Func<object> val)
         {
-			_field.GetValue(val);
+            _field.GetValue(val);
 
             return this;
         }
 
         /// <summary>
         /// Get the HTTP / JSON name for the field.
-        ///  
+        ///
         /// The name is typically the same as the `DbField` name, since it makes things
         /// less confusing(!), but it is possible to set a different name for the data
         /// which is used in the JSON returned to DataTables in a 'get' operation and
@@ -195,12 +195,12 @@ namespace DataTables
         /// <returns>Field HTTP name</returns>
         public string Name()
         {
-			return _field.Name();
+            return _field.Name();
         }
 
         /// <summary>
         /// Set the HTTP / JSON name for the field.
-        /// 
+        ///
         /// The name is typically the same as the `DbField` name, since it makes things
         /// less confusing(!), but it is possible to set a different name for the data
         /// which is used in the JSON returned to DataTables in a 'get' operation and
@@ -210,7 +210,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column Name(string name)
         {
-			_field.Name(name);
+            _field.Name(name);
 
             return this;
         }
@@ -221,7 +221,7 @@ namespace DataTables
         /// <returns>Options object</returns>
         public Options Options()
         {
-			return _field.Options();
+            return _field.Options();
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column Options(OptionsFunc fn)
         {
-			_field.Options(fn);
+            _field.Options(fn);
 
             return this;
         }
@@ -245,16 +245,17 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Column Options(Options opts)
         {
-			_field.Options(opts);
+            _field.Options(opts);
 
             return this;
         }
-		
+
         /// <summary>
         /// Get the SearchBuilderOptions object configured for this field
         /// </summary>
         /// <returns>SearchBuilderOptions object</returns>
-        public SearchBuilderOptions SearchBuilderOptions() {
+        public SearchBuilderOptions SearchBuilderOptions()
+        {
             return _field.SearchBuilderOptions();
         }
 
@@ -264,8 +265,11 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of SearchBuilder options</param>
         /// <returns>Self for chaining</returns>
-        public Column SearchBuilderOptions(Func<object, object, List<Dictionary<string, object>>> fn) {
-			_field.SearchBuilderOptions(fn);
+        public Column SearchBuilderOptions(
+            Func<object, object, List<Dictionary<string, object>>> fn
+        )
+        {
+            _field.SearchBuilderOptions(fn);
 
             return this;
         }
@@ -275,18 +279,20 @@ namespace DataTables
         /// </summary>
         /// <param name="opts">Configured SearchBuilderOptions object</param>
         /// <returns>Self for chaining</returns>
-        public Column SearchBuilderOptions(SearchBuilderOptions sbOpts) {
-			_field.SearchBuilderOptions(sbOpts);
+        public Column SearchBuilderOptions(SearchBuilderOptions sbOpts)
+        {
+            _field.SearchBuilderOptions(sbOpts);
 
             return this;
         }
-        
+
         /// <summary>
         /// Get the SearchPaneOptions object configured for this field
         /// </summary>
         /// <returns>SearchPaneOptions object</returns>
-        public SearchPaneOptions SearchPaneOptions() {
-			return _field.SearchPaneOptions();
+        public SearchPaneOptions SearchPaneOptions()
+        {
+            return _field.SearchPaneOptions();
         }
 
         /// <summary>
@@ -295,8 +301,9 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of SearchPane options</param>
         /// <returns>Self for chaining</returns>
-        public Column SearchPaneOptions(Func<object, object, List<Dictionary<string, object>>> fn){
-			_field.SearchPaneOptions(fn);
+        public Column SearchPaneOptions(Func<object, object, List<Dictionary<string, object>>> fn)
+        {
+            _field.SearchPaneOptions(fn);
 
             return this;
         }
@@ -306,19 +313,20 @@ namespace DataTables
         /// </summary>
         /// <param name="opts">Configured SearchPaneOptions object</param>
         /// <returns>Self for chaining</returns>
-        public Column SearchPaneOptions(SearchPaneOptions spOpts){
-			_field.SearchPaneOptions(spOpts);
+        public Column SearchPaneOptions(SearchPaneOptions spOpts)
+        {
+            _field.SearchPaneOptions(spOpts);
 
             return this;
         }
 
-		/// <summary>
-		/// Get the field instance associated with this column
-		/// </summary>
-		/// <returns>Field instance</returns>
-		internal Field Field()
-		{
-			return _field;
-		}
-	}
+        /// <summary>
+        /// Get the field instance associated with this column
+        /// </summary>
+        /// <returns>Field instance</returns>
+        internal Field Field()
+        {
+            return _field;
+        }
+    }
 }

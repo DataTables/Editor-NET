@@ -1,14 +1,14 @@
-// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
+﻿// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // Field class which defines how individual fields for Editor
 // </summary>
 using System;
-using System.Data;
 using System.Collections.Generic;
+using System.Data;
 using System.Text.RegularExpressions;
-using DataTables.EditorUtil;
 using System.Web;
+using DataTables.EditorUtil;
 
 namespace DataTables
 {
@@ -17,14 +17,13 @@ namespace DataTables
     /// <summary>
     /// Field definitions for the DataTables Editor.
     ///
-    /// Each Database column that is used with Editor can be described with this 
+    /// Each Database column that is used with Editor can be described with this
     /// Field method (both for Editor and Join instances). It basically tells
     /// Editor what table column to use, how to format the data and if you want
     /// to read and/or write this column.
     /// </summary>
     public class Field
     {
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Statics
          */
@@ -53,9 +52,8 @@ namespace DataTables
             /// <summary>
             /// Set the value on only the edit action
             /// </summary>
-            Edit
+            Edit,
         };
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructor
@@ -107,7 +105,6 @@ namespace DataTables
             }
         }
 
-
         /// <summary>
         /// Create a new Field instance - different db and http names with type specified
         /// </summary>
@@ -139,7 +136,6 @@ namespace DataTables
             }
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private parameters
          */
@@ -154,7 +150,9 @@ namespace DataTables
         private SetType _set = SetType.Both;
         private Func<object, Dictionary<string, object>, object> _setFormatter;
         private dynamic _setValue;
-        private readonly List<Func<object, Dictionary<string, object>, ValidationHost, string>> _validators =
+        private readonly List<
+            Func<object, Dictionary<string, object>, ValidationHost, string>
+        > _validators =
             new List<Func<object, Dictionary<string, object>, ValidationHost, string>>();
         private Options _opts;
         private SearchPaneOptions _spOpts;
@@ -165,7 +163,6 @@ namespace DataTables
         private Func<string, string> _xss;
         private bool _xssFormat = true;
         private Options _columnControl = null;
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
@@ -203,7 +200,7 @@ namespace DataTables
 
         /// <summary>
         /// Set the DB field name.
-        /// 
+        ///
         /// Note that when used as a setter, an alias can be given for the field
         /// using the SQL `as` keyword - for example: `firstName as name`. In this
         /// situation the dbField is set to the field name before the `as`, and the
@@ -233,20 +230,20 @@ namespace DataTables
             return this;
         }
 
-		/// <summary>
-		/// Get the database type for the field
-		/// </summary>
-		/// <returns>The DB type</returns>
+        /// <summary>
+        /// Get the database type for the field
+        /// </summary>
+        /// <returns>The DB type</returns>
         public DbType? DbType()
         {
             return _dbType;
         }
 
-		/// <summary>
-		/// Set the database type for the field
-		/// </summary>
+        /// <summary>
+        /// Set the database type for the field
+        /// </summary>
         /// <param name="type">DB type to set</param>
-		/// <returns>Self for chaining</returns>
+        /// <returns>Self for chaining</returns>
         public Field DbType(DbType? type)
         {
             _dbType = type;
@@ -333,7 +330,7 @@ namespace DataTables
 
         /// <summary>
         /// Get the HTTP / JSON name for the field.
-        ///  
+        ///
         /// The name is typically the same as the `DbField` name, since it makes things
         /// less confusing(!), but it is possible to set a different name for the data
         /// which is used in the JSON returned to DataTables in a 'get' operation and
@@ -347,7 +344,7 @@ namespace DataTables
 
         /// <summary>
         /// Set the HTTP / JSON name for the field.
-        /// 
+        ///
         /// The name is typically the same as the `DbField` name, since it makes things
         /// less confusing(!), but it is possible to set a different name for the data
         /// which is used in the JSON returned to DataTables in a 'get' operation and
@@ -411,12 +408,15 @@ namespace DataTables
         /// <param name="condition">Function that will using the Query class passed in to apply a condtion</param>
         /// <param name="format">Formatting function (called for every option)</param>
         /// <returns>Self for chaining</returns>
-        public Field Options(string table, string value, string label, Action<Query> condition = null, Func<Dictionary<string, object>, string> format = null)
+        public Field Options(
+            string table,
+            string value,
+            string label,
+            Action<Query> condition = null,
+            Func<Dictionary<string, object>, string> format = null
+        )
         {
-            var opts = new Options()
-                .Table(table)
-                .Value(value)
-                .Label(label);
+            var opts = new Options().Table(table).Value(value).Label(label);
 
             if (condition != null)
             {
@@ -447,12 +447,15 @@ namespace DataTables
         /// <param name="condition">Function that will using the Query class passed in to apply a condtion</param>
         /// <param name="format">Formatting function (called for every option)</param>
         /// <returns>Self for chaining</returns>
-        public Field Options(string table, string value, IEnumerable<string> label, Action<Query> condition = null, Func<Dictionary<string, object>, string> format = null)
+        public Field Options(
+            string table,
+            string value,
+            IEnumerable<string> label,
+            Action<Query> condition = null,
+            Func<Dictionary<string, object>, string> format = null
+        )
         {
-            var opts = new Options()
-                .Table(table)
-                .Value(value)
-                .Label(label);
+            var opts = new Options().Table(table).Value(value).Label(label);
 
             if (condition != null)
             {
@@ -473,7 +476,8 @@ namespace DataTables
         /// Get the SearchBuilderOptions object configured for this field
         /// </summary>
         /// <returns>SearchBuilderOptions object</returns>
-        public SearchBuilderOptions SearchBuilderOptions() {
+        public SearchBuilderOptions SearchBuilderOptions()
+        {
             return _sbOpts;
         }
 
@@ -483,7 +487,8 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of SearchBuilder options</param>
         /// <returns>Self for chaining</returns>
-        public Field SearchBuilderOptions(Func<object, object, List<Dictionary<string, object>>> fn){
+        public Field SearchBuilderOptions(Func<object, object, List<Dictionary<string, object>>> fn)
+        {
             _sbOpts = null;
             _sbOptsFn = fn;
 
@@ -495,18 +500,20 @@ namespace DataTables
         /// </summary>
         /// <param name="opts">Configured SearchBuilderOptions object</param>
         /// <returns>Self for chaining</returns>
-        public Field SearchBuilderOptions(SearchBuilderOptions sbOpts){
+        public Field SearchBuilderOptions(SearchBuilderOptions sbOpts)
+        {
             _sbOpts = sbOpts;
             _sbOptsFn = null;
 
             return this;
         }
-        
+
         /// <summary>
         /// Get the SearchPaneOptions object configured for this field
         /// </summary>
         /// <returns>SearchPaneOptions object</returns>
-        public SearchPaneOptions SearchPaneOptions() {
+        public SearchPaneOptions SearchPaneOptions()
+        {
             return _spOpts;
         }
 
@@ -516,7 +523,8 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Delegate that will return a list of SearchPane options</param>
         /// <returns>Self for chaining</returns>
-        public Field SearchPaneOptions(Func<object, object, List<Dictionary<string, object>>> fn){
+        public Field SearchPaneOptions(Func<object, object, List<Dictionary<string, object>>> fn)
+        {
             _spOpts = null;
             _spOptsFn = fn;
 
@@ -528,7 +536,8 @@ namespace DataTables
         /// </summary>
         /// <param name="opts">Configured SearchPaneOptions object</param>
         /// <returns>Self for chaining</returns>
-        public Field SearchPaneOptions(SearchPaneOptions spOpts){
+        public Field SearchPaneOptions(SearchPaneOptions spOpts)
+        {
             _spOpts = spOpts;
             _spOptsFn = null;
 
@@ -649,9 +658,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Field Type(Type t)
         {
-            _type = t.ToString().Contains("Nullable") ?
-                Nullable.GetUnderlyingType(t) :
-                t;
+            _type = t.ToString().Contains("Nullable") ? Nullable.GetUnderlyingType(t) : t;
 
             return this;
         }
@@ -706,7 +713,7 @@ namespace DataTables
         /// Multiple validation options can be applied to a field instance by calling
         /// this method multiple times. For example, it would be possible to have a
         /// 'Required' validation and a 'MaxLength' validation with multiple calls.
-        /// 
+        ///
         /// Editor has a number of validation available with the <code>Validation</code> class
         /// which can be used directly with this method.
         /// </summary>
@@ -723,12 +730,12 @@ namespace DataTables
         /// Set a formatting method that will be used for XSS checking / removal.
         /// This should be a function that takes a single argument (the value to be
         /// cleaned) and returns the cleaned value.
-        /// 
-        /// Editor will use the Microsoft security library's `Encoder.HtmlEncode` 
+        ///
+        /// Editor will use the Microsoft security library's `Encoder.HtmlEncode`
         /// method by default for this operation, which is built into the software
         /// and no additional configuration is required, but a custom function can
         /// be used if you wish to use a different formatter such as HtmlSanitizer.
-        /// 
+        ///
         /// If you wish to disable this option (which you would only do if you are
         /// absolutely confident that your validation will pick up on any XSS inputs)
         /// simply pass in 'false' or provide a closure function that returns the
@@ -754,8 +761,6 @@ namespace DataTables
 
             return this;
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -813,11 +818,20 @@ namespace DataTables
         /// <param name="fields">Field[] instance</param>
         /// <param name="http">DtRequest instance</param>
         /// <returns>List of SearchBuilderOptions</returns>
-        internal List<Dictionary<string, object>> SearchBuilderOptionsExec(Field field, Editor editor, List<LeftJoin> leftJoin, Field[] fields, DtRequest http) {
-            if (_sbOptsFn != null){
+        internal List<Dictionary<string, object>> SearchBuilderOptionsExec(
+            Field field,
+            Editor editor,
+            List<LeftJoin> leftJoin,
+            Field[] fields,
+            DtRequest http
+        )
+        {
+            if (_sbOptsFn != null)
+            {
                 return _sbOptsFn(editor.Db(), editor);
             }
-            if(_sbOpts != null) {
+            if (_sbOpts != null)
+            {
                 return _sbOpts.Exec(field, editor, leftJoin, http, fields);
             }
             return null;
@@ -833,11 +847,20 @@ namespace DataTables
         /// <param name="fields">Field[] instance</param>
         /// <param name="http">DtRequest instance</param>
         /// <returns>List of SearchPaneOptions</returns>
-        internal List<Dictionary<string, object>> SearchPaneOptionsExec(Field field, Editor editor, List<LeftJoin> leftJoin, Field[] fields, DtRequest http) {
-            if (_spOptsFn != null){
+        internal List<Dictionary<string, object>> SearchPaneOptionsExec(
+            Field field,
+            Editor editor,
+            List<LeftJoin> leftJoin,
+            Field[] fields,
+            DtRequest http
+        )
+        {
+            if (_spOptsFn != null)
+            {
                 return _spOptsFn(editor.Db(), editor);
             }
-            if(_spOpts != null) {
+            if (_spOpts != null)
+            {
                 return _spOpts.Exec(field, editor, leftJoin, http, fields);
             }
             return null;
@@ -864,18 +887,17 @@ namespace DataTables
                 }
                 else
                 {
-                    val = data.ContainsKey(_dbField) ?
-                        data[_dbField] :
-                        null;
+                    val = data.ContainsKey(_dbField) ? data[_dbField] : null;
                 }
 
                 return _Format(val, data, _getFormatter);
             }
 
             // Use data from setting from the POST / GET data, so use the name
-            val = _setValue != null ?
-                _GetAssignedValue(_setValue) :
-                NestedData.ReadProp(Name(), data);
+            val =
+                _setValue != null
+                    ? _GetAssignedValue(_setValue)
+                    : NestedData.ReadProp(Name(), data);
 
             // XSS prevention
             if (val is string && _xssFormat)
@@ -910,7 +932,7 @@ namespace DataTables
                 Id = id,
                 Field = this,
                 Editor = editor,
-                Db = editor.Db()
+                Db = editor.Db(),
             };
 
             foreach (var validator in _validators)
@@ -943,14 +965,13 @@ namespace DataTables
         /// <returns></returns>
         internal string XssSafety(string val)
         {
-            if ( _xss != null )
+            if (_xss != null)
             {
                 return _xss(val);
             }
 
-            return HttpUtility.HtmlEncode( val );
+            return HttpUtility.HtmlEncode(val);
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
@@ -964,11 +985,13 @@ namespace DataTables
         /// <param name="data">Full row data</param>
         /// <param name="formatter">Formatting function to be called</param>
         /// <returns>Formatted value</returns>
-        private object _Format(object val, Dictionary<string, object> data, Func<object, Dictionary<string, object>, dynamic> formatter)
+        private object _Format(
+            object val,
+            Dictionary<string, object> data,
+            Func<object, Dictionary<string, object>, dynamic> formatter
+        )
         {
-            return formatter != null ?
-                formatter(val, data) :
-                val;
+            return formatter != null ? formatter(val, data) : val;
         }
 
         /// <summary>
@@ -979,9 +1002,7 @@ namespace DataTables
         /// <returns>Value assigned, or returned from the function</returns>
         private object _GetAssignedValue(object val)
         {
-            return val is Func<object> ?
-                ((Func<object>)val)() :
-                val;
+            return val is Func<object> ? ((Func<object>)val)() : val;
         }
     }
 }

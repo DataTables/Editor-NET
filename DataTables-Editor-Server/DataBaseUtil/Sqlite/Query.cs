@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
 using DataTables.DatabaseUtil;
 
 namespace DataTables.DatabaseUtil.Sqlite
@@ -19,9 +19,7 @@ namespace DataTables.DatabaseUtil.Sqlite
         /// <param name="db">Host database</param>
         /// <param name="type">Query type</param>
         public Query(Database db, string type)
-            : base(db, type)
-        {
-        }
+            : base(db, type) { }
 
         /// <summary>
         /// Bind parameters to the SQL statement
@@ -37,7 +35,8 @@ namespace DataTables.DatabaseUtil.Sqlite
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
-            if (_db.CommandTimeout != -1) {
+            if (_db.CommandTimeout != -1)
+            {
                 cmd.CommandTimeout = _db.CommandTimeout;
             }
 
@@ -73,10 +72,11 @@ namespace DataTables.DatabaseUtil.Sqlite
 
             using (var dr = _stmt.ExecuteReader())
             {
-                try {
+                try
+                {
                     dt.Load(dr);
                 }
-                catch {}
+                catch { }
             }
 
             return new Sqlite.Result(_db, dt, this);

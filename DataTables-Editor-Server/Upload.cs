@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 #if NETCOREAPP2_1_OR_GREATER
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -11,18 +11,17 @@ using System.Web;
 using IFormFile = System.Web.HttpPostedFile;
 #endif
 
-
 namespace DataTables
 {
     /// <summary>
     /// Upload class for Editor. This class provides the ability to easily specify
     /// file upload information, specifically how the file should be recorded on
     /// the server (database and file system).
-    /// 
+    ///
     /// An instance of this class is attached to a field using the 'Field.upload()'
     /// method. When Editor detects a file upload for that file the information
     /// provided for this instance is executed.
-    /// 
+    ///
     /// The configuration is primarily driven through the 'db' and 'action' methods
     /// </summary>
     public class Upload
@@ -89,9 +88,8 @@ namespace DataTables
             /// Don't write to the database, just read (default value or updated
             /// else where)
             /// </summary>
-            ReadOnly
+            ReadOnly,
         }
-
 
         /*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
          * Private parameters
@@ -108,7 +106,8 @@ namespace DataTables
         private string _dbCleanTableField;
         private readonly List<Action<Query>> _where = new List<Action<Query>>();
         private Func<IFormFile, dynamic, dynamic> _actionFn;
-        private readonly List<Func<IFormFile, string>> _validators = new List<Func<IFormFile, string>>();
+        private readonly List<Func<IFormFile, string>> _validators =
+            new List<Func<IFormFile, string>>();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Constructor
@@ -117,8 +116,7 @@ namespace DataTables
         /// <summary>
         /// Upload constructor
         /// </summary>
-        public Upload()
-        { }
+        public Upload() { }
 
         /// <summary>
         /// Upload constructor with a path action
@@ -140,7 +138,6 @@ namespace DataTables
             Action(action);
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
          */
@@ -150,7 +147,7 @@ namespace DataTables
         /// given is the full system path to where the uploaded file is written to.
         /// The value given can include three "macros" which are replaced by the
         /// script dependent on the uploaded file:
-        /// 
+        ///
         /// * '__EXTN__' - the file extension (with the dot)
         /// * '__NAME__' - the uploaded file's name (including the extension)
         /// * '__ID__' - Database primary key value if the 'Db()' method is used
@@ -190,7 +187,10 @@ namespace DataTables
         /// <param name="error">Error message for if the file is not valid.</param>
         /// <returns>Self for chaining</returns>
         /// <deprecated>Use the Validation.FileExtensions() method instead</deprecated>
-        public Upload AllowedExtensions(IEnumerable<string> extns, string error = "This file type cannot be uploaded")
+        public Upload AllowedExtensions(
+            IEnumerable<string> extns,
+            string error = "This file type cannot be uploaded"
+        )
         {
             _extns = extns;
             _extnError = error;
@@ -213,7 +213,12 @@ namespace DataTables
         /// which will be written directly to the database, or a function which will be
         /// executed and the returned value written to the database.</param>
         /// <returns>Self for chanining</returns>
-        public Upload Db(string table, string pkey, Dictionary<string, object> fields, Action<Dictionary<string, object>> format = null)
+        public Upload Db(
+            string table,
+            string pkey,
+            Dictionary<string, object> fields,
+            Action<Dictionary<string, object>> format = null
+        )
         {
             _dbTable = table;
             _dbPKey = pkey;
@@ -256,7 +261,10 @@ namespace DataTables
         /// (including none) will result in the records being retained.
         /// </param>
         /// <returns>Self for chaining</returns>
-        public Upload DbClean(string tableField, Func<List<Dictionary<string, object>>, bool> callback)
+        public Upload DbClean(
+            string tableField,
+            Func<List<Dictionary<string, object>>, bool> callback
+        )
         {
             _dbCleanCallback = callback;
             _dbCleanTableField = tableField;
@@ -293,7 +301,6 @@ namespace DataTables
             return this;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
          */
@@ -304,7 +311,10 @@ namespace DataTables
         /// <param name="db">Database instance</param>
         /// <param name="ids">Limit the results to a collection of ids</param>
         /// <returns>Database information</returns>
-        internal Dictionary<string, Dictionary<string, object>> Data(Database db, ICollection<object> ids = null)
+        internal Dictionary<string, Dictionary<string, object>> Data(
+            Database db,
+            ICollection<object> ids = null
+        )
         {
             if (_dbTable == null)
             {
@@ -312,9 +322,7 @@ namespace DataTables
             }
 
             // Select the configured db columns
-            var q = db.Query("select")
-                .Table(_dbTable)
-                .Get(_dbPKey);
+            var q = db.Query("select").Table(_dbTable).Get(_dbPKey);
 
             foreach (var pair in _dbFields)
             {
@@ -361,7 +369,6 @@ namespace DataTables
             return outData;
         }
 
-
         /// <summary>
         /// Execute a file clean up
         /// </summary>
@@ -372,7 +379,6 @@ namespace DataTables
             var tables = editor.Table();
             _DbClean(editor.Db(), tables.First(), field.DbField());
         }
-
 
         /// <summary>
         /// Get the error message for the uplaod
@@ -438,11 +444,15 @@ namespace DataTables
                     var column = pair.Key;
                     var prop = pair.Value;
 
-                    if (_actionStr == null && prop is DbType &&
-                        ((DbType)prop == DbType.SystemPath || (DbType)prop == DbType.WebPath))
+                    if (
+                        _actionStr == null
+                        && prop is DbType
+                        && ((DbType)prop == DbType.SystemPath || (DbType)prop == DbType.WebPath)
+                    )
                     {
-                        _error = "Cannot set path information in database " +
-                            "if a custom method is used to save the file.";
+                        _error =
+                            "Cannot set path information in database "
+                            + "if a custom method is used to save the file.";
                         return false;
                     }
                 }
@@ -473,7 +483,6 @@ namespace DataTables
             return _dbTable;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
          */
@@ -489,9 +498,7 @@ namespace DataTables
             if (_actionStr == null)
             {
                 // Custom function
-                return _actionFn != null ?
-                    _actionFn(upload, id) :
-                    id;
+                return _actionFn != null ? _actionFn(upload, id) : id;
             }
 
             // Default action - move the file to the location specified by the
@@ -547,14 +554,15 @@ namespace DataTables
                 // fieldName can be Field (a.lenght == 1), Table.Field or schema.Table.Field
                 var editorTableName = editorTable.Split(new[] { '.' }).Last();
                 var fieldTableName = a.Length == 2 ? a[0] : a[1];
-                table = fieldTableName == editorTableName ? editorTable : string.Join(".", a.Take(a.Length - 1));
+                table =
+                    fieldTableName == editorTableName
+                        ? editorTable
+                        : string.Join(".", a.Take(a.Length - 1));
                 field = a.Last();
             }
 
             // Get the infromation from the database about the orphaned children
-            var q = db.Query("select")
-                .Table(_dbTable)
-                .Get(_dbPKey);
+            var q = db.Query("select").Table(_dbTable).Get(_dbPKey);
 
             foreach (var pair in _dbFields)
             {
@@ -567,7 +575,12 @@ namespace DataTables
                 }
             }
 
-            q.Where(_dbPKey, "(SELECT " + field + " FROM " + table + " WHERE " + field + " IS NOT NULL)", "NOT IN", false);
+            q.Where(
+                _dbPKey,
+                "(SELECT " + field + " FROM " + table + " WHERE " + field + " IS NOT NULL)",
+                "NOT IN",
+                false
+            );
 
             var data = q.Exec().FetchAll();
 
@@ -583,8 +596,7 @@ namespace DataTables
                 return;
             }
 
-            var qDelete = db.Query("delete")
-                .Table(_dbTable);
+            var qDelete = db.Query("delete").Table(_dbTable);
 
             foreach (var row in data)
             {
@@ -607,9 +619,7 @@ namespace DataTables
             string insertedId = null;
 
             // Insert the details requested, for the columns requested
-            var q = db.Query("insert")
-                .Table(_dbTable)
-                .Pkey(new[] { _dbPKey });
+            var q = db.Query("insert").Table(_dbTable).Pkey(new[] { _dbPKey });
 
             foreach (var pair in _dbFields)
             {
@@ -689,27 +699,28 @@ namespace DataTables
                         var propFn = (Func<Database, IFormFile, dynamic>)prop;
                         val = propFn(db, upload);
                     }
-                    catch (Exception) {}
+                    catch (Exception) { }
 
-                    if (column == _dbPKey) {
+                    if (column == _dbPKey)
+                    {
                         insertedId = val;
                     }
 
-                    if (val is string) {
+                    if (val is string)
+                    {
                         // Allow for replacement of __ID__, etc when the value is a string
                         pathFields.Add(column, val);
                         q.Set(column, "-"); // Use a temporary value (as above)
                     }
-                    else {
+                    else
+                    {
                         q.Set(column, val);
                     }
                 }
             }
 
             var res = q.Exec();
-            var id = insertedId != null
-                ? insertedId
-                : res.InsertId();
+            var id = insertedId != null ? insertedId : res.InsertId();
 
             // Update the newly inserted row with the path information. We have to
             // use a second statement here as we don't know in advance what the
@@ -723,20 +734,16 @@ namespace DataTables
                 var path = _path(_actionStr, upload.FileName, id);
 #if NETCOREAPP
                 var physicalPath = Directory.GetCurrentDirectory() ?? "";
-                var webPath = physicalPath.Length != 0 ?
-                    path.Replace(physicalPath, "") :
-                    "";
+                var webPath = physicalPath.Length != 0 ? path.Replace(physicalPath, "") : "";
 #else
                 var physicalPath = editor.Request().PhysicalApplicationPath ?? "";
-                var webPath = physicalPath.Length != 0 ?
-                    path.Replace(physicalPath, Path.DirectorySeparatorChar.ToString()) :
-                    "";
+                var webPath =
+                    physicalPath.Length != 0
+                        ? path.Replace(physicalPath, Path.DirectorySeparatorChar.ToString())
+                        : "";
 #endif
 
-                var pathQ = db
-                    .Query("update")
-                    .Table(_dbTable)
-                    .Where(_dbPKey, id);
+                var pathQ = db.Query("update").Table(_dbTable).Where(_dbPKey, id);
 
                 foreach (var pathField in pathFields)
                 {
@@ -762,8 +769,7 @@ namespace DataTables
         /// <returns>Resolved path</returns>
         private string _path(string val, string name, string id)
         {
-            return val
-                .Replace("__NAME__", Path.GetFileNameWithoutExtension(name))
+            return val.Replace("__NAME__", Path.GetFileNameWithoutExtension(name))
                 .Replace("__ID__", id)
                 .Replace("__EXTN__", Path.GetExtension(name));
         }

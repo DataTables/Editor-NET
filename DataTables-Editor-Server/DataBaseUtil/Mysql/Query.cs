@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Common;
 
 namespace DataTables.DatabaseUtil.Mysql
@@ -8,17 +8,15 @@ namespace DataTables.DatabaseUtil.Mysql
     /// </summary>
     public class Query : DataTables.Query
     {
-       internal override string[] _identifierLimiter => new[] { "`", "`" };
- 
+        internal override string[] _identifierLimiter => new[] { "`", "`" };
+
         /// <summary>
         /// Create a query instance specifically for MySQL
         /// </summary>
         /// <param name="db">Host database</param>
         /// <param name="type">Query type</param>
         public Query(Database db, string type)
-            : base(db, type)
-        {
-        }
+            : base(db, type) { }
 
         /// <summary>
         /// Bind parameters to the SQL statement
@@ -40,7 +38,8 @@ namespace DataTables.DatabaseUtil.Mysql
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
-            if (_db.CommandTimeout != -1) {
+            if (_db.CommandTimeout != -1)
+            {
                 cmd.CommandTimeout = _db.CommandTimeout;
             }
 

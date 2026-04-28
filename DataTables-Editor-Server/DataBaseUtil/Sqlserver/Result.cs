@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
-using System.Data;
 
 namespace DataTables.DatabaseUtil.Sqlserver
 {
@@ -20,9 +20,7 @@ namespace DataTables.DatabaseUtil.Sqlserver
         /// <param name="dt">DataTable containing the results</param>
         /// <param name="q">Source query</param>
         public Result(Database db, System.Data.DataTable dt, Query q)
-            : base(db, dt, q)
-        {
-        }
+            : base(db, dt, q) { }
 
         /// <summary>
         /// Get the last insert ID from an insert query

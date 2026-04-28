@@ -9,11 +9,9 @@ namespace DataTables
     /// <summary>
     /// This  base class is used to extend models used in the 'Model()' method
     /// for the Editor class.
-    /// 
+    ///
     /// Currently it doesn't actually do anything, but there is a chance it
     /// will in future, so this is just for future compatibility
     /// </summary>
-    public class EditorModel
-    {
-    }
+    public class EditorModel { }
 }

@@ -21,7 +21,7 @@ namespace DataTables.EditorUtil
                 return data.ContainsKey(name);
             }
 
-            var names = name.Split(new [] {'.'});
+            var names = name.Split(new[] { '.' });
             var inner = data;
 
             for (int i = 0, ien = names.Length - 1; i < ien; i++)
@@ -37,7 +37,6 @@ namespace DataTables.EditorUtil
             return inner.ContainsKey(names.Last());
         }
 
-
         /// <summary>
         /// Read a value from a data structure, using Javascript dotted object
         /// notation. This is the inverse of the `_writeProp` method and provides
@@ -51,12 +50,10 @@ namespace DataTables.EditorUtil
         {
             if (!name.Contains("."))
             {
-                return inData.ContainsKey(name) ?
-                    inData[name] :
-                    null;
+                return inData.ContainsKey(name) ? inData[name] : null;
             }
 
-            var names = name.Split(new [] {'.'});
+            var names = name.Split(new[] { '.' });
             var inner = inData;
 
             for (var i = 0; i < names.Length - 1; i++)
@@ -69,9 +66,7 @@ namespace DataTables.EditorUtil
                 inner = inner[names[i]] as IDictionary<string, object>;
             }
 
-            return inner.ContainsKey(names.Last()) ?
-                inner[names.Last()] :
-                null;
+            return inner.ContainsKey(names.Last()) ? inner[names.Last()] : null;
         }
 
         /// <summary>
@@ -86,7 +81,12 @@ namespace DataTables.EditorUtil
         /// <param name="name">Javascript dotted object name to write to</param>
         /// <param name="value">Value to write</param>
         /// <param name="type">Type to convert to</param>
-        internal static void WriteProp(Dictionary<string, object> outData, string name, object value, Type type)
+        internal static void WriteProp(
+            Dictionary<string, object> outData,
+            string name,
+            object value,
+            Type type
+        )
         {
             if (!name.Contains("."))
             {
@@ -94,7 +94,7 @@ namespace DataTables.EditorUtil
                 return;
             }
 
-            var names = name.Split(new [] {'.'});
+            var names = name.Split(new[] { '.' });
             var inner = outData;
 
             for (var i = 0; i < names.Length - 1; i++)
@@ -108,9 +108,11 @@ namespace DataTables.EditorUtil
                 else if (!(inner[loopName] is Dictionary<string, object>))
                 {
                     throw new Exception(
-                        "A property with the name `" + name + "` already exists. This " +
-                        "can occur if you have properties which share a prefix - " +
-                        "for example `name` and `name.first`"
+                        "A property with the name `"
+                            + name
+                            + "` already exists. This "
+                            + "can occur if you have properties which share a prefix - "
+                            + "for example `name` and `name.first`"
                     );
                 }
 
@@ -120,15 +122,16 @@ namespace DataTables.EditorUtil
             if (inner.ContainsKey(names.Last()))
             {
                 throw new Exception(
-                    "Duplicate field detected - a field with the name `" + name + "` " +
-                    "already exists."
+                    "Duplicate field detected - a field with the name `"
+                        + name
+                        + "` "
+                        + "already exists."
                 );
             }
 
             // Attempt to cast to the type given
             WriteCast(inner, names.Last(), value, type);
         }
-
 
         /// <summary>
         /// Convert the value to the field's type, with error handling
@@ -137,7 +140,12 @@ namespace DataTables.EditorUtil
         /// <param name="name">Javascript dotted object name to write to</param>
         /// <param name="value">Value to write</param>
         /// <param name="type">Type to convert to</param>
-        internal static void WriteCast(Dictionary<string, object> outData, string name, object value, Type type)
+        internal static void WriteCast(
+            Dictionary<string, object> outData,
+            string name,
+            object value,
+            Type type
+        )
         {
             try
             {
@@ -156,7 +164,9 @@ namespace DataTables.EditorUtil
             }
             catch (Exception)
             {
-                throw new Exception("Unable to cast value to be " + type.Name + " from " + value.GetType());
+                throw new Exception(
+                    "Unable to cast value to be " + type.Name + " from " + value.GetType()
+                );
             }
         }
     }

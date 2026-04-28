@@ -26,7 +26,7 @@ namespace DataTables
         /// <summary>
         /// Create a new Options instance, to be configured by its methods.
         /// </summary>
-        public Options() {}
+        public Options() { }
 
         /// <summary>
         /// Create a new Options instance, setting basic database lookup details
@@ -60,7 +60,8 @@ namespace DataTables
         private List<string> _label;
         private readonly List<LeftJoin> _leftJoin = new List<LeftJoin>();
         private int _limit = -1;
-        private List<Dictionary<string, object>> _manualOpts = new List<Dictionary<string, object>>();
+        private List<Dictionary<string, object>> _manualOpts =
+            new List<Dictionary<string, object>>();
         private string _orderSql = null;
         private bool _orderLocal = true;
         private Func<Dictionary<string, object>, object> _renderer;
@@ -68,7 +69,6 @@ namespace DataTables
         private string _table;
         private string _value;
         private Action<Query> _where;
-
 
         /// <summary>
         /// Add a manually defined option to the list from the database. The object added should
@@ -83,7 +83,6 @@ namespace DataTables
 
             return this;
         }
-
 
         /// <summary>
         /// Add a manually defined option to the list from the database. Note that options added
@@ -107,12 +106,14 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Options Add(string label, object value)
         {
-            _manualOpts.Add(new Dictionary<string, object>
-            {
-                {"value", value},
-                {"label", label},
-                {"_manual", true}
-            });
+            _manualOpts.Add(
+                new Dictionary<string, object>
+                {
+                    { "value", value },
+                    { "label", label },
+                    { "_manual", true },
+                }
+            );
 
             return this;
         }
@@ -131,19 +132,25 @@ namespace DataTables
             {
                 if (int.TryParse(pair.Key, out var valueInt))
                 {
-                    _manualOpts.Add(new Dictionary<string, object> {
-                        { "value", valueInt },
-                        { "label", pair.Value },
-                        {"_manual", true}
-                    });
+                    _manualOpts.Add(
+                        new Dictionary<string, object>
+                        {
+                            { "value", valueInt },
+                            { "label", pair.Value },
+                            { "_manual", true },
+                        }
+                    );
                 }
                 else
                 {
-                    _manualOpts.Add(new Dictionary<string, object> {
-                        { "value", pair.Key },
-                        { "label", pair.Value },
-                        {"_manual", true}
-                    });
+                    _manualOpts.Add(
+                        new Dictionary<string, object>
+                        {
+                            { "value", pair.Key },
+                            { "label", pair.Value },
+                            { "_manual", true },
+                        }
+                    );
                 }
             }
 
@@ -350,11 +357,11 @@ namespace DataTables
 
         /// <summary>
         /// Use local ordering rather than in the SQL database.
-        /// 
+        ///
         /// If this option is `true` (which it is by default) the ordering will
         /// be based on the rendered output, either numerically or alphabetically
         /// based on the data returned by the renderer. If `false` no ordering
-        /// will be performed and whatever is returned from the database will 
+        /// will be performed and whatever is returned from the database will
         /// be used.
         /// </summary>
         /// <param name="order">Enable local sorting</param>
@@ -473,7 +480,6 @@ namespace DataTables
             return this;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
          */
@@ -491,8 +497,9 @@ namespace DataTables
             List<string> find = null
         )
         {
-		    // Local enablement
-            if (_get == false) {
+            // Local enablement
+            if (_get == false)
+            {
                 return null;
             }
 
@@ -514,20 +521,24 @@ namespace DataTables
             }
 
             // Default formatter if one isn't provided
-            var formatter = _renderer ?? (row =>
-            {
-                var list = new List<string>();
-
-                foreach (var label in _label)
-                {
-                    if (row[label] != null)
+            var formatter =
+                _renderer
+                ?? (
+                    row =>
                     {
-                        list.Add(row[label].ToString());
-                    }
-                }
+                        var list = new List<string>();
 
-                return string.Join(" ", list);
-            });
+                        foreach (var label in _label)
+                        {
+                            if (row[label] != null)
+                            {
+                                list.Add(row[label].ToString());
+                            }
+                        }
+
+                        return string.Join(" ", list);
+                    }
+                );
 
             // Get database data
             var options = ExecDb(db, find);
@@ -546,16 +557,14 @@ namespace DataTables
                 var rowLabel = opt.ContainsKey("_manual")
                     ? opt["label"] as string
                     : formatter(opt) as string;
-                var rowValue = opt.ContainsKey("_manual")
-                    ? opt["value"]
-                    : opt[_value];
+                var rowValue = opt.ContainsKey("_manual") ? opt["value"] : opt[_value];
 
                 // Apply the search to the rendered label. Need to do it here rather than in SQL since
                 // the label is rendered in script.
                 if (
-                    search == null ||
-                    search == "" ||
-                    rowLabel.ToLower().IndexOf(search.ToLower()) == 0
+                    search == null
+                    || search == ""
+                    || rowLabel.ToLower().IndexOf(search.ToLower()) == 0
                 )
                 {
                     var option = new Dictionary<string, object>();
@@ -594,7 +603,7 @@ namespace DataTables
             {
                 output = DistinctByAllPairs(output);
             }
-            
+
             return output;
         }
 
@@ -606,12 +615,13 @@ namespace DataTables
         /// <returns>List of found options</returns>
         internal List<Dictionary<string, object>> ExecDb(Database db, List<string> find)
         {
-            if (_table is null  || _value is null|| _label is null || _label.Count == 0) 
+            if (_table is null || _value is null || _label is null || _label.Count == 0)
                 return new List<Dictionary<string, object>>();
-            
+
             var fields = new List<string>(_label);
 
-            if (! fields.Contains(_value)) {
+            if (!fields.Contains(_value))
+            {
                 fields.Add(_value);
             }
 
@@ -643,9 +653,7 @@ namespace DataTables
                 q.Order(_label[0] + " asc");
             }
 
-            var rows = q
-                .Exec()
-                .FetchAll();
+            var rows = q.Exec().FetchAll();
 
             return rows;
         }
@@ -671,7 +679,7 @@ namespace DataTables
         {
             return Exec(db, false, term);
         }
-        
+
         /// <summary>
         /// Removes duplicate dictionaries from <paramref name="items"/> by
         /// comparing their full set of key/value pairs (order independent),
@@ -704,7 +712,7 @@ namespace DataTables
 
             return result;
         }
-        
+
         /// <summary>
         /// Fingerprint a key/value list
         /// </summary>
@@ -712,8 +720,9 @@ namespace DataTables
         /// <returns>Fingerprint</returns>
         internal static string Fingerprint(Dictionary<string, object> d)
         {
-            return string.Join("|",
-                d.OrderBy(kvp => kvp.Key, StringComparer.Ordinal )
+            return string.Join(
+                "|",
+                d.OrderBy(kvp => kvp.Key, StringComparer.Ordinal)
                     .Select(kvp => $"{kvp.Key}={kvp.Value}")
             );
         }

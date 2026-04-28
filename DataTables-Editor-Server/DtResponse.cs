@@ -47,7 +47,6 @@ namespace DataTables
         /// </summary>
         public int? recordsFiltered { get; set; }
 
-
         /* Editor parameters */
 
         /// <summary>
@@ -59,8 +58,7 @@ namespace DataTables
         /// List of field errors if one or more fields are in an error state
         /// when validated
         /// </summary>
-        public List<FieldError> fieldErrors { get; set; } =
-            new List<FieldError>();
+        public List<FieldError> fieldErrors { get; set; } = new List<FieldError>();
 
         /// <summary>
         /// Id of the newly created row for the create action
@@ -71,38 +69,36 @@ namespace DataTables
         /// Information that can be processes in the Ajax callback handlers can
         /// be added here. It is not actively used by the libraries.
         /// </summary>
-        public Dictionary<string, object> meta { get; set; } =
-            new Dictionary<string, object>();
+        public Dictionary<string, object> meta { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// List of options for Editor `select`, `radio` and `checkbox` field types
         /// </summary>
-        public Dictionary<string, object> options { get; set; } =
-            new Dictionary<string, object>();
+        public Dictionary<string, object> options { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Object containing a list of options from SearchPanes
         /// </summary>
-        public SearchBuilderReturn searchBuilder { get; set; } = 
-            new SearchBuilderReturn();
+        public SearchBuilderReturn searchBuilder { get; set; } = new SearchBuilderReturn();
 
         /// <summary>
         /// Object containing a list of options from SearchPanes
         /// </summary>
-        public SearchPanesReturn searchPanes { get; set; } = 
-            new SearchPanesReturn();
+        public SearchPanesReturn searchPanes { get; set; } = new SearchPanesReturn();
 
         /// <summary>
         /// File information for the upload input types
         /// </summary>
-        public Dictionary<string, Dictionary<string, Dictionary<string, object>>> files { get; set; } =
+        public Dictionary<
+            string,
+            Dictionary<string, Dictionary<string, object>>
+        > files { get; set; } =
             new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
 
         /// <summary>
         /// Row data on update action
         /// </summary>
-        public ResponseUpload upload { get; set; } =
-            new ResponseUpload();
+        public ResponseUpload upload { get; set; } = new ResponseUpload();
 
         /// <summary>
         /// If debug mode is enabled, this property will be populated with information
@@ -120,8 +116,6 @@ namespace DataTables
         /// </summary>
         public Dictionary<string, object> columnControl { get; set; } =
             new Dictionary<string, object>();
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
@@ -177,19 +171,29 @@ namespace DataTables
                 this.options = b.options;
             }
 
-            if (b.searchPanes != null && b.searchPanes.options != null && b.searchPanes.options.Count() != 0)
+            if (
+                b.searchPanes != null
+                && b.searchPanes.options != null
+                && b.searchPanes.options.Count() != 0
+            )
             {
                 this.searchPanes.options = b.searchPanes.options;
             }
-            else if (b.searchPanes == null) {
+            else if (b.searchPanes == null)
+            {
                 this.searchPanes = null;
             }
 
-            if (b.searchBuilder != null && b.searchBuilder.options != null && b.searchBuilder.options.Count() != 0)
+            if (
+                b.searchBuilder != null
+                && b.searchBuilder.options != null
+                && b.searchBuilder.options.Count() != 0
+            )
             {
                 this.searchBuilder.options = b.searchBuilder.options;
             }
-            else if (b.searchBuilder == null) {
+            else if (b.searchBuilder == null)
+            {
                 this.searchBuilder = null;
             }
 
@@ -200,8 +204,6 @@ namespace DataTables
 
             return this;
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Nested class

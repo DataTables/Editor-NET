@@ -1,4 +1,4 @@
-// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
+﻿// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // DataTables database abstraction library core class.
@@ -12,12 +12,12 @@ namespace DataTables
 {
     /// <summary>
     /// DataTables Database connection object.
-    /// 
+    ///
     /// Create a database connection which may then have queries performed upon it.
-    /// 
+    ///
     /// This is a database abstraction class that can be used on multiple different
     /// databases. As a result of this, it might not be suitable to perform complex
-    /// queries through this interface or vendor specific queries, but everything 
+    /// queries through this interface or vendor specific queries, but everything
     /// required for basic database interaction is provided through the abstracted
     /// methods.
     /// </summary>
@@ -29,7 +29,7 @@ namespace DataTables
         private DbConnection _Conn;
         private bool _DbInited = false;
         private Action<object> _DebugCallback = null;
-        
+
         public DbTransaction DbTransaction = null;
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace DataTables
             {
                 throw new Exception("Debug mode is enabled by adding a callback");
             }
- 
+
             _DebugCallback = null;
             return this;
         }
@@ -131,11 +131,7 @@ namespace DataTables
         {
             if (_DebugCallback != null)
             {
-                _DebugCallback(new DebugInfo
-                {
-                    Query = sql,
-                    Bindings = bindings
-                });
+                _DebugCallback(new DebugInfo { Query = sql, Bindings = bindings });
             }
 
             return this;
@@ -198,11 +194,7 @@ namespace DataTables
         /// <returns>Boolean flag - true if there were rows</returns>
         public bool Any(string table, Action<Query> where = null)
         {
-            var res = Query("select")
-                .Table(table)
-                .Get("*")
-                .Where(where)
-                .Exec();
+            var res = Query("select").Table(table).Get("*").Where(where).Exec();
 
             return res.Count() > 0;
         }
@@ -230,14 +222,14 @@ namespace DataTables
         /// Get the database type
         /// </summary>
         /// <returns>Database type</returns>
-        public string DbType ()
+        public string DbType()
         {
             return _DbType;
         }
 
         /// <summary>
         /// Perform a delete query on a table.
-        /// 
+        ///
         /// This is a short cut method that creates and update query and then uses the
         /// <code>query('delete')</code>, table, where and exec methods of the query.
         /// </summary>
@@ -246,10 +238,7 @@ namespace DataTables
         /// <returns>Result instance</returns>
         public Result Delete(string table, Dictionary<string, dynamic> where)
         {
-            return Query("delete")
-                    .Table(table)
-                    .Where(where)
-                    .Exec();
+            return Query("delete").Table(table).Where(where).Exec();
         }
 
         /// <summary>
@@ -270,7 +259,7 @@ namespace DataTables
 
         /// <summary>
         /// Insert data into a table.
-        /// 
+        ///
         /// This is a short cut method that creates an update query and then uses
         /// the <code>query('insert')</code>, table, set and exec methods of the query.
         /// </summary>
@@ -281,13 +270,9 @@ namespace DataTables
         /// doesn't need to be set, but it must be if you want to use the
         /// `Result.InsertId()` method.</param>
         /// <returns>Result instance</returns>
-        public Result Insert(string table, Dictionary<string, dynamic> set, string[] pkey=null)
+        public Result Insert(string table, Dictionary<string, dynamic> set, string[] pkey = null)
         {
-            return Query("insert")
-                .Pkey(pkey)
-                .Table(table)
-                .Set(set)
-                .Exec();
+            return Query("insert").Pkey(pkey).Table(table).Set(set).Exec();
         }
 
         /// <summary>
@@ -302,7 +287,12 @@ namespace DataTables
         /// doesn't need to be set, but it must be if you want to use the
         /// `Result.InsertId()` method.</param>
         /// <returns>Result instance</returns>
-        public Result Push(string table, Dictionary<string, dynamic> set, Dictionary<string, dynamic> where, string[] pkey=null)
+        public Result Push(
+            string table,
+            Dictionary<string, dynamic> set,
+            Dictionary<string, dynamic> where,
+            string[] pkey = null
+        )
         {
             var selectColumns = new[] { "*" };
 
@@ -425,7 +415,7 @@ namespace DataTables
 
         /// <summary>
         /// Select data from a table.
-        /// 
+        ///
         /// This is a short cut method that creates an update query and then uses
         /// the <code>query('select')</code>, table, get, where and exec methods
         /// of the query.
@@ -435,24 +425,24 @@ namespace DataTables
         /// <param name="where">Where condition for what to select</param>
         /// <param name="orderBy">Order by condition</param>
         /// <returns>Result instance</returns>
-        public Result Select(string table, IEnumerable<string> field = null, Dictionary<string, dynamic> where = null, IEnumerable<string> orderBy = null)
+        public Result Select(
+            string table,
+            IEnumerable<string> field = null,
+            Dictionary<string, dynamic> where = null,
+            IEnumerable<string> orderBy = null
+        )
         {
             if (field == null)
             {
                 field = new[] { "*" };
             }
 
-            return Query("select")
-                .Table(table)
-                .Get(field)
-                .Where(where)
-                .Order(orderBy)
-                .Exec();
+            return Query("select").Table(table).Get(field).Where(where).Order(orderBy).Exec();
         }
 
         /// <summary>
         /// Select data from a table.
-        /// 
+        ///
         /// This is a short cut method that creates an update query and then uses
         /// the <code>query('select')</code>, table, get, where and exec methods
         /// of the query.
@@ -462,24 +452,24 @@ namespace DataTables
         /// <param name="where">Where condition for what to select</param>
         /// <param name="orderBy">Order by condition</param>
         /// <returns>Result instance</returns>
-        public Result Select(string table, IEnumerable<string> field = null, Action<Query> where = null, IEnumerable<string> orderBy = null)
+        public Result Select(
+            string table,
+            IEnumerable<string> field = null,
+            Action<Query> where = null,
+            IEnumerable<string> orderBy = null
+        )
         {
             if (field == null)
             {
                 field = new[] { "*" };
             }
 
-            return Query("select")
-                .Table(table)
-                .Get(field)
-                .Where(where)
-                .Order(orderBy)
-                .Exec();
+            return Query("select").Table(table).Get(field).Where(where).Order(orderBy).Exec();
         }
 
         /// <summary>
         /// Select distinct data from a table.
-        /// 
+        ///
         /// This is a short cut method that creates an update query and then uses the
         /// <code>query('select')</code>, distinct ,table, get, where and exec methods of the
         /// query.
@@ -489,35 +479,12 @@ namespace DataTables
         /// <param name="where">Where condition for what to select</param>
         /// <param name="orderBy">Order by condition</param>
         /// <returns>Result instance</returns>
-        public Result SelectDistinct(string table, IEnumerable<string> field = null, Dictionary<string, dynamic> where = null, IEnumerable<string> orderBy = null)
-        {
-            if (field == null)
-            {
-                field = new[] { "*" };
-            }
-
-            return Query("select")
-                .Table(table)
-                .Distinct(true)
-                .Get(field)
-                .Where(where)
-                .Order(orderBy)
-                .Exec();
-        }
-
-        /// <summary>
-        /// Select distinct data from a table.
-        /// 
-        /// This is a short cut method that creates an update query and then uses the
-        /// <code>query('select')</code>, distinct ,table, get, where and exec methods of the
-        /// query.
-        /// </summary>
-        /// <param name="table">Table name to act upon</param>
-        /// <param name="field">Collection of field names to get. If null all fields are returned</param>
-        /// <param name="where">Where condition for what to select</param>
-        /// <param name="orderBy">Order by condition</param>
-        /// <returns>Result instance</returns>
-        public Result SelectDistinct(string table, IEnumerable<string> field = null, Action<Query> where = null, string orderBy = null)
+        public Result SelectDistinct(
+            string table,
+            IEnumerable<string> field = null,
+            Dictionary<string, dynamic> where = null,
+            IEnumerable<string> orderBy = null
+        )
         {
             if (field == null)
             {
@@ -535,7 +502,7 @@ namespace DataTables
 
         /// <summary>
         /// Select distinct data from a table.
-        /// 
+        ///
         /// This is a short cut method that creates an update query and then uses the
         /// <code>query('select')</code>, distinct ,table, get, where and exec methods of the
         /// query.
@@ -545,7 +512,45 @@ namespace DataTables
         /// <param name="where">Where condition for what to select</param>
         /// <param name="orderBy">Order by condition</param>
         /// <returns>Result instance</returns>
-        public Result SelectDistinct(string table, IEnumerable<string> field = null, Action<Query> where = null, IEnumerable<string> orderBy = null)
+        public Result SelectDistinct(
+            string table,
+            IEnumerable<string> field = null,
+            Action<Query> where = null,
+            string orderBy = null
+        )
+        {
+            if (field == null)
+            {
+                field = new[] { "*" };
+            }
+
+            return Query("select")
+                .Table(table)
+                .Distinct(true)
+                .Get(field)
+                .Where(where)
+                .Order(orderBy)
+                .Exec();
+        }
+
+        /// <summary>
+        /// Select distinct data from a table.
+        ///
+        /// This is a short cut method that creates an update query and then uses the
+        /// <code>query('select')</code>, distinct ,table, get, where and exec methods of the
+        /// query.
+        /// </summary>
+        /// <param name="table">Table name to act upon</param>
+        /// <param name="field">Collection of field names to get. If null all fields are returned</param>
+        /// <param name="where">Where condition for what to select</param>
+        /// <param name="orderBy">Order by condition</param>
+        /// <returns>Result instance</returns>
+        public Result SelectDistinct(
+            string table,
+            IEnumerable<string> field = null,
+            Action<Query> where = null,
+            IEnumerable<string> orderBy = null
+        )
         {
             if (field == null)
             {
@@ -593,13 +598,13 @@ namespace DataTables
         /// <param name="set">Field names and values to set</param>
         /// <param name="where">Where condition for what to update</param>
         /// <returns>Self for chaining</returns>
-        public Result Update(string table, Dictionary<string, dynamic> set, Dictionary<string, dynamic> where)
+        public Result Update(
+            string table,
+            Dictionary<string, dynamic> set,
+            Dictionary<string, dynamic> where
+        )
         {
-            return Query("update")
-                .Table(table)
-                .Set(set)
-                .Where(where)
-                .Exec();
+            return Query("update").Table(table).Set(set).Where(where).Exec();
         }
     }
 }

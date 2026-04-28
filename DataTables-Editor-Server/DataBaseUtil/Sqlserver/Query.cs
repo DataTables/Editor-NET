@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
 using DataTables.DatabaseUtil;
 
 namespace DataTables.DatabaseUtil.Sqlserver
@@ -22,9 +22,7 @@ namespace DataTables.DatabaseUtil.Sqlserver
         /// <param name="db">Host database</param>
         /// <param name="type">Query type</param>
         public Query(Database db, string type)
-            : base(db, type)
-        {
-        }
+            : base(db, type) { }
 
         /// <summary>
         /// Create LIMIT / OFFSET for SQL Server 2012+. Note that this will only work
@@ -57,7 +55,6 @@ namespace DataTables.DatabaseUtil.Sqlserver
             return limit;
         }
 
-
         /// <summary>
         /// Bind parameters to the SQL statement
         /// </summary>
@@ -73,36 +70,39 @@ namespace DataTables.DatabaseUtil.Sqlserver
             if (_type == "insert")
             {
                 var pkeyCmd = provider.CreateCommand();
-                var parts = _table[0].Split(new [] {'.'});
+                var parts = _table[0].Split(new[] { '.' });
                 var schemaName = parts.Count() > 1 ? parts[0] : "";
                 var tableName = parts.Count() > 1 ? parts[1] : _table[0];
                 var pkey = Pkey();
 
-                if (pkey != null && pkey.Count() == 1) {
+                if (pkey != null && pkey.Count() == 1)
+                {
                     // We've got a primary key name - we need to determine its data type
-                    var schemaQuery = schemaName != "" ?
-                        " TABLE_SCHEMA = @schema AND " :
-                        "";
+                    var schemaQuery = schemaName != "" ? " TABLE_SCHEMA = @schema AND " : "";
 
                     // Note that readin the column name is rather redundant here since we
                     // already know it - but it means the code below can be used for both
                     // the known and unknown state
-                    pkeyCmd.CommandText = @"
+                    pkeyCmd.CommandText =
+                        @"
                         SELECT
                             DATA_TYPE as data_type,
                             CHARACTER_MAXIMUM_LENGTH as data_length,
                             COLUMN_NAME as column_name
                         FROM INFORMATION_SCHEMA.COLUMNS
                         WHERE 
-                            " + schemaQuery + @"
+                            "
+                        + schemaQuery
+                        + @"
                             TABLE_NAME   = @table AND 
                             COLUMN_NAME  = @column
                     ";
 
                     var column = pkey[0];
 
-                    if (column.Contains(".")) {
-                        var split = column.Split(new [] {'.'});
+                    if (column.Contains("."))
+                    {
+                        var split = column.Split(new[] { '.' });
                         column = split.Last();
                     }
 
@@ -111,14 +111,14 @@ namespace DataTables.DatabaseUtil.Sqlserver
                     param.Value = column;
                     pkeyCmd.Parameters.Add(param);
                 }
-                else {
+                else
+                {
                     // Don't have the primary key name - need to try and work out what it is
-                    var schemaQuery = schemaName != "" ?
-                        " KCU.TABLE_SCHEMA = @schema AND " :
-                        "";
+                    var schemaQuery = schemaName != "" ? " KCU.TABLE_SCHEMA = @schema AND " : "";
 
                     // We need to find out what the primary key column name and type is
-                    pkeyCmd.CommandText = @"
+                    pkeyCmd.CommandText =
+                        @"
                         SELECT
                             KCU.table_name as table_name,
                             KCU.column_name as column_name,
@@ -127,9 +127,9 @@ namespace DataTables.DatabaseUtil.Sqlserver
                         FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC
                         INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU ON
                             TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND
-                            TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND " +
-                            schemaQuery +
-                            @"KCU.TABLE_NAME = @table
+                            TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME AND "
+                        + schemaQuery
+                        + @"KCU.TABLE_NAME = @table
                         JOIN
                             INFORMATION_SCHEMA.COLUMNS as C ON
                                 C.table_name = KCU.table_name AND
@@ -146,7 +146,8 @@ namespace DataTables.DatabaseUtil.Sqlserver
                 param.Value = tableName;
                 pkeyCmd.Parameters.Add(param);
 
-                if (schemaName != "") {
+                if (schemaName != "")
+                {
                     param = pkeyCmd.CreateParameter();
                     param.ParameterName = "@schema";
                     param.Value = schemaName;
@@ -163,14 +164,25 @@ namespace DataTables.DatabaseUtil.Sqlserver
                         // This is required for tables which have a trigger on insert
                         // See thread 29556. We can't just use 'SELECT SCOPE_IDENTITY()'
                         // since the primary key might not be an identity column
-                        sql = dr["data_length"] != DBNull.Value ?
-                            "DECLARE @T TABLE ( insert_id " + dr["data_type"] + " (" + dr["data_length"] + ") ); " + sql :
-                            "DECLARE @T TABLE ( insert_id " + dr["data_type"] + " ); " + sql;
-                        sql = sql.Replace(" VALUES (",
-                            " OUTPUT INSERTED." + dr["column_name"] + " as insert_id INTO @T VALUES (");
+                        sql =
+                            dr["data_length"] != DBNull.Value
+                                ? "DECLARE @T TABLE ( insert_id "
+                                    + dr["data_type"]
+                                    + " ("
+                                    + dr["data_length"]
+                                    + ") ); "
+                                    + sql
+                                : "DECLARE @T TABLE ( insert_id " + dr["data_type"] + " ); " + sql;
+                        sql = sql.Replace(
+                            " VALUES (",
+                            " OUTPUT INSERTED."
+                                + dr["column_name"]
+                                + " as insert_id INTO @T VALUES ("
+                        );
                         sql += "; SELECT insert_id FROM @T";
                     }
-                    else {
+                    else
+                    {
                         _db.DebugInfo("No pkey data found");
                     }
                 }
@@ -180,7 +192,8 @@ namespace DataTables.DatabaseUtil.Sqlserver
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
-            if (_db.CommandTimeout != -1) {
+            if (_db.CommandTimeout != -1)
+            {
                 cmd.CommandTimeout = _db.CommandTimeout;
             }
 
@@ -205,7 +218,6 @@ namespace DataTables.DatabaseUtil.Sqlserver
 
             _db.DebugInfo(sql, _bindings);
         }
-
 
         /// <summary>
         /// Execute the SQL command

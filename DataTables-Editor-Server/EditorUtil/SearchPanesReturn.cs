@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 namespace DataTables.EditorUtil
 {
     /// <summary>

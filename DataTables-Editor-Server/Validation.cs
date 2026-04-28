@@ -43,7 +43,9 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> None(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> None(
+            ValidationOpts cfg = null
+        )
         {
             return (val, data, host) => null;
         }
@@ -56,11 +58,13 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Basic(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Basic(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
@@ -72,13 +76,15 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Required(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Required(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
             opts.Empty = false;
             opts.Optional = false;
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
@@ -90,29 +96,32 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> NotEmpty(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> NotEmpty(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
             opts.Empty = false;
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 return common == false ? opts.Message : null;
             };
         }
 
-
         /// <summary>
         /// Validate an input as a boolean value.
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Boolean(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Boolean(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -131,7 +140,6 @@ namespace DataTables
             };
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Number validation methods
          */
@@ -142,11 +150,14 @@ namespace DataTables
         /// <param name="culture">Numeric conversion culture</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Numeric(string culture = "en-US", ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Numeric(
+            string culture = "en-US",
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -172,11 +183,15 @@ namespace DataTables
         /// <param name="culture">Numeric conversion culture</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(decimal min, string culture = "en-US", ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(
+            decimal min,
+            string culture = "en-US",
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -191,9 +206,7 @@ namespace DataTables
                 }
 
                 // Converted to dec must be possible since Numeric passed to get here
-                return Convert.ToDecimal(val, new CultureInfo(culture)) < min ?
-                    opts.Message :
-                    null;
+                return Convert.ToDecimal(val, new CultureInfo(culture)) < min ? opts.Message : null;
             };
         }
 
@@ -203,8 +216,10 @@ namespace DataTables
         /// <param name="min">Minimum value the numeric value can take</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(decimal min,
-            ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinNum(
+            decimal min,
+            ValidationOpts cfg = null
+        )
         {
             return MinNum(min, "en-US", cfg);
         }
@@ -216,11 +231,15 @@ namespace DataTables
         /// <param name="culture">Numeric conversion culture</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxNum(decimal max, string culture = "en-US", ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxNum(
+            decimal max,
+            string culture = "en-US",
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -235,9 +254,7 @@ namespace DataTables
                 }
 
                 // Converted to dec must be possible since Numeric passed to get here
-                return Convert.ToDecimal(val, new CultureInfo(culture)) > max ?
-                    opts.Message :
-                    null;
+                return Convert.ToDecimal(val, new CultureInfo(culture)) > max ? opts.Message : null;
             };
         }
 
@@ -247,7 +264,10 @@ namespace DataTables
         /// <param name="max">Maximum value the numeric value can take</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxNum(decimal max, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxNum(
+            decimal max,
+            ValidationOpts cfg = null
+        )
         {
             return MaxNum(max, "en-US", cfg);
         }
@@ -260,11 +280,16 @@ namespace DataTables
         /// <param name="culture">Numeric conversion culture</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxNum(decimal min, decimal max, string culture = "en-US", ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxNum(
+            decimal min,
+            decimal max,
+            string culture = "en-US",
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -280,9 +305,7 @@ namespace DataTables
 
                 // Converted to dec must be possible since Numeric passed to get here
                 var dec = Convert.ToDecimal(val, new CultureInfo(culture));
-                return dec < min || dec > max ?
-                    opts.Message :
-                    null;
+                return dec < min || dec > max ? opts.Message : null;
             };
         }
 
@@ -293,12 +316,14 @@ namespace DataTables
         /// <param name="max">Maximum value the numeric value can take</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxNum(decimal min, decimal max, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxNum(
+            decimal min,
+            decimal max,
+            ValidationOpts cfg = null
+        )
         {
             return MinMaxNum(min, max, "en-US", cfg);
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * String validation methods
@@ -309,11 +334,13 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Email(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Email(
+            ValidationOpts cfg = null
+        )
         {
             ValidationOpts opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -339,11 +366,14 @@ namespace DataTables
         /// <param name="min">Minimum length</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinLen(int min, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinLen(
+            int min,
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -352,9 +382,7 @@ namespace DataTables
                 }
 
                 var str = Convert.ToString(val);
-                return str.Length < min ?
-                    opts.Message :
-                    null;
+                return str.Length < min ? opts.Message : null;
             };
         }
 
@@ -364,11 +392,14 @@ namespace DataTables
         /// <param name="max">Maximum length</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxLen(int max, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MaxLen(
+            int max,
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -377,9 +408,7 @@ namespace DataTables
                 }
 
                 var str = Convert.ToString(val);
-                return str.Length > max ?
-                    opts.Message :
-                    null;
+                return str.Length > max ? opts.Message : null;
             };
         }
 
@@ -390,11 +419,15 @@ namespace DataTables
         /// <param name="max">Maximum length</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxLen(int min, int max, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> MinMaxLen(
+            int min,
+            int max,
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -403,9 +436,7 @@ namespace DataTables
                 }
 
                 var str = Convert.ToString(val);
-                return str.Length < min || str.Length > max ?
-                    opts.Message :
-                    null;
+                return str.Length < min || str.Length > max ? opts.Message : null;
             };
         }
 
@@ -414,11 +445,13 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Ip(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Ip(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -428,9 +461,7 @@ namespace DataTables
 
                 var str = Convert.ToString(val);
                 System.Net.IPAddress addr;
-                return System.Net.IPAddress.TryParse(str, out addr) ?
-                    null :
-                    opts.Message;
+                return System.Net.IPAddress.TryParse(str, out addr) ? null : opts.Message;
             };
         }
 
@@ -439,11 +470,13 @@ namespace DataTables
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Url(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Url(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -453,23 +486,24 @@ namespace DataTables
 
                 var str = Convert.ToString(val);
                 Uri addr;
-                return Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out addr) ?
-                    null :
-                    opts.Message;
+                return Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out addr)
+                    ? null
+                    : opts.Message;
             };
         }
-
 
         /// <summary>
         /// Check if string could contain an XSS attack string
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Xss(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Xss(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -482,12 +516,9 @@ namespace DataTables
                     return null;
                 }
 
-                return host.Field.XssSafety((string)val) == (string)val
-                    ? null
-                    : opts.Message;
+                return host.Field.XssSafety((string)val) == (string)val ? null : opts.Message;
             };
         }
-
 
         /// <summary>
         /// Confirm that the value submitted is in a list of allowable values
@@ -495,11 +526,14 @@ namespace DataTables
         /// <param name="cfg">Validation options</param>
         /// <param name="valid">List of values that are valid</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> Values(ValidationOpts cfg = null, IEnumerable<object> valid = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> Values(
+            ValidationOpts cfg = null,
+            IEnumerable<object> valid = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -508,23 +542,22 @@ namespace DataTables
                 }
 
                 // If defined in local options
-                return valid != null && valid.Contains(val) ?
-                    null :
-                    opts.Message;
+                return valid != null && valid.Contains(val) ? null : opts.Message;
             };
         }
-
 
         /// <summary>
         /// Ensure that the submitted string does not contain HTML tags
         /// </summary>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> NoTags(ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> NoTags(
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -539,13 +572,9 @@ namespace DataTables
 
                 var tagRegex = new Regex(@"<[^>]+>");
 
-                return tagRegex.IsMatch((string)val)
-                    ? opts.Message
-                    : null;
+                return tagRegex.IsMatch((string)val) ? opts.Message : null;
             };
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Date validation methods
@@ -557,11 +586,14 @@ namespace DataTables
         /// <param name="format">Format that the date / time should be given in</param>
         /// <param name="cfg">Validation options</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> DateFormat(string format, ValidationOpts cfg = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> DateFormat(
+            string format,
+            ValidationOpts cfg = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -572,7 +604,11 @@ namespace DataTables
                 try
                 {
                     var str = Convert.ToString(val);
-                    DateTime.ParseExact(str, format, System.Globalization.CultureInfo.InvariantCulture);
+                    DateTime.ParseExact(
+                        str,
+                        format,
+                        System.Globalization.CultureInfo.InvariantCulture
+                    );
                     return null; // If no exceptions - then valid
                 }
                 catch (Exception) { }
@@ -580,8 +616,6 @@ namespace DataTables
                 return opts.Message;
             };
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Database validation methods
@@ -596,7 +630,11 @@ namespace DataTables
         /// <param name="db">Database connection. If not given the host Editor's database connection is used</param>
         /// <returns>Validation delegate</returns>
         public static Func<object, Dictionary<string, object>, ValidationHost, string> Unique(
-            ValidationOpts cfg = null, string column = null, string table = null, Database db = null)
+            ValidationOpts cfg = null,
+            string column = null,
+            string table = null,
+            Database db = null
+        )
         {
             return _Unique(cfg, column, table, db);
         }
@@ -611,7 +649,11 @@ namespace DataTables
         /// <param name="db">Database connection. If not given the host Editor's database connection is used</param>
         /// <returns>Validation delegate</returns>
         public static Func<object, Dictionary<string, object>, ValidationHost, string> Unique<T>(
-            ValidationOpts cfg = null, string column = null, string table = null, Database db = null)
+            ValidationOpts cfg = null,
+            string column = null,
+            string table = null,
+            Database db = null
+        )
         {
             return _Unique(cfg, column, table, db, typeof(T));
         }
@@ -629,11 +671,17 @@ namespace DataTables
         /// <param name="db">Database connection. If not given the host Editor's database connection is used</param>
         /// <param name="valid">List of values that are valid in addition to the values found via the database</param>
         /// <returns>Validation delegate</returns>
-        public static Func<object, Dictionary<string, object>, ValidationHost, string> DbValues(ValidationOpts cfg = null, string column = null, string table = null, Database db = null, IEnumerable<object> valid = null)
+        public static Func<object, Dictionary<string, object>, ValidationHost, string> DbValues(
+            ValidationOpts cfg = null,
+            string column = null,
+            string table = null,
+            Database db = null,
+            IEnumerable<object> valid = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -664,7 +712,10 @@ namespace DataTables
 
                 if (table == null || column == null)
                 {
-                    throw new Exception("Table or column for database value check is not defined for field " + host.Field.Name());
+                    throw new Exception(
+                        "Table or column for database value check is not defined for field "
+                            + host.Field.Name()
+                    );
                 }
 
                 try
@@ -676,9 +727,7 @@ namespace DataTables
                         .Exec()
                         .Count();
 
-                    return count == 0 ?
-                        opts.Message :
-                        null;
+                    return count == 0 ? opts.Message : null;
                 }
                 catch (Exception)
                 {
@@ -686,7 +735,6 @@ namespace DataTables
                 }
             };
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * File validation methods
@@ -698,16 +746,15 @@ namespace DataTables
         /// <param name="size">Max file size in bytes</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>File validation delegate</returns>
-        public static Func<IFormFile, string> FileSize(int size, string msg = "Uploaded file is too large.")
+        public static Func<IFormFile, string> FileSize(
+            int size,
+            string msg = "Uploaded file is too large."
+        )
         {
 #if NETCOREAPP
-            return file => file.Length > size
-                ? msg
-                : null;
+            return file => file.Length > size ? msg : null;
 #else
-            return file => file.ContentLength > size
-                ? msg
-                : null;
+            return file => file.ContentLength > size ? msg : null;
 #endif
         }
 
@@ -717,9 +764,12 @@ namespace DataTables
         /// <param name="extensions">List of extensions that are allowed. This is case insensitive.</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>File validation delegate</returns>
-        public static Func<IFormFile, string> FileExtensions(IEnumerable<string> extensions, string msg = "Invalid file type.")
+        public static Func<IFormFile, string> FileExtensions(
+            IEnumerable<string> extensions,
+            string msg = "Invalid file type."
+        )
         {
-            return delegate (IFormFile file)
+            return delegate(IFormFile file)
             {
                 var extn = Path.GetExtension(file.FileName).Replace(".", "");
                 return extensions.Contains(extn, StringComparer.InvariantCultureIgnoreCase)
@@ -727,8 +777,6 @@ namespace DataTables
                     : msg;
             };
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Mjoin validation
@@ -740,16 +788,22 @@ namespace DataTables
         /// <param name="count">Minimum number of items required.</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>Mjoin validation delegate</returns>
-        public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMinCount(int count, string msg = "Too few items")
+        public static Func<
+            Editor,
+            DtRequest.RequestTypes,
+            Dictionary<string, object>,
+            string
+        > MjoinMinCount(int count, string msg = "Too few items")
         {
-            return delegate (Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            return delegate(
+                Editor editor,
+                DtRequest.RequestTypes action,
+                Dictionary<string, object> data
+            )
             {
-                return data.Count < count
-                    ? msg
-                    : null;
+                return data.Count < count ? msg : null;
             };
         }
-
 
         /// <summary>
         /// Mjoin maximum number of selected values validation
@@ -757,26 +811,38 @@ namespace DataTables
         /// <param name="count">Maximum number of items required.</param>
         /// <param name="msg">Error message if validation fails.</param>
         /// <returns>Mjoin validation delegate</returns>
-        public static Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> MjoinMaxCount(int count, string msg = "Too many items")
+        public static Func<
+            Editor,
+            DtRequest.RequestTypes,
+            Dictionary<string, object>,
+            string
+        > MjoinMaxCount(int count, string msg = "Too many items")
         {
-            return delegate (Editor editor, DtRequest.RequestTypes action, Dictionary<string, object> data)
+            return delegate(
+                Editor editor,
+                DtRequest.RequestTypes action,
+                Dictionary<string, object> data
+            )
             {
-                return data.Count > count
-                    ? msg
-                    : null;
+                return data.Count > count ? msg : null;
             };
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
          */
 
-        private static Func<object, Dictionary<string, object>, ValidationHost, string> _Unique(ValidationOpts cfg = null, string column = null, string table = null, Database db = null, Type t = null)
+        private static Func<object, Dictionary<string, object>, ValidationHost, string> _Unique(
+            ValidationOpts cfg = null,
+            string column = null,
+            string table = null,
+            Database db = null,
+            Type t = null
+        )
         {
             var opts = ValidationOpts.Select(cfg);
 
-            return delegate (object val, Dictionary<string, object> data, ValidationHost host)
+            return delegate(object val, Dictionary<string, object> data, ValidationHost host)
             {
                 var common = _Common(val, opts, data, host);
                 if (common != null)
@@ -804,10 +870,7 @@ namespace DataTables
                     val = Convert.ChangeType(val, t);
                 }
 
-                var query = db.Query("select")
-                    .Table(table)
-                    .Get(column)
-                    .Where(column, val);
+                var query = db.Query("select").Table(table).Get(column).Where(column, val);
 
                 // If doing an edit then we need to also discount the current row,
                 // since it is of course already validly unique
@@ -819,9 +882,7 @@ namespace DataTables
 
                 var res = query.Exec();
 
-                return res.Count() == 0 ?
-                    null :
-                    opts.Message;
+                return res.Count() == 0 ? null : opts.Message;
             };
         }
 
@@ -849,11 +910,11 @@ namespace DataTables
             }
 
             // Error state tests
-                if (!opts.Optional && val == null)
-                {
-                    // Value must be given
-                    return false;
-                }
+            if (!opts.Optional && val == null)
+            {
+                // Value must be given
+                return false;
+            }
 
             if (val != null && opts.Empty == false && val.ToString() == "")
             {
@@ -889,7 +950,8 @@ namespace DataTables
             object val,
             ValidationOpts opts,
             Dictionary<string, object> data,
-            ValidationHost host)
+            ValidationHost host
+        )
         {
             if (opts == null)
             {

@@ -1,4 +1,3 @@
-﻿
 namespace DataTables.DatabaseUtil.Mysql
 {
     /// <summary>
@@ -13,11 +12,9 @@ namespace DataTables.DatabaseUtil.Mysql
         /// <param name="dt">DataTable containing the results</param>
         /// <param name="q">Source query</param>
         public Result(Database db, System.Data.DataTable dt, Query q)
-            : base(db, dt, q)
-        {
-        }
+            : base(db, dt, q) { }
 
-        override public string InsertId()
+        public override string InsertId()
         {
             if (_dt.Rows.Count > 0 && _dt.Columns.Contains("insert_id"))
             {

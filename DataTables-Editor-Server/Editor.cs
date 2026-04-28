@@ -4,20 +4,20 @@
 // Editor class for reading tables as well as creating, editing and deleting rows
 // </summary>
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using DataTables.EditorUtil;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 #else
 using System.Web;
 #endif
-using DataTables.EditorUtil;
 
 namespace DataTables
 {
@@ -89,7 +89,9 @@ namespace DataTables
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
         /// <returns>Request type</returns>
-        public static DtRequest.RequestTypes Action(IEnumerable<KeyValuePair<string, string>> data = null)
+        public static DtRequest.RequestTypes Action(
+            IEnumerable<KeyValuePair<string, string>> data = null
+        )
         {
             var request = new DtRequest(data);
             return request.RequestType;
@@ -101,7 +103,9 @@ namespace DataTables
         /// </summary>
         /// <param name="data">Data sent from the client-side</param>
         /// <returns>Request type</returns>
-        public static DtRequest.RequestTypes Action(IEnumerable<KeyValuePair<String, StringValues>> data = null)
+        public static DtRequest.RequestTypes Action(
+            IEnumerable<KeyValuePair<String, StringValues>> data = null
+        )
         {
             var request = new DtRequest(data);
             return request.RequestType;
@@ -160,7 +164,6 @@ namespace DataTables
                 Pkey(pkey);
             }
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public events
@@ -265,7 +268,6 @@ namespace DataTables
         /// </summary>
         public event EventHandler<PostUploadEventArgs> PostUpload;
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private parameters
          */
@@ -292,12 +294,17 @@ namespace DataTables
 #else
         private HttpFileCollection _requestFiles;
 #endif
-        private readonly Dictionary<string, List<Delegate>> _events = new Dictionary<string, List<Delegate>>();
+        private readonly Dictionary<string, List<Delegate>> _events =
+            new Dictionary<string, List<Delegate>>();
         private bool _tryCatch = true;
         private bool _debug = false;
         private List<object> _DebugInfo = new List<object>();
-        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validator = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
-        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validatorAfterFields = new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
+        private List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> _validator =
+            new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
+        private List<
+            Func<Editor, DtRequest.RequestTypes, DtRequest, string>
+        > _validatorAfterFields =
+            new List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>>();
         private bool _leftJoinRemove = false;
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -401,7 +408,7 @@ namespace DataTables
         /// </summary>
         /// <param name="f">Field name to select</param>
         /// <returns>Field instance</returns>
-		/// <exception cref="Exception">Unknown field name</exception>
+        /// <exception cref="Exception">Unknown field name</exception>
         public Field Field(string f)
         {
             for (var i = 0; i < _field.Count(); i++)
@@ -457,10 +464,10 @@ namespace DataTables
 
         /// <summary>
         /// Get the DOM prefix.
-        /// 
+        ///
         /// Typically primary keys are numeric and this is not a valid ID value in an
         /// HTML document - is also increases the likelihood of an ID clash if multiple
-        /// tables are used on a single page. As such, a prefix is assigned to the 
+        /// tables are used on a single page. As such, a prefix is assigned to the
         /// primary key value for each row, and this is used as the DOM ID, so Editor
         /// can track individual rows.
         /// </summary>
@@ -472,10 +479,10 @@ namespace DataTables
 
         /// <summary>
         /// Set the DOM prefix.
-        /// 
+        ///
         /// Typically primary keys are numeric and this is not a valid ID value in an
         /// HTML document - is also increases the likelihood of an ID clash if multiple
-        /// tables are used on a single page. As such, a prefix is assigned to the 
+        /// tables are used on a single page. As such, a prefix is assigned to the
         /// primary key value for each row, and this is used as the DOM ID, so Editor
         /// can track individual rows.
         /// </summary>
@@ -557,9 +564,9 @@ namespace DataTables
         }
 
         /// <summary>
-	    /// Indicate if a remove should be performed on left joined tables when deleting
-	    /// from the parent row. Note that this is disabled by default and will be
-	    /// removed completely in v2. Use `ON DELETE CASCADE` in your database instead.
+        /// Indicate if a remove should be performed on left joined tables when deleting
+        /// from the parent row. Note that this is disabled by default and will be
+        /// removed completely in v2. Use `ON DELETE CASCADE` in your database instead.
         /// </summary>
         /// <param name="remove">Value to set</param>
         /// <returns>Self for chaining</returns>
@@ -635,7 +642,6 @@ namespace DataTables
             return this;
         }
 
-
         /// <summary>
         /// Get the read database table name this Editor instance will use
         /// </summary>
@@ -670,7 +676,6 @@ namespace DataTables
             }
             return this;
         }
-
 
         /// <summary>
         /// Get the database table name this Editor instance will use
@@ -708,7 +713,7 @@ namespace DataTables
 
         /// <summary>
         /// Get the transaction state for this instance.
-        /// 
+        ///
         /// When enabled (which it is by default) Editor will use an SQL transaction
         /// to ensure data integrity while it is performing operations on the table.
         /// This can be optionally disabled using this method, if required by your
@@ -749,7 +754,7 @@ namespace DataTables
 
         /// <summary>
         /// Get the primary key field that has been configured.
-        /// 
+        ///
         /// The primary key must be known to Editor so it will know which rows are being
         /// edited / deleted upon those actions. The default value is 'id'.
         /// </summary>
@@ -763,7 +768,7 @@ namespace DataTables
         /// Set the primary key field to use. Please note that at this time
         /// Editor does not support composite primary keys in a table, only a
         /// single field primary key is supported.
-        /// 
+        ///
         /// The primary key must be known to Editor so it will know which rows are being
         /// edited / deleted upon those actions. The default value is 'id'.
         /// </summary>
@@ -797,7 +802,7 @@ namespace DataTables
         {
             var id = new List<string>();
 
-            for (int i = 0, ien = _pkey.Length; i<ien; i++)
+            for (int i = 0, ien = _pkey.Length; i < ien; i++)
             {
                 var column = _pkey[i];
                 string val = null;
@@ -830,7 +835,7 @@ namespace DataTables
                     throw new Exception("Primary key element is not available in data set.");
                 }
 
-                id.Add( val );
+                id.Add(val);
             }
 
             return string.Join(_pkeySeparator(), id);
@@ -845,7 +850,11 @@ namespace DataTables
         /// <param name="pkey">Primary key to use. Instance default will be used
         /// if not given</param>
         /// <returns>Field values that the id was made up of.</returns>
-        public Dictionary<string, object> PkeyToArray (string value, bool flat=false, string[] pkey=null)
+        public Dictionary<string, object> PkeyToArray(
+            string value,
+            bool flat = false,
+            string[] pkey = null
+        )
         {
             var arr = new Dictionary<string, object>();
 
@@ -855,7 +864,7 @@ namespace DataTables
             }
 
             value = value.Replace(IdPrefix(), "");
-            var idParts = value.Split(new[] {_pkeySeparator()}, StringSplitOptions.None);
+            var idParts = value.Split(new[] { _pkeySeparator() }, StringSplitOptions.None);
 
             if (pkey.Length != idParts.Length)
             {
@@ -877,7 +886,6 @@ namespace DataTables
             return arr;
         }
 
-
         /// <summary>
         /// Process a request from the Editor client-side to get / set data.
         /// </summary>
@@ -889,10 +897,12 @@ namespace DataTables
             {
                 _DebugInfo.Add("Editor .NET libraries - version " + Version);
 
-                _db.Debug((o) =>
-                {
-                    _DebugInfo.Add(o);
-                });
+                _db.Debug(
+                    (o) =>
+                    {
+                        _DebugInfo.Add(o);
+                    }
+                );
             }
 
             if (_tryCatch)
@@ -932,7 +942,10 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(IEnumerable<KeyValuePair<string, string>> data = null, string culture=null)
+        public Editor Process(
+            IEnumerable<KeyValuePair<string, string>> data = null,
+            string culture = null
+        )
         {
             return Process(new DtRequest(data, culture));
         }
@@ -944,7 +957,10 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Request type</returns>
-        public Editor Process(IEnumerable<KeyValuePair<String, StringValues>> data = null, string culture=null)
+        public Editor Process(
+            IEnumerable<KeyValuePair<String, StringValues>> data = null,
+            string culture = null
+        )
         {
             return Process(new DtRequest(data, culture));
         }
@@ -957,7 +973,7 @@ namespace DataTables
         /// <param name="data">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(NameValueCollection data = null, string culture=null)
+        public Editor Process(NameValueCollection data = null, string culture = null)
         {
             var list = new List<KeyValuePair<string, string>>();
 
@@ -979,12 +995,13 @@ namespace DataTables
         /// <param name="request">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(HttpRequest request, string culture=null)
+        public Editor Process(HttpRequest request, string culture = null)
         {
             _request = request;
 
 #if NETCOREAPP
-            if ( request.HasFormContentType ) {
+            if (request.HasFormContentType)
+            {
                 _requestFiles = request.Form.Files;
                 return Process(request.Form);
             }
@@ -1007,7 +1024,7 @@ namespace DataTables
         /// <param name="request">Data sent from the client-side</param>
         /// <param name="culture">Culture string to use for number formatting - https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo</param>
         /// <returns>Self for chaining</returns>
-        public Editor Process(UnvalidatedRequestValues request, string culture=null)
+        public Editor Process(UnvalidatedRequestValues request, string culture = null)
         {
             _requestFiles = request.Files;
 
@@ -1030,8 +1047,10 @@ namespace DataTables
         public bool Validate(DtResponse response, DtRequest request)
         {
             // Validation is only performed on create and edit
-            if (request.RequestType != DtRequest.RequestTypes.EditorCreate &&
-                request.RequestType != DtRequest.RequestTypes.EditorEdit)
+            if (
+                request.RequestType != DtRequest.RequestTypes.EditorCreate
+                && request.RequestType != DtRequest.RequestTypes.EditorEdit
+            )
             {
                 return true;
             }
@@ -1046,11 +1065,9 @@ namespace DataTables
 
                     if (validation != null)
                     {
-                        response.fieldErrors.Add(new DtResponse.FieldError
-                        {
-                            name = field.Name(),
-                            status = validation
-                        });
+                        response.fieldErrors.Add(
+                            new DtResponse.FieldError { name = field.Name(), status = validation }
+                        );
                     }
                 }
 
@@ -1082,11 +1099,11 @@ namespace DataTables
         /// </summary>
         /// <param name="afterFields">Indicates if the validators for before (`false`, default) or after (`true`) field validation should be returned.</param>
         /// <returns>Validation functions set</returns>
-        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator(bool afterFields=false)
+        public List<Func<Editor, DtRequest.RequestTypes, DtRequest, string>> Validator(
+            bool afterFields = false
+        )
         {
-            return afterFields
-                ? _validatorAfterFields
-                : _validator;
+            return afterFields ? _validatorAfterFields : _validator;
         }
 
         /// <summary>
@@ -1106,7 +1123,10 @@ namespace DataTables
         /// <param name="afterFields">`true` to run after field validation, `false` to run before.</param>
         /// <param name="validator">Validation function to set</param>
         /// <returns></returns>
-        public Editor Validator(bool afterFields, Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator)
+        public Editor Validator(
+            bool afterFields,
+            Func<Editor, DtRequest.RequestTypes, DtRequest, string> validator
+        )
         {
             if (afterFields == false)
             {
@@ -1123,9 +1143,9 @@ namespace DataTables
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -1145,10 +1165,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Editor Where(Action<Query> fn)
         {
-            _where.Add(new WhereCondition
-            {
-                Custom = fn
-            });
+            _where.Add(new WhereCondition { Custom = fn });
 
             return this;
         }
@@ -1156,9 +1173,9 @@ namespace DataTables
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -1180,12 +1197,14 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public Editor Where(string key, object value, string op = "=")
         {
-            _where.Add(new WhereCondition
-            {
-                Key = key,
-                Value = value,
-                Operator = op
-            });
+            _where.Add(
+                new WhereCondition
+                {
+                    Key = key,
+                    Value = value,
+                    Operator = op,
+                }
+            );
 
             return this;
         }
@@ -1194,7 +1213,8 @@ namespace DataTables
         /// Get the value of this._write
         /// </summary>
         /// <returns>bool the value of this._write</returns>
-        public bool Write(){
+        public bool Write()
+        {
             return this._write;
         }
 
@@ -1203,7 +1223,8 @@ namespace DataTables
         /// </summary>
         /// <param name="writeVal">The value that this._write is to be set to</param>
         /// <returns>Self for chaining</returns>
-        public Editor Write(bool writeVal) {
+        public Editor Write(bool writeVal)
+        {
             this._write = writeVal;
             return this;
         }
@@ -1241,7 +1262,6 @@ namespace DataTables
             return _request;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
          */
@@ -1274,8 +1294,10 @@ namespace DataTables
 
             if (string.IsNullOrEmpty(_out.error))
             {
-                if (data.RequestType == DtRequest.RequestTypes.DataTablesGet ||
-                    data.RequestType == DtRequest.RequestTypes.DataTablesSsp)
+                if (
+                    data.RequestType == DtRequest.RequestTypes.DataTablesGet
+                    || data.RequestType == DtRequest.RequestTypes.DataTablesSsp
+                )
                 {
                     // DataTable get request
                     _out.Merge(_Get(null, data));
@@ -1297,14 +1319,18 @@ namespace DataTables
                     _Options(true);
                     _FileClean();
                 }
-                else if ((data.RequestType == DtRequest.RequestTypes.EditorCreate ||
-                         data.RequestType == DtRequest.RequestTypes.EditorEdit) && this._write)
+                else if (
+                    (
+                        data.RequestType == DtRequest.RequestTypes.EditorCreate
+                        || data.RequestType == DtRequest.RequestTypes.EditorEdit
+                    ) && this._write
+                )
                 {
                     // Create or edit
                     // Trigger pre events before validation, so validation could be added
                     var cancelResult = false;
                     var toRemove = new List<string>();
-                    
+
                     foreach (var pair in data.Data)
                     {
                         if (data.RequestType == DtRequest.RequestTypes.EditorCreate)
@@ -1314,7 +1340,7 @@ namespace DataTables
                                 var args = new PreCreateEventArgs
                                 {
                                     Editor = this,
-                                    Values = pair.Value as Dictionary<string, object>
+                                    Values = pair.Value as Dictionary<string, object>,
                                 };
                                 PreCreate(this, args);
 
@@ -1329,7 +1355,7 @@ namespace DataTables
                                 {
                                     Editor = this,
                                     Id = pair.Key.Replace(_idPrefix, ""),
-                                    Values = pair.Value as Dictionary<string, object>
+                                    Values = pair.Value as Dictionary<string, object>,
                                 };
                                 PreEdit(this, args);
 
@@ -1356,14 +1382,15 @@ namespace DataTables
 
                     // Validate
                     var valid = Validate(_out, data);
-                        
+
                     if (valid)
                     {
                         foreach (var pair in data.Data)
                         {
-                            var d = data.RequestType == DtRequest.RequestTypes.EditorCreate
-                                ? _Insert(pair.Value as Dictionary<string, object>)
-                                : _Update(pair.Key, pair.Value as Dictionary<string, object>);
+                            var d =
+                                data.RequestType == DtRequest.RequestTypes.EditorCreate
+                                    ? _Insert(pair.Value as Dictionary<string, object>)
+                                    : _Update(pair.Key, pair.Value as Dictionary<string, object>);
 
                             if (d != null)
                             {
@@ -1371,7 +1398,7 @@ namespace DataTables
                             }
                         }
 
-                    	_FileClean();
+                        _FileClean();
                     }
 
                     _Options(true);
@@ -1391,7 +1418,7 @@ namespace DataTables
             {
                 foreach (KeyValuePair<string, Type> pair in _userModelT)
                 {
-                    _FieldFromModel(pair.Value, pair.Key=="" ? pair.Key : pair.Key+".");
+                    _FieldFromModel(pair.Value, pair.Key == "" ? pair.Key : pair.Key + ".");
                 }
             }
         }
@@ -1402,9 +1429,9 @@ namespace DataTables
             foreach (var pi in model.GetProperties())
             {
                 // Check for ignore attribute
-                var ignAttr = pi
-                    .GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
-                    .Cast<EditorIgnoreAttribute>().FirstOrDefault();
+                var ignAttr = pi.GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
+                    .Cast<EditorIgnoreAttribute>()
+                    .FirstOrDefault();
 
                 if (ignAttr != null && ignAttr.Ignore)
                 {
@@ -1423,36 +1450,36 @@ namespace DataTables
                 // Then assign the information from the model
                 field.Type(pi.PropertyType);
 
-                var err = pi
-                    .GetCustomAttributes(typeof(EditorTypeErrorAttribute), true)
-                    .Cast<EditorTypeErrorAttribute>().FirstOrDefault();
+                var err = pi.GetCustomAttributes(typeof(EditorTypeErrorAttribute), true)
+                    .Cast<EditorTypeErrorAttribute>()
+                    .FirstOrDefault();
 
                 if (err != null)
                 {
                     field.TypeError(err.Msg);
                 }
 
-                var name = pi
-                    .GetCustomAttributes(typeof(EditorHttpNameAttribute), false)
-                    .Cast<EditorHttpNameAttribute>().FirstOrDefault();
+                var name = pi.GetCustomAttributes(typeof(EditorHttpNameAttribute), false)
+                    .Cast<EditorHttpNameAttribute>()
+                    .FirstOrDefault();
 
                 if (name != null)
                 {
                     field.Name(name.Name);
                 }
 
-                var get = pi
-                    .GetCustomAttributes(typeof(EditorGetAttribute), false)
-                    .Cast<EditorGetAttribute>().FirstOrDefault();
+                var get = pi.GetCustomAttributes(typeof(EditorGetAttribute), false)
+                    .Cast<EditorGetAttribute>()
+                    .FirstOrDefault();
 
                 if (get != null)
                 {
                     field.Get(get.Get);
                 }
 
-                var set = pi
-                    .GetCustomAttributes(typeof(EditorSetAttribute), false)
-                    .Cast<EditorSetAttribute>().FirstOrDefault();
+                var set = pi.GetCustomAttributes(typeof(EditorSetAttribute), false)
+                    .Cast<EditorSetAttribute>()
+                    .FirstOrDefault();
 
                 if (set != null)
                 {
@@ -1469,19 +1496,13 @@ namespace DataTables
             }
         }
 
-
-
         private DtResponse _Get(object id = null, DtRequest http = null)
         {
             var dtData = new DtResponse();
 
             if (PreGet != null)
             {
-                var args = new PreGetEventArgs
-                {
-                    Editor = this,
-                    Id = id
-                };
+                var args = new PreGetEventArgs { Editor = this, Id = id };
                 PreGet(this, args);
 
                 if (args.Cancel)
@@ -1490,11 +1511,7 @@ namespace DataTables
                 }
             }
 
-            Query query = _db
-                .Query("select")
-                .Table(_ReadTable())
-                .Get(_pkey)
-                .LeftJoin(_leftJoin);
+            Query query = _db.Query("select").Table(_ReadTable()).Get(_pkey).LeftJoin(_leftJoin);
 
             // Add all fields that we need to get from the database
             foreach (var field in _field)
@@ -1504,7 +1521,7 @@ namespace DataTables
                 {
                     continue;
                 }
-                
+
                 if (field.Apply("get") && field.GetValue() == null)
                 {
                     query.Get(field.DbField());
@@ -1541,7 +1558,10 @@ namespace DataTables
 
                 while ((row = res.Fetch()) != null)
                 {
-                    var inner = new Dictionary<string, object> { { "DT_RowId", _idPrefix + PkeyToValue(row, true) } };
+                    var inner = new Dictionary<string, object>
+                    {
+                        { "DT_RowId", _idPrefix + PkeyToValue(row, true) },
+                    };
 
                     foreach (var field in _field)
                     {
@@ -1570,7 +1590,7 @@ namespace DataTables
                 {
                     Editor = this,
                     Id = id,
-                    Data = dtData.data
+                    Data = dtData.data,
                 };
                 PostGet(this, args);
             }
@@ -1580,7 +1600,6 @@ namespace DataTables
             return dtData;
         }
 
-
         private Dictionary<string, object> _Insert(Dictionary<string, object> values)
         {
             // Get values to generate the id, including from SetValue, not just the
@@ -1589,9 +1608,14 @@ namespace DataTables
 
             foreach (var field in _field)
             {
-			    if (field.Apply("set", values))
+                if (field.Apply("set", values))
                 {
-                    NestedData.WriteProp(all, field.Name(), field.Val("set", values), typeof(string));
+                    NestedData.WriteProp(
+                        all,
+                        field.Name(),
+                        field.Val("set", values),
+                        typeof(string)
+                    );
                 }
             }
 
@@ -1601,11 +1625,10 @@ namespace DataTables
             // generated values.
             _PkeyValidateInsert(all);
 
-            ValidatedCreate?.Invoke(this, new ValidatedCreateEventArgs
-            {
-                Editor = this,
-                Values = values
-            });
+            ValidatedCreate?.Invoke(
+                this,
+                new ValidatedCreateEventArgs { Editor = this, Values = values }
+            );
 
             // Insert the new row
             var id = _InsertOrUpdate(null, values);
@@ -1617,10 +1640,8 @@ namespace DataTables
 
             // Was the primary key altered as part of the edit, if so use the
             // submitted values
-            id = _pkey.Length > 1
-                ? PkeyToValue(all)
-                : _PkeySubmitMerge(id.ToString(), all);
-            
+            id = _pkey.Length > 1 ? PkeyToValue(all) : _PkeySubmitMerge(id.ToString(), all);
+
             // Row based joins
             foreach (var mjoin in _mJoin)
             {
@@ -1628,42 +1649,48 @@ namespace DataTables
             }
 
             // _Trigger("WirteCreate", id, values);
-            WriteCreate?.Invoke(this, new WriteCreateEventArgs
-            {
-                Editor = this,
-                Values = values,
-                Id = id
-            });
+            WriteCreate?.Invoke(
+                this,
+                new WriteCreateEventArgs
+                {
+                    Editor = this,
+                    Values = values,
+                    Id = id,
+                }
+            );
 
             // Full data set for the created row
             var row = _Get(id);
-            var rowData = row.data.Any() ?
-                row.data[0] :
-                null;
+            var rowData = row.data.Any() ? row.data[0] : null;
 
             // _Trigger("postCreate", id, values, row);
-            PostCreate?.Invoke(this, new PostCreateEventArgs
-            {
-                Editor = this,
-                Values = values,
-                Data = rowData,
-                Id = id
-            });
+            PostCreate?.Invoke(
+                this,
+                new PostCreateEventArgs
+                {
+                    Editor = this,
+                    Values = values,
+                    Data = rowData,
+                    Id = id,
+                }
+            );
 
             return rowData;
         }
-
 
         private Dictionary<string, object> _Update(string id, Dictionary<string, object> values)
         {
             id = id.Replace(_idPrefix, "");
 
-            ValidatedEdit?.Invoke(this, new ValidatedEditEventArgs
-            {
-                Editor = this,
-                Id = id,
-                Values = values
-            });
+            ValidatedEdit?.Invoke(
+                this,
+                new ValidatedEditEventArgs
+                {
+                    Editor = this,
+                    Id = id,
+                    Values = values,
+                }
+            );
 
             // Update or insert the rows for the parent table and the left joined
             // tables
@@ -1679,30 +1706,33 @@ namespace DataTables
             // submitted values
             var getId = _PkeySubmitMerge(id, values);
 
-            WriteEdit?.Invoke(this, new WriteEditEventArgs
-            {
-                Editor = this,
-                Id = id,
-                Values = values
-            });
+            WriteEdit?.Invoke(
+                this,
+                new WriteEditEventArgs
+                {
+                    Editor = this,
+                    Id = id,
+                    Values = values,
+                }
+            );
 
             // Full data set for the modified row
             var row = _Get(getId);
-            var rowData = row.data.Any() ?
-                row.data[0] :
-                null;
+            var rowData = row.data.Any() ? row.data[0] : null;
 
-            PostEdit?.Invoke(this, new PostEditEventArgs
-            {
-                Editor = this,
-                Id = id,
-                Data = rowData,
-                Values = values
-            });
+            PostEdit?.Invoke(
+                this,
+                new PostEditEventArgs
+                {
+                    Editor = this,
+                    Id = id,
+                    Data = rowData,
+                    Values = values,
+                }
+            );
 
             return rowData;
         }
-
 
         private void _Remove(DtRequest data)
         {
@@ -1719,7 +1749,7 @@ namespace DataTables
                     {
                         Editor = this,
                         Id = id,
-                        Values = pair.Value as Dictionary<string, object>
+                        Values = pair.Value as Dictionary<string, object>,
                     };
                     PreRemove(this, args);
 
@@ -1751,13 +1781,13 @@ namespace DataTables
             }
 
             // Remove from the left join tables
-            if ( _leftJoinRemove ) {
+            if (_leftJoinRemove)
+            {
                 for (int i = 0, ien = _leftJoin.Count(); i < ien; i++)
                 {
                     var join = _leftJoin[i];
                     string parentLink;
                     string childLink;
-
 
                     // which side of the join refers to the parent table?
                     if (join.Field1.IndexOf(join.Table) == 0)
@@ -1777,7 +1807,7 @@ namespace DataTables
                     // over multiple fields.
                     if (_pkey.Length == 1 && parentLink == _pkey[0])
                     {
-                        _RemoveTable(join.Table, ids, new[] {childLink});
+                        _RemoveTable(join.Table, ids, new[] { childLink });
                     }
                 }
             }
@@ -1792,21 +1822,25 @@ namespace DataTables
             {
                 var id = pair.Key.Replace(_idPrefix, "");
 
-                PostRemove?.Invoke(this, new PostRemoveEventArgs
-                {
-                    Editor = this,
-                    Id = id,
-                    Values = pair.Value as Dictionary<string, object>
-                });
+                PostRemove?.Invoke(
+                    this,
+                    new PostRemoveEventArgs
+                    {
+                        Editor = this,
+                        Id = id,
+                        Values = pair.Value as Dictionary<string, object>,
+                    }
+                );
             }
         }
-
 
         private void _Upload(DtRequest data)
         {
             if (_requestFiles == null)
             {
-                throw new Exception("File upload requires that 'Process' be called with an HttpRequest or UnvalidatedRequestValues object");
+                throw new Exception(
+                    "File upload requires that 'Process' be called with an HttpRequest or UnvalidatedRequestValues object"
+                );
             }
 
             var field = _FindField(data.UploadField, "name");
@@ -1829,7 +1863,6 @@ namespace DataTables
                             fieldName = name;
                         }
                     }
-
                 }
             }
             else
@@ -1844,11 +1877,7 @@ namespace DataTables
 
             if (PreUpload != null)
             {
-                var args = new PreUploadEventArgs
-                {
-                    Editor = this,
-                    Data = data
-                };
+                var args = new PreUploadEventArgs { Editor = this, Data = data };
                 PreUpload(this, args);
 
                 if (args.Cancel)
@@ -1860,40 +1889,43 @@ namespace DataTables
             var upload = field.Upload();
             if (upload == null)
             {
-                throw new Exception("File uploaded to a field that does not have upload options configured");
+                throw new Exception(
+                    "File uploaded to a field that does not have upload options configured"
+                );
             }
 
             object res = upload.Exec(this);
 
             if (res is Boolean && (Boolean)res == false)
             {
-                _out.fieldErrors.Add(new DtResponse.FieldError
-                {
-                    name = fieldName,
-                    status = upload.Error()
-                });
+                _out.fieldErrors.Add(
+                    new DtResponse.FieldError { name = fieldName, status = upload.Error() }
+                );
             }
             else
             {
-                _out.files = _FileData(upload.Table(), new object[] {res});
+                _out.files = _FileData(upload.Table(), new object[] { res });
                 _out.upload.id = res;
 
-                PostUpload?.Invoke(this, new PostUploadEventArgs
-                {
-                    Editor = this,
-                    Id = res,
-                    Files = _out.files,
-                    Data = data
-                });
+                PostUpload?.Invoke(
+                    this,
+                    new PostUploadEventArgs
+                    {
+                        Editor = this,
+                        Id = res,
+                        Files = _out.files,
+                        Data = data,
+                    }
+                );
             }
         }
-
 
         private Dictionary<string, Dictionary<string, Dictionary<string, object>>> _FileData(
             string limitTable = null,
             ICollection<object> ids = null,
             List<Dictionary<string, object>> data = null
-        ) {
+        )
+        {
             var files = new Dictionary<string, Dictionary<string, Dictionary<string, object>>>();
 
             // The fields in this instance
@@ -1906,19 +1938,19 @@ namespace DataTables
                 // un-nest it (i.e. get the array of joined data for each row)
                 List<Dictionary<string, object>> joinData = null;
 
-                if ( data != null )
+                if (data != null)
                 {
                     joinData = new List<Dictionary<string, object>>();
 
                     foreach (var row in data)
                     {
-                        if ( row.ContainsKey( join.Name() ) )
+                        if (row.ContainsKey(join.Name()))
                         {
                             var d = row[join.Name()] as ICollection<Dictionary<string, object>>;
 
-                            if ( d != null )
+                            if (d != null)
                             {
-                                foreach (var i in d )
+                                foreach (var i in d)
                                 {
                                     joinData.Add(i);
                                 }
@@ -1933,9 +1965,13 @@ namespace DataTables
             return files;
         }
 
-
-        private void _FileDataFields(IDictionary<string, Dictionary<string, Dictionary<string, object>>> @files,
-            IEnumerable<Field> fields, string limitTable, ICollection<object> ids, List<Dictionary<string, object>> data = null)
+        private void _FileDataFields(
+            IDictionary<string, Dictionary<string, Dictionary<string, object>>> @files,
+            IEnumerable<Field> fields,
+            string limitTable,
+            ICollection<object> ids,
+            List<Dictionary<string, object>> data = null
+        )
         {
             foreach (var field in fields)
             {
@@ -1970,28 +2006,30 @@ namespace DataTables
 
                 // Make a collection of the ids used in this data set to get a limited data set
                 // in return (security and performance)
-                if ( ids == null )
+                if (ids == null)
                 {
                     ids = new List<object>();
                 }
 
-                if ( data != null )
+                if (data != null)
                 {
                     foreach (var row in data)
                     {
                         var val = NestedData.ReadProp(field.Name(), row);
 
-                        if ( val != null )
+                        if (val != null)
                         {
                             ids.Add(val);
                         }
                     }
 
-                    if ( ids.Count == 0 ) {
+                    if (ids.Count == 0)
+                    {
                         // If no data to fetch, then don't bother
                         return;
                     }
-                    else if ( ids.Count > 1000 ) {
+                    else if (ids.Count > 1000)
+                    {
                         // Don't use whereIn for really large data sets
                         ids = new List<object>();
                     }
@@ -2001,9 +2039,9 @@ namespace DataTables
 
                 if (fileData != null)
                 {
-                    foreach(var file in fileData)
+                    foreach (var file in fileData)
                     {
-                        if (! entries.ContainsKey(file.Key))
+                        if (!entries.ContainsKey(file.Key))
                         {
                             entries.Add(file.Key, file.Value);
                         }
@@ -2011,7 +2049,6 @@ namespace DataTables
                 }
             }
         }
-
 
         private void _FileClean()
         {
@@ -2039,7 +2076,6 @@ namespace DataTables
             }
         }
 
-
         private void _RemoveTable(string table, IEnumerable<string> ids, string[] pkey = null)
         {
             if (pkey == null)
@@ -2052,28 +2088,34 @@ namespace DataTables
 
             // If using an alias we need to replace the alias'ed table name in
             // our pkey with the real table name
-            for (var i = 0; i < pkey.Count(); i++) {
-                var a = pkey[i].Split(new [] {'.'});
+            for (var i = 0; i < pkey.Count(); i++)
+            {
+                var a = pkey[i].Split(new[] { '.' });
 
-                if (a.Count() > 1 && a[0] == tableAlias) {
+                if (a.Count() > 1 && a[0] == tableAlias)
+                {
                     pkey[i] = tableOrig + "." + a[1];
                 }
             }
 
             // Check that there is a field which has a set option for this table
-            var count = _field.Count(field => {
+            var count = _field.Count(field =>
+            {
                 // Need at least one field to be settable
-                if (field.Set() == DataTables.Field.SetType.None) {
+                if (field.Set() == DataTables.Field.SetType.None)
+                {
                     return false;
                 }
 
                 // If no db or schema prefix
-                if (!field.DbField().Contains(".")) {
+                if (!field.DbField().Contains("."))
+                {
                     return true;
                 }
 
                 // And if db or schema prefix
-                if (field.DbField().StartsWith(tableAlias)) {
+                if (field.DbField().StartsWith(tableAlias))
+                {
                     return true;
                 }
 
@@ -2082,8 +2124,7 @@ namespace DataTables
 
             if (count > 0)
             {
-                var q = _db.Query("delete")
-                    .Table(tableOrig);
+                var q = _db.Query("delete").Table(tableOrig);
 
                 foreach (var id in ids)
                 {
@@ -2098,7 +2139,6 @@ namespace DataTables
                 q.Exec();
             }
         }
-
 
         private void _PrepJoin()
         {
@@ -2125,9 +2165,12 @@ namespace DataTables
 
                 if (!name.Contains("."))
                 {
-                    throw new Exception("Table part of the field '" + name + "' was not found. " +
-                        "In Editor instance that use a join, all the fields must have the " +
-                        "database table set explicity."
+                    throw new Exception(
+                        "Table part of the field '"
+                            + name
+                            + "' was not found. "
+                            + "In Editor instance that use a join, all the fields must have the "
+                            + "database table set explicity."
                     );
                 }
             }
@@ -2143,11 +2186,11 @@ namespace DataTables
             Field[] fields = new Field[_processData.Columns.Count()];
             int x = 0;
 
-            for(int i = 0; i < this._field.Count(); i++)
+            for (int i = 0; i < this._field.Count(); i++)
             {
-                for(int j = 0;  j < _processData.Columns.Count(); j++)
+                for (int j = 0; j < _processData.Columns.Count(); j++)
                 {
-                    if(this._field[i].Name() == _processData.Columns[j].Data)
+                    if (this._field[i].Name() == _processData.Columns[j].Data)
                     {
                         fields[x] = this._field[i];
                         x++;
@@ -2163,19 +2206,32 @@ namespace DataTables
                 {
                     var opts = options.Exec(_db, refresh);
 
-                    if (opts != null) {
+                    if (opts != null)
+                    {
                         _out.options.Add(field.Name(), opts);
                     }
                 }
 
-                var spOpts = field.SearchPaneOptionsExec(field, this, this._leftJoin, fields, _processData);
+                var spOpts = field.SearchPaneOptionsExec(
+                    field,
+                    this,
+                    this._leftJoin,
+                    fields,
+                    _processData
+                );
 
                 if (spOpts != null)
                 {
                     _out.searchPanes.options.Add(field.Name(), spOpts);
                 }
 
-                var sbOpts = field.SearchBuilderOptionsExec(field, this, this._leftJoin, fields, _processData);
+                var sbOpts = field.SearchBuilderOptionsExec(
+                    field,
+                    this,
+                    this._leftJoin,
+                    fields,
+                    _processData
+                );
 
                 if (sbOpts != null)
                 {
@@ -2188,7 +2244,8 @@ namespace DataTables
                 {
                     var opts = cc.Exec(_db, false);
 
-                    if (opts != null) {
+                    if (opts != null)
+                    {
                         _out.columnControl.Add(field.Name(), opts);
                     }
                 }
@@ -2205,7 +2262,8 @@ namespace DataTables
             }
 
             // Check the join's for a list of options
-            foreach (var join in _mJoin) {
+            foreach (var join in _mJoin)
+            {
                 join.Options(_out.options, _db, refresh);
             }
         }
@@ -2240,7 +2298,6 @@ namespace DataTables
             }
         }
 
-
         private Field _FindField(string name, string type)
         {
             for (int i = 0, ien = _field.Count(); i < ien; i++)
@@ -2261,7 +2318,6 @@ namespace DataTables
             return null;
         }
 
-
         private void _GetWhere(Query query)
         {
             foreach (var where in _where)
@@ -2276,7 +2332,6 @@ namespace DataTables
                 }
             }
         }
-
 
         private DtResponse _SspQuery(Query query, DtRequest http)
         {
@@ -2293,11 +2348,7 @@ namespace DataTables
             _SspFilter(query, http);
 
             // Get the nuber of rows in the result set
-            var setCount = _db
-                .Query("count")
-                .Table(_ReadTable())
-                .Get(_pkey[0])
-                .LeftJoin(_leftJoin);
+            var setCount = _db.Query("count").Table(_ReadTable()).Get(_pkey[0]).LeftJoin(_leftJoin);
             _GetWhere(setCount);
             _SspFilter(setCount, http);
 
@@ -2307,10 +2358,7 @@ namespace DataTables
             // Get the number of rows in the full set
             if (setCount.HasConditions())
             {
-                var fullCount = _db
-                    .Query("count")
-                    .Table(_ReadTable())
-                    .Get(_pkey[0]);
+                var fullCount = _db.Query("count").Table(_ReadTable()).Get(_pkey[0]);
                 _GetWhere(fullCount);
 
                 // A left join is only needed if there is a where condition, incase the
@@ -2329,7 +2377,6 @@ namespace DataTables
 
             return ssp;
         }
-
 
         private string _SspField(DtRequest http, int index)
         {
@@ -2350,13 +2397,13 @@ namespace DataTables
             throw new Exception("Unknown field: " + name + " (index " + index + ")");
         }
 
-
         private void _SspSort(Query query, DtRequest http)
         {
             // Paging makes little sense without an ordering clause, so if there is
             // no order to apply (possible in DT2 on the third click of a header)
             // we apply the primary key as the ordering value.
-            if (http.Order.Count() == 0) {
+            if (http.Order.Count() == 0)
+            {
                 query.Order(_pkey[0] + " asc");
             }
 
@@ -2365,12 +2412,10 @@ namespace DataTables
                 var order = http.Order[i];
 
                 query.Order(
-                    _SspField(http, order.Column) + " " +
-                    (order.Dir == "asc" ? "asc" : "desc")
+                    _SspField(http, order.Column) + " " + (order.Dir == "asc" ? "asc" : "desc")
                 );
             }
         }
-
 
         private void _SspFilter(Query query, DtRequest http)
         {
@@ -2378,30 +2423,36 @@ namespace DataTables
             // in the table (not the fields, just the columns submitted)
             if (http.Search.Value != "")
             {
-                query.Where(delegate(Query q)
-                {
-                    for (int i = 0, ien = http.Columns.Count(); i < ien; i++)
+                query.Where(
+                    delegate(Query q)
                     {
-                        if (!http.Columns[i].Searchable)
+                        for (int i = 0, ien = http.Columns.Count(); i < ien; i++)
                         {
-                            continue;
-                        }
+                            if (!http.Columns[i].Searchable)
+                            {
+                                continue;
+                            }
 
-                        var field = _SspField(http, i);
+                            var field = _SspField(http, i);
 
-                        if (field != null)
-                        {
-                            q.OrWhere(field, "%" + http.Search.Value + "%", "like");
+                            if (field != null)
+                            {
+                                q.OrWhere(field, "%" + http.Search.Value + "%", "like");
+                            }
                         }
                     }
-                });
+                );
             }
 
-            if(http.searchPanes != null){
+            if (http.searchPanes != null)
+            {
                 // Add the Where statements due to SearchPanes Selections
-                foreach(var field in this._field){
-                    if(http.searchPanes.ContainsKey(field.Name())){
-                        for(int i = 0; i < http.searchPanes[field.Name()].Count(); i++) {
+                foreach (var field in this._field)
+                {
+                    if (http.searchPanes.ContainsKey(field.Name()))
+                    {
+                        for (int i = 0; i < http.searchPanes[field.Name()].Count(); i++)
+                        {
                             // Check the number of rows...
                             Query q = this.Db()
                                 .Query("select")
@@ -2411,55 +2462,60 @@ namespace DataTables
 
                             // ... where the selected option is present...
                             if (
-                                http.searchPanes_null.ContainsKey(field.Name()) &&
-                                http.searchPanes_null[field.Name()][i]
-                            ) {
+                                http.searchPanes_null.ContainsKey(field.Name())
+                                && http.searchPanes_null[field.Name()][i]
+                            )
+                            {
                                 q.Where(field.Name(), null, "=");
                                 q.OrWhere(field.Name(), "", "=");
                             }
-                            else {
-                                q.Where(
-                                    field.Name(),
-                                    http.searchPanes[field.Name()][i],
-                                    "="
-                                );
+                            else
+                            {
+                                q.Where(field.Name(), http.searchPanes[field.Name()][i], "=");
                             }
-                            
+
                             var r = q.Exec().Count();
 
                             // ... If there are none then don't bother with this selection
-                            if(r == 0) {
-                                http.searchPanes[field.Name()] = http.searchPanes[field.Name()].Where(v => v != http.searchPanes[field.Name()][i]).ToArray();
+                            if (r == 0)
+                            {
+                                http.searchPanes[field.Name()] = http.searchPanes[field.Name()]
+                                    .Where(v => v != http.searchPanes[field.Name()][i])
+                                    .ToArray();
                                 i--;
                             }
                         }
 
                         query.Where(qu =>
+                        {
+                            for (int j = 0; j < http.searchPanes[field.Name()].Count(); j++)
                             {
-                                for(int j =0; j < http.searchPanes[field.Name()].Count(); j++){
-                                    if (
-                                        http.searchPanes_null.ContainsKey(field.Name()) &&
-                                        http.searchPanes_null[field.Name()][j]
-                                    ) {
-                                        qu.OrWhere(field.Name(), null, "=");
-                                        qu.OrWhere(field.Name(), "", "=");
-                                    }
-                                    else {
-                                        qu.OrWhere(
-                                            field.Name(),
-                                            http.searchPanes[field.Name()][j],
-                                            "="
-                                        );
-                                    }
+                                if (
+                                    http.searchPanes_null.ContainsKey(field.Name())
+                                    && http.searchPanes_null[field.Name()][j]
+                                )
+                                {
+                                    qu.OrWhere(field.Name(), null, "=");
+                                    qu.OrWhere(field.Name(), "", "=");
                                 }
-                            });
+                                else
+                                {
+                                    qu.OrWhere(
+                                        field.Name(),
+                                        http.searchPanes[field.Name()][j],
+                                        "="
+                                    );
+                                }
+                            }
+                        });
                     }
                 }
             }
 
-            
-            if(http.searchBuilder != null) {
-                void nestSB(Query q) {
+            if (http.searchBuilder != null)
+            {
+                void nestSB(Query q)
+                {
                     // This function constructs the nested where condition based on SearchBuilders current criteria
                     this._constructSearchBuilderConditions(q, http.searchBuilder);
                 }
@@ -2481,203 +2537,266 @@ namespace DataTables
             }
         }
 
-        private Query _constructSearchBuilderConditions(Query query, SearchBuilderDetails data) {
+        private Query _constructSearchBuilderConditions(Query query, SearchBuilderDetails data)
+        {
             Boolean first = true;
 
             // Iterate over every group or criteria in the current group
-            foreach(SearchBuilderDetails crit in data.criteria) {
+            foreach (SearchBuilderDetails crit in data.criteria)
+            {
                 // If criteria is defined then this must be a group
-                if(crit.criteria.Count > 0) {
-                    void nestSB(Query q) {
+                if (crit.criteria.Count > 0)
+                {
+                    void nestSB(Query q)
+                    {
                         this._constructSearchBuilderConditions(q, crit);
                     }
                     // Check if this is the first, or if it is and logic
-                    if(data.logic == "AND" || first) {
+                    if (data.logic == "AND" || first)
+                    {
                         // Call the function for the next group
-                       query.WhereGroup(nestSB);
+                        query.WhereGroup(nestSB);
                         // Set first to false so that in future only the logic is checked
                         first = false;
                     }
-                    else {
+                    else
+                    {
                         query.WhereGroup(nestSB, "OR");
                     }
                 }
-                else if (crit.condition != null && (crit.value1 != null || crit.condition == "null" || crit.condition == "!null")) {
+                else if (
+                    crit.condition != null
+                    && (
+                        crit.value1 != null || crit.condition == "null" || crit.condition == "!null"
+                    )
+                )
+                {
                     // Sometimes the structure of the object that is passed across is named in a strange way.
                     // This conditional assignment solves that issue
                     String val1 = crit.value1;
                     String val2 = crit.value2;
 
                     if (
-                        (val1.Length == 0 && crit.condition != "null" && crit.condition != "!null") ||
-                        (val2.Length == 0 && (crit.condition == "between" || crit.condition == "!between"))
-                    ) {
+                        (val1.Length == 0 && crit.condition != "null" && crit.condition != "!null")
+                        || (
+                            val2.Length == 0
+                            && (crit.condition == "between" || crit.condition == "!between")
+                        )
+                    )
+                    {
                         continue;
                     }
 
                     // Switch on the condition that has been passed in
-                    switch(crit.condition) {
+                    switch (crit.condition)
+                    {
                         case "=":
                             // Check if this is the first, or if it is and logic
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 // Call the where function for this condition
                                 query.Where(crit.origData, val1, "=");
                                 // Set first to false so that in future only the logic is checked
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 // Call the or_where function - has to be or logic in this block
                                 query.OrWhere(crit.origData, val1, "=");
                             }
                             break;
                         case "!=":
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 query.Where(crit.origData, val1, "!=");
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 query.OrWhere(crit.origData, val1, "!=");
                             }
                             break;
                         case "contains":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "%"+val1+"%", "LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, "%" + val1 + "%", "LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, "%"+val1+"%", "LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, "%" + val1 + "%", "LIKE");
                             }
                             break;
                         case "!contains":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "%"+val1+"%", "NOT LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, "%" + val1 + "%", "NOT LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, "%"+val1+"%", "NOT LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, "%" + val1 + "%", "NOT LIKE");
                             }
                             break;
                         case "starts":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, val1+"%", "LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, val1 + "%", "LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, val1+"%", "LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, val1 + "%", "LIKE");
                             }
                             break;
                         case "!starts":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, val1+"%", "NOT LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, val1 + "%", "NOT LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, val1+"%", "NOT LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, val1 + "%", "NOT LIKE");
                             }
                             break;
                         case "ends":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "%"+val1, "LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, "%" + val1, "LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, "%"+val1, "LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, "%" + val1, "LIKE");
                             }
                             break;
                         case "!ends":
-                            if(data.logic == "AND" || first) {
-                                query.Where(crit.origData, "%"+val1, "NOT LIKE");
+                            if (data.logic == "AND" || first)
+                            {
+                                query.Where(crit.origData, "%" + val1, "NOT LIKE");
                                 first = false;
                             }
-                            else {
-                                query.OrWhere(crit.origData, "%"+val1, "NOT LIKE");
+                            else
+                            {
+                                query.OrWhere(crit.origData, "%" + val1, "NOT LIKE");
                             }
                             break;
                         case "<":
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 query.Where(crit.origData, val1, "<");
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 query.OrWhere(crit.origData, val1, "<");
                             }
                             break;
                         case "<=":
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 query.Where(crit.origData, val1, "<=");
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 query.OrWhere(crit.origData, val1, "<=");
                             }
                             break;
                         case ">=":
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 query.Where(crit.origData, val1, ">=");
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 query.OrWhere(crit.origData, val1, ">=");
                             }
                             break;
                         case ">":
-                            if(data.logic == "AND" || first) {
+                            if (data.logic == "AND" || first)
+                            {
                                 query.Where(crit.origData, val1, ">");
                                 first = false;
                             }
-                            else {
+                            else
+                            {
                                 query.OrWhere(crit.origData, val1, ">");
                             }
                             break;
                         case "between":
-                            if(data.logic == "AND" || first) {
-                                void func(Query q) {
-                                    q
-                                        .Where(crit.origData, val1, ">=")
+                            if (data.logic == "AND" || first)
+                            {
+                                void func(Query q)
+                                {
+                                    q.Where(crit.origData, val1, ">=")
                                         .Where(crit.origData, val2, "<=");
                                 }
                                 query.WhereGroup(func);
                                 first = false;
                             }
-                            else {
-                                void func(Query q) {
-                                    q
-                                        .Where(crit.origData, val1, ">=")
+                            else
+                            {
+                                void func(Query q)
+                                {
+                                    q.Where(crit.origData, val1, ">=")
                                         .Where(crit.origData, val2, "<=");
                                 }
                                 query.WhereGroup(func, "OR");
                             }
                             break;
                         case "!between":
-                            if(data.logic == "AND" || first) {
-                                void func(Query q) {
-                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                            if (data.logic == "AND" || first)
+                            {
+                                void func(Query q)
+                                {
+                                    q.Where(crit.origData, val1, "<")
+                                        .OrWhere(crit.origData, val2, ">");
                                 }
                                 query.WhereGroup(func);
                                 first = false;
                             }
-                            else {
-                                void func(Query q) {
-                                    q.Where(crit.origData, val1, "<").OrWhere(crit.origData, val2, ">");
+                            else
+                            {
+                                void func(Query q)
+                                {
+                                    q.Where(crit.origData, val1, "<")
+                                        .OrWhere(crit.origData, val2, ">");
                                 }
                                 query.WhereGroup(func, "OR");
                             }
                             break;
                         case "null":
-                            if(data.logic == "AND" || first) {
-                                void func(Query q) {
+                            if (data.logic == "AND" || first)
+                            {
+                                void func(Query q)
+                                {
                                     q.Where(crit.origData, null, "=");
-                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                    if (
+                                        !crit.type.Contains("date")
+                                        && !crit.type.Contains("moment")
+                                        && !crit.type.Contains("luxon")
+                                    )
+                                    {
                                         q.OrWhere(crit.origData, "", "=");
                                     }
                                 }
                                 query.WhereGroup(func);
                                 first = false;
                             }
-                            else {
-                                void func(Query q) {
+                            else
+                            {
+                                void func(Query q)
+                                {
                                     q.Where(crit.origData, null, "=");
-                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                    if (
+                                        !crit.type.Contains("date")
+                                        && !crit.type.Contains("moment")
+                                        && !crit.type.Contains("luxon")
+                                    )
+                                    {
                                         q.OrWhere(crit.origData, "", "=");
                                     }
                                 }
@@ -2685,20 +2804,34 @@ namespace DataTables
                             }
                             break;
                         case "!null":
-                            if(data.logic == "AND" || first) {
-                                void func (Query q) {
+                            if (data.logic == "AND" || first)
+                            {
+                                void func(Query q)
+                                {
                                     q.Where(crit.origData, null, "!=");
-                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                    if (
+                                        !crit.type.Contains("date")
+                                        && !crit.type.Contains("moment")
+                                        && !crit.type.Contains("luxon")
+                                    )
+                                    {
                                         q.Where(crit.origData, "", "!=");
                                     }
                                 }
                                 query.Where(func);
                                 first = false;
                             }
-                            else {
-                                void func (Query q) {
+                            else
+                            {
+                                void func(Query q)
+                                {
                                     q.Where(crit.origData, null, "!=");
-                                    if (!crit.type.Contains("date") && !crit.type.Contains("moment") && !crit.type.Contains("luxon")) {
+                                    if (
+                                        !crit.type.Contains("date")
+                                        && !crit.type.Contains("moment")
+                                        && !crit.type.Contains("luxon")
+                                    )
+                                    {
                                         q.Where(crit.origData, "", "!=");
                                     }
                                 }
@@ -2718,12 +2851,9 @@ namespace DataTables
             // -1 is "show all" in DataTables, so there would be no limit at that point
             if (http.Length != -1)
             {
-                query
-                    .Offset(http.Start)
-                    .Limit(http.Length);
+                query.Offset(http.Start).Limit(http.Length);
             }
         }
-
 
         private object _InsertOrUpdate(object id, Dictionary<string, object> values)
         {
@@ -2733,9 +2863,7 @@ namespace DataTables
                 var res = _InsertOrUpdateTable(
                     _table[i],
                     values,
-                    id == null ?
-                        null :
-                        PkeyToArray(id.ToString(), true)
+                    id == null ? null : PkeyToArray(id.ToString(), true)
                 );
 
                 // If we don't have an id yet, then the first insert will return
@@ -2807,8 +2935,11 @@ namespace DataTables
             return id;
         }
 
-
-        private Result _InsertOrUpdateTable(string table, Dictionary<string, object> values, Dictionary<string, object> where)
+        private Result _InsertOrUpdateTable(
+            string table,
+            Dictionary<string, object> values,
+            Dictionary<string, object> where
+        )
         {
             var set = new Dictionary<string, object>();
             var action = where == null ? "create" : "edit";
@@ -2821,10 +2952,7 @@ namespace DataTables
                 pkey = _pkey;
             }
 
-            var query = _db
-                .Query(action == "create" ? "insert" : "update")
-                .Table(table)
-                .Pkey(pkey);
+            var query = _db.Query(action == "create" ? "insert" : "update").Table(table).Pkey(pkey);
 
             if (where != null)
             {
@@ -2864,7 +2992,8 @@ namespace DataTables
             }
 
             // If nothing to do, then do nothing!
-            if (runIt == false) {
+            if (runIt == false)
+            {
                 return null;
             }
 
@@ -2872,29 +3001,22 @@ namespace DataTables
             return query.Exec();
         }
 
-
         private string _Alias(string name, string type = "alias")
         {
             if (name.IndexOf(" as ", StringComparison.OrdinalIgnoreCase) > 0)
             {
                 var a = Regex.Split(name, " as ", RegexOptions.IgnoreCase);
-                return type == "alias"
-                    ? a[1]
-                    : a[0];
+                return type == "alias" ? a[1] : a[0];
             }
 
             if (name.IndexOf(" ", StringComparison.OrdinalIgnoreCase) > 0)
             {
                 var a = Regex.Split(name, " ", RegexOptions.IgnoreCase);
-                return type == "alias"
-                    ? a[1]
-                    : a[0];
+                return type == "alias" ? a[1] : a[0];
             }
 
             return name;
-
         }
-
 
         private string _Part(string name, string type = "table")
         {
@@ -2904,7 +3026,7 @@ namespace DataTables
 
             if (name.Contains("."))
             {
-                var a = name.Split(new [] {'.'});
+                var a = name.Split(new[] { '.' });
 
                 if (a.Count() == 3)
                 {
@@ -2959,7 +3081,6 @@ namespace DataTables
             return PkeyToValue(arr, true);
         }
 
-
         private bool _PkeyValidateInsert(Dictionary<string, object> row)
         {
             if (_pkey.Length == 1)
@@ -2974,14 +3095,15 @@ namespace DataTables
 
                 if (field == null || !field.Apply("create", row))
                 {
-                    throw new Exception("When inserting into a compound key table, " +
-                                        "all fields that are part of the compound key must be " +
-                                        "submitted with a specific value.");
+                    throw new Exception(
+                        "When inserting into a compound key table, "
+                            + "all fields that are part of the compound key must be "
+                            + "submitted with a specific value."
+                    );
                 }
             }
             return true;
         }
-
 
         private string _pkeySeparator()
         {
@@ -2992,9 +3114,7 @@ namespace DataTables
 
         private List<string> _ReadTable()
         {
-            return _readTableNames.Count != 0 ?
-                _readTableNames :
-                _table;
+            return _readTableNames.Count != 0 ? _readTableNames : _table;
         }
     }
 }

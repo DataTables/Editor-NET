@@ -5,8 +5,8 @@
 // </summary>
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Data;
+using System.Data.Common;
 using System.Text.RegularExpressions;
 using DataTables.DatabaseUtil;
 using DataTables.EditorUtil;
@@ -16,14 +16,14 @@ namespace DataTables
     /// <summary>
     /// The Query class provides methods to craft an individual query
     /// against the database.
-    /// 
+    ///
     /// The typical pattern for using this class is through the 'Database'.
     /// Typically it would not be initialised directly.
     ///
     /// Note that this is a stub class that a driver will extend and complete as
     /// required for individual database types. Individual drivers could add
     /// additional methods, but this is discouraged to ensure that the API is the
-    /// same for all database types. 
+    /// same for all database types.
     /// </summary>
     abstract public class Query
     {
@@ -42,8 +42,6 @@ namespace DataTables
             _db = db;
             _type = type;
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Protected properties
@@ -105,8 +103,7 @@ namespace DataTables
         /// Method that can be used by the database driver to run commands on first connect
         /// </summary>
         /// <param name="dbh">Database instance</param>
-        public static void Init(Database dbh)
-        { }
+        public static void Init(Database dbh) { }
 
         /// <summary>
         /// Start a new transaction
@@ -116,7 +113,9 @@ namespace DataTables
         {
             if (dbh.DbTransaction != null)
             {
-                throw new Exception("Already in a transaction. Please close the exisiting transaction first");
+                throw new Exception(
+                    "Already in a transaction. Please close the exisiting transaction first"
+                );
             }
 
             var conn = dbh.Conn();
@@ -134,8 +133,6 @@ namespace DataTables
             dbh.DbTransaction = null;
         }
 
-
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Instance methods
          */
@@ -150,16 +147,18 @@ namespace DataTables
         /// <returns>Query instance for chaining</returns>
         public Query Bind(string name, dynamic value, dynamic type = null)
         {
-            _bindings.Add(new Binding
-            {
-                Name = _SafeBind(name),
-                Value = value,
-                Type = type
-            });
+            _bindings.Add(
+                new Binding
+                {
+                    Name = _SafeBind(name),
+                    Value = value,
+                    Type = type,
+                }
+            );
 
             return this;
         }
-        
+
         /// <summary>
         /// Generate a unique name for binding values.
         /// </summary>
@@ -284,7 +283,15 @@ namespace DataTables
         /// <returns>Query instance for chaining</returns>
         public Query Join(string table, string condition, string type = "", bool bind = true)
         {
-            string[] joinTypes = new string[] { "LEFT", "RIGHT", "INNER", "OUTER", "LEFT OUTER", "RIGHT OUTER" };
+            string[] joinTypes = new string[]
+            {
+                "LEFT",
+                "RIGHT",
+                "INNER",
+                "OUTER",
+                "LEFT OUTER",
+                "RIGHT OUTER",
+            };
 
             // Tidy and check we know what the join type is
             if (type != "")
@@ -323,11 +330,17 @@ namespace DataTables
         {
             foreach (var join in leftJoin)
             {
-                if (join.Field2 == null && join.Operator == null ) {
+                if (join.Field2 == null && join.Operator == null)
+                {
                     this.Join(join.Table, join.Field1, "LEFT", false);
                 }
-                else {
-                    this.Join(join.Table, join.Field1 + " " + join.Operator + " " + join.Field2, "LEFT");
+                else
+                {
+                    this.Join(
+                        join.Table,
+                        join.Field1 + " " + join.Operator + " " + join.Field2,
+                        "LEFT"
+                    );
                 }
             }
 
@@ -374,7 +387,7 @@ namespace DataTables
                 return this;
             }
 
-            string[] ordering = order.Split(new [] {','});
+            string[] ordering = order.Split(new[] { ',' });
 
             for (int i = 0; i < ordering.Length; i++)
             {
@@ -529,7 +542,7 @@ namespace DataTables
                 return null;
             }
 
-            string[] tables = table.Split(new [] {','});
+            string[] tables = table.Split(new[] { ',' });
 
             for (int i = 0; i < tables.Length; i++)
             {
@@ -597,7 +610,12 @@ namespace DataTables
         /// <param name="op">Conditional operation to perform</param>
         /// <param name="bind">Bind the value or not. Binding will cause the parameter to effectively be escaped, which you might not want for some cases, such as passing in an SQL function as the condition</param>
         /// <returns>Query instance for chaining</returns>
-        public Query Where(string key, IEnumerable<dynamic> values, string op = "=", bool bind = true)
+        public Query Where(
+            string key,
+            IEnumerable<dynamic> values,
+            string op = "=",
+            bool bind = true
+        )
         {
             if (values == null)
             {
@@ -669,7 +687,12 @@ namespace DataTables
         /// <param name="op">Conditional operation to perform</param>
         /// <param name="bind">Bind the value or not. Binding will cause the parameter to effectively be escaped, which you might not want for some cases, such as passing in an SQL function as the condition</param>
         /// <returns>Query instance for chaining</returns>
-        public Query AndWhere(string key, IEnumerable<dynamic> values, string op = "=", bool bind = true)
+        public Query AndWhere(
+            string key,
+            IEnumerable<dynamic> values,
+            string op = "=",
+            bool bind = true
+        )
         {
             if (values == null)
             {
@@ -735,7 +758,12 @@ namespace DataTables
         /// <param name="op">Conditional operation to perform</param>
         /// <param name="bind">Bind the value or not. Binding will cause the parameter to effectively be escaped, which you might not want for some cases, such as passing in an SQL function as the condition</param>
         /// <returns>Query instance for chaining</returns>
-        public Query OrWhere(string key, IEnumerable<dynamic> values, string op = "=", bool bind = true)
+        public Query OrWhere(
+            string key,
+            IEnumerable<dynamic> values,
+            string op = "=",
+            bool bind = true
+        )
         {
             if (values == null)
             {
@@ -775,7 +803,9 @@ namespace DataTables
         /// <param name="inOut">`true` to open brackets, `false` to close</param>
         /// <param name="op">Conditional operator to use to join to the preceding condition.</param>
         /// <returns>Self for chaining</returns>
-        [Obsolete("WhereGroup with a boolean as the first parameter is deprecated, please use WhereGroup with a callback instead.")]
+        [Obsolete(
+            "WhereGroup with a boolean as the first parameter is deprecated, please use WhereGroup with a callback instead."
+        )]
         public Query WhereGroup(bool inOut, string op = "AND")
         {
             _WhereGroup(inOut, op);
@@ -807,12 +837,13 @@ namespace DataTables
         /// <returns></returns>
         public Query WhereIn<T>(string field, ICollection<T> values, string op = "AND")
         {
-            if ( values.Count == 0 ) {
+            if (values.Count == 0)
+            {
                 return this;
             }
 
             var binders = new List<string>();
-            var prefix = _bindChar+"wherein";
+            var prefix = _bindChar + "wherein";
 
             foreach (var val in values)
             {
@@ -824,25 +855,25 @@ namespace DataTables
                 _whereInCnt++;
             }
 
-            _where.Add(new Where()
-                .Operator(op)
-                .Field(_ProtectIdentifiers(field))
-                .Query(_ProtectIdentifiers(field) + " IN (" + String.Join(",", binders)+ ")")
+            _where.Add(
+                new Where()
+                    .Operator(op)
+                    .Field(_ProtectIdentifiers(field))
+                    .Query(_ProtectIdentifiers(field) + " IN (" + String.Join(",", binders) + ")")
             );
 
             return this;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Protected methods
          */
 
-            /// <summary>
-            /// Create a comma separated field list
-            /// </summary>
-            /// <param name="addAlias">Indicate if the fields should have an `as` alias added automatically (true) or not</param>
-            /// <returns>SQL list of fields</returns>
+        /// <summary>
+        /// Create a comma separated field list
+        /// </summary>
+        /// <param name="addAlias">Indicate if the fields should have an `as` alias added automatically (true) or not</param>
+        /// <returns>SQL list of fields</returns>
         virtual protected string _BuildField(Boolean addAlias = false)
         {
             List<string> a = new List<string>();
@@ -858,8 +889,11 @@ namespace DataTables
                     {
                         var split = field.Split(new[] { " as " }, StringSplitOptions.None);
                         a.Add(
-                            _ProtectIdentifiers(split[0]) + " as " +
-                            _fieldQuote + split[1] + _fieldQuote
+                            _ProtectIdentifiers(split[0])
+                                + " as "
+                                + _fieldQuote
+                                + split[1]
+                                + _fieldQuote
                         );
                     }
                     else
@@ -873,8 +907,11 @@ namespace DataTables
                         }
 
                         a.Add(
-                            _ProtectIdentifiers(field) + " as " +
-                            _fieldQuote + fieldName + _fieldQuote
+                            _ProtectIdentifiers(field)
+                                + " as "
+                                + _fieldQuote
+                                + fieldName
+                                + _fieldQuote
                         );
                     }
                 }
@@ -894,8 +931,9 @@ namespace DataTables
         virtual protected string _BuildGroupBy()
         {
             string output = "";
-            if(this._groupBy != null){
-                output = " GROUP BY " +_ProtectIdentifiers(this._groupBy);
+            if (this._groupBy != null)
+            {
+                output = " GROUP BY " + _ProtectIdentifiers(this._groupBy);
             }
             return output;
         }
@@ -911,7 +949,7 @@ namespace DataTables
 
         /// <summary>
         /// Create the LIMIT / OFFSET string.
-        /// 
+        ///
         /// Default is to create a MySQL and Postgres style statement. Drivers can override
         /// </summary>
         /// <returns>SQL limit and offset statement</returns>
@@ -987,17 +1025,17 @@ namespace DataTables
                 {
                     if (table.IndexOf(" as ") != -1)
                     {
-                        var split = table.Split(new[] {" as "}, StringSplitOptions.None);
+                        var split = table.Split(new[] { " as " }, StringSplitOptions.None);
                         name = split[0];
                     }
                     else if (table.IndexOf(" ") != -1)
                     {
-                        var split = table.Split(new[] {" "}, StringSplitOptions.None);
+                        var split = table.Split(new[] { " " }, StringSplitOptions.None);
                         name = split[0];
                     }
                 }
 
-                tables.Add( _ProtectIdentifiers(name));
+                tables.Add(_ProtectIdentifiers(name));
             }
 
             return " " + string.Join(",", tables.ToArray()) + " ";
@@ -1081,14 +1119,15 @@ namespace DataTables
 
             _Prepare(
                 select
-                + " FROM " + _BuildTable()
-                + _BuildJoin()
-                + _BuildWhere()
-                + _BuildGroupBy()
-                + _BuildOrder()
-                + _BuildLimit()
+                    + " FROM "
+                    + _BuildTable()
+                    + _BuildJoin()
+                    + _BuildWhere()
+                    + _BuildGroupBy()
+                    + _BuildOrder()
+                    + _BuildLimit()
             );
-            
+
             return _Exec();
         }
 
@@ -1098,11 +1137,7 @@ namespace DataTables
         /// <returns>Query result</returns>
         virtual protected Result _Delete()
         {
-            _Prepare(
-                "DELETE FROM "
-                + _BuildTable()
-                + _BuildWhere()
-            );
+            _Prepare("DELETE FROM " + _BuildTable() + _BuildWhere());
 
             return _Exec();
         }
@@ -1123,13 +1158,14 @@ namespace DataTables
         virtual protected Result _Insert()
         {
             _Prepare(
-                "INSERT INTO " +
-                    _BuildTable() + " ("
-                        + _BuildField()
+                "INSERT INTO "
+                    + _BuildTable()
+                    + " ("
+                    + _BuildField()
                     + ") "
-                + "VALUES ("
+                    + "VALUES ("
                     + _BuildValue()
-                + ")"
+                    + ")"
             );
 
             return _Exec();
@@ -1175,7 +1211,8 @@ namespace DataTables
             identifier = identifier.Replace(" as ", " ");
 
             // If more than a single space, then return
-            if (identifier.Split(new [] {' '}).Length > 2) {
+            if (identifier.Split(new[] { ' ' }).Length > 2)
+            {
                 return identifier;
             }
 
@@ -1192,7 +1229,7 @@ namespace DataTables
                 alias = "";
             }
 
-            var a = identifier.Split(new [] {'.'});
+            var a = identifier.Split(new[] { '.' });
             return left + string.Join(right + '.' + left, a) + right + alias;
         }
 
@@ -1217,8 +1254,7 @@ namespace DataTables
         /// <returns>Modify field name</returns>
         virtual protected string _SafeBind(string name)
         {
-            return name
-                .Replace(".", "_1_")
+            return name.Replace(".", "_1_")
                 .Replace("-", "_2_")
                 .Replace("/", "_3_")
                 .Replace("\\", "_4_");
@@ -1231,14 +1267,16 @@ namespace DataTables
         virtual protected Result _Select()
         {
             _Prepare(
-                "SELECT " + (_distinct ? "DISTINCT " : "")
-                + _BuildField(true)
-                + "FROM " + _BuildTable()
-                + _BuildJoin()
-                + _BuildWhere()
-                + _BuildGroupBy()
-                + _BuildOrder()
-                + _BuildLimit()
+                "SELECT "
+                    + (_distinct ? "DISTINCT " : "")
+                    + _BuildField(true)
+                    + "FROM "
+                    + _BuildTable()
+                    + _BuildJoin()
+                    + _BuildWhere()
+                    + _BuildGroupBy()
+                    + _BuildOrder()
+                    + _BuildLimit()
             );
 
             return _Exec();
@@ -1250,12 +1288,7 @@ namespace DataTables
         /// <returns>Query result</returns>
         virtual protected Result _Update()
         {
-            _Prepare(
-                "UPDATE "
-                + _BuildTable()
-                + "SET " + _BuildSet()
-                + _BuildWhere()
-            );
+            _Prepare("UPDATE " + _BuildTable() + "SET " + _BuildSet() + _BuildWhere());
 
             return _Exec();
         }
@@ -1268,44 +1301,67 @@ namespace DataTables
         /// <param name="type">Combination operator</param>
         /// <param name="op">Conditional operator</param>
         /// <param name="bind">Bind flag</param>
-        virtual protected void _Where(string key, dynamic value, string type = "AND ", string op = "=", bool bind = true)
+        virtual protected void _Where(
+            string key,
+            dynamic value,
+            string type = "AND ",
+            string op = "=",
+            bool bind = true
+        )
         {
             int whereCount = _where.Count;
 
             if (value == null)
             {
-                _where.Add(new Where()
-                    .Operator(type)
-                    .Field(_ProtectIdentifiers(key))
-                    .Query(_ProtectIdentifiers(key) + (op == "=" ?
-                        " IS NULL" :
-                        " IS NOT NULL"
-                    ))
+                _where.Add(
+                    new Where()
+                        .Operator(type)
+                        .Field(_ProtectIdentifiers(key))
+                        .Query(_ProtectIdentifiers(key) + (op == "=" ? " IS NULL" : " IS NOT NULL"))
                 );
             }
             else if (bind)
             {
-                if (this._db.DbType() == "postgres" && op == "like") {
-                    _where.Add(new Where()
-                        .Operator(type)
-                        .Field(_ProtectIdentifiers(key))
-                        .Query(_ProtectIdentifiers(key) + "::text ilike " + _bindChar + "where_" + whereCount)
+                if (this._db.DbType() == "postgres" && op == "like")
+                {
+                    _where.Add(
+                        new Where()
+                            .Operator(type)
+                            .Field(_ProtectIdentifiers(key))
+                            .Query(
+                                _ProtectIdentifiers(key)
+                                    + "::text ilike "
+                                    + _bindChar
+                                    + "where_"
+                                    + whereCount
+                            )
                     );
                 }
-                else {
-                    _where.Add(new Where()
-                        .Operator(type)
-                        .Field(_ProtectIdentifiers(key))
-                        .Query(_ProtectIdentifiers(key) + " " + op + " " + _bindChar + "where_" + whereCount)
+                else
+                {
+                    _where.Add(
+                        new Where()
+                            .Operator(type)
+                            .Field(_ProtectIdentifiers(key))
+                            .Query(
+                                _ProtectIdentifiers(key)
+                                    + " "
+                                    + op
+                                    + " "
+                                    + _bindChar
+                                    + "where_"
+                                    + whereCount
+                            )
                     );
                 }
                 Bind(_bindChar + "where_" + whereCount, value);
             }
             else
             {
-                _where.Add(new Where()
-                    .Operator(type)
-                    .Query(_ProtectIdentifiers(key) + " " + op + " " + value)
+                _where.Add(
+                    new Where()
+                        .Operator(type)
+                        .Query(_ProtectIdentifiers(key) + " " + op + " " + value)
                 );
             }
         }
@@ -1317,10 +1373,7 @@ namespace DataTables
         /// <param name="op">Operator</param>
         virtual protected void _WhereGroup(bool inOut, string op)
         {
-            _where.Add(new Where()
-                .Group(inOut ? "(" : ")")
-                .Operator(op)
-            );
+            _where.Add(new Where().Group(inOut ? "(" : ")").Operator(op));
         }
     }
 }

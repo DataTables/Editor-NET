@@ -41,7 +41,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public SearchPaneOptions Label(string label)
         {
-            var list = new List<string> {label};
+            var list = new List<string> { label };
 
             _label = list;
 
@@ -202,10 +202,12 @@ namespace DataTables
         /// <param name="entriesQuery">Query to apply the condition to</param>
         /// <param name="http">DTRequest Instance for where conditions</param>
         /// <param name="fileName">Field name being added</param>
-        private void _QueryAddCondition(Query entriesQuery, DtRequest http, string fieldName, string fieldDb)
-        {
-        }
-
+        private void _QueryAddCondition(
+            Query entriesQuery,
+            DtRequest http,
+            string fieldName,
+            string fieldDb
+        ) { }
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -221,7 +223,13 @@ namespace DataTables
         /// <param name="http">DTRequest Instance for where conditions</param>
         /// <param name="fields">Array of all of the other fields</param>
         /// <returns>List of SearchPaneOptions</returns>
-        internal List<Dictionary<string, object>> Exec(Field fieldIn, Editor editor, List<LeftJoin> leftJoinIn, DtRequest http, Field[] fields)
+        internal List<Dictionary<string, object>> Exec(
+            Field fieldIn,
+            Editor editor,
+            List<LeftJoin> leftJoinIn,
+            DtRequest http,
+            Field[] fields
+        )
         {
             var db = editor.Db();
             var viewCount = http.searchPanesOptions.ViewCount;
@@ -230,7 +238,7 @@ namespace DataTables
             var gettingCount = false;
             Dictionary<string, object> entries = null;
 
-    		// If the value is not yet set then set the variable to be the field name
+            // If the value is not yet set then set the variable to be the field name
             var value = _value ?? fieldIn.DbField();
 
             // If the table is not yet set then set the table variable to be the same as editor
@@ -238,40 +246,50 @@ namespace DataTables
             var table = editor.Table()[0];
             var readTable = editor.ReadTable();
 
-            if (_table != null) {
+            if (_table != null)
+            {
                 table = _table;
             }
-            else if (readTable.Count() != 0) {
+            else if (readTable.Count() != 0)
+            {
                 table = readTable[0];
             }
-            
-    		// If the label value has not yet been set then just set it to be the same as value
+
+            // If the label value has not yet been set then just set it to be the same as value
             var label = _label.Count() != 0 ? _label.ElementAt(0) : value;
 
             // Just return the label if no default renderer
-            var formatter = _renderer ?? (str =>
-            {
-                return str;
-            });
+            var formatter =
+                _renderer
+                ?? (
+                    str =>
+                    {
+                        return str;
+                    }
+                );
 
-    		// Use Editor's left joins and merge in any additional from this instance
+            // Use Editor's left joins and merge in any additional from this instance
             var join = new List<LeftJoin>(_leftJoin);
 
-            foreach(var lfi in leftJoinIn) {
+            foreach (var lfi in leftJoinIn)
+            {
                 var found = false;
 
-                foreach(var inner in join) {
-                    if (inner.Table == lfi.Table) {
+                foreach (var inner in join)
+                {
+                    if (inner.Table == lfi.Table)
+                    {
                         found = true;
                     }
                 }
 
-                if (! found) {
+                if (!found)
+                {
                     join.Add(lfi);
                 }
             }
-            
-    		// Get the data for the pane options
+
+            // Get the data for the pane options
             var q = db.Query("select")
                 .Distinct(true)
                 .Table(table)
@@ -281,23 +299,27 @@ namespace DataTables
                 .Where(_where)
                 .LeftJoin(join);
 
-            if (viewTotal) {
+            if (viewTotal)
+            {
                 q.Get("COUNT(*) as total");
             }
 
-            if ( _order != null ) {
+            if (_order != null)
+            {
                 // For cases where we are ordering by a field which isn't included in the list
                 // of fields to display, we need to add the ordering field, due to the
                 // select distinct.
                 var orderFields = _order.Split(new[] { ',' });
 
-                foreach(var orderField in orderFields) {
+                foreach (var orderField in orderFields)
+                {
                     var clean = orderField.ToLower();
                     clean = clean.Replace(" asc", "");
                     clean = clean.Replace(" desc", "");
                     clean = clean.Trim();
 
-                    if (! q.Get().Contains(clean)) {
+                    if (!q.Get().Contains(clean))
+                    {
                         q.Get(clean);
                     }
                 }
@@ -305,71 +327,84 @@ namespace DataTables
                 q.Order(_order);
             }
 
-            var rows = q
-                .Exec()
-                .FetchAll();
+            var rows = q.Exec().FetchAll();
 
-            // Replace labels from database with enum names, fall back on database values 
-            if (_fromEnum.Count > 0) {
-                foreach (var row in rows) {
+            // Replace labels from database with enum names, fall back on database values
+            if (_fromEnum.Count > 0)
+            {
+                foreach (var row in rows)
+                {
                     row["label"] = _fromEnum[row["label"].ToString()] ?? row["label"].ToString();
                 }
             }
 
-    		// Remove any filtering entries that don't exist in the database (values might have changed)
-            if (http.searchPanes.ContainsKey(fieldIn.Name())) {
+            // Remove any filtering entries that don't exist in the database (values might have changed)
+            if (http.searchPanes.ContainsKey(fieldIn.Name()))
+            {
                 var values = rows.Select(r => r["value"].ToString());
                 var selected = http.searchPanes[fieldIn.Name()];
 
                 http.searchPanes[fieldIn.Name()] = selected.Intersect(values).ToArray();
             }
 
-	    	// Apply filters to cascade tables
-            if (viewCount || cascade) {
-                var entriesQuery = db.Query("select")
-                    .Distinct(true)
-                    .Table(table)
-                    .LeftJoin(join);
+            // Apply filters to cascade tables
+            if (viewCount || cascade)
+            {
+                var entriesQuery = db.Query("select").Distinct(true).Table(table).LeftJoin(join);
 
-                if (fieldIn.Apply("get") && fieldIn.GetValue() == null) {
+                if (fieldIn.Apply("get") && fieldIn.GetValue() == null)
+                {
                     gettingCount = true;
                     entriesQuery.Get(value + " as value");
                     entriesQuery.GroupBy(value);
 
                     // We viewTotal is enabled, we need to do a count to get the number of records,
                     // If it isn't we still need to know it exists, but don't care about the cardinality
-                    if (viewCount) {
+                    if (viewCount)
+                    {
                         entriesQuery.Get("COUNT(*) as count");
                     }
-                    else {
+                    else
+                    {
                         entriesQuery.Get("(1) as count");
                     }
                 }
 
                 // Construct the where queries based upon the options selected by the user
-                for(int i = 0; i < fields.Count(); i++) {
+                for (int i = 0; i < fields.Count(); i++)
+                {
                     var add = false;
                     var fieldName = fields[i].Name();
 
                     // If there is a last value set then a slightly different set of results is required for cascade
                     // That panes results are based off of the results when only considering the selections of all of the others
-                    if (http.searchPanesLast != null && fieldIn.Name() == http.searchPanesLast) {
-                        if (http.searchPanes.ContainsKey(fieldName) && fieldName != http.searchPanesLast) {
-                           add = true;
+                    if (http.searchPanesLast != null && fieldIn.Name() == http.searchPanesLast)
+                    {
+                        if (
+                            http.searchPanes.ContainsKey(fieldName)
+                            && fieldName != http.searchPanesLast
+                        )
+                        {
+                            add = true;
                         }
                     }
-                    else if (http.searchPanes != null && http.searchPanes.ContainsKey(fieldName)) {
+                    else if (http.searchPanes != null && http.searchPanes.ContainsKey(fieldName))
+                    {
                         add = true;
                     }
 
-                    if (add) {
-                        entriesQuery.Where(qu => {
-                            for(int j =0; j < http.searchPanes[fieldName].Count(); j++) {
+                    if (add)
+                    {
+                        entriesQuery.Where(qu =>
+                        {
+                            for (int j = 0; j < http.searchPanes[fieldName].Count(); j++)
+                            {
                                 qu.OrWhere(
                                     fields[i].DbField(),
-                                    http.searchPanes_null.ContainsKey(fieldName) && http.searchPanes_null[fieldName][j] ?
-                                        null :
-                                        http.searchPanes[fieldName][j],
+                                    http.searchPanes_null.ContainsKey(fieldName)
+                                    && http.searchPanes_null[fieldName][j]
+                                        ? null
+                                        : http.searchPanes[fieldName][j],
                                     "="
                                 );
                             }
@@ -377,29 +412,31 @@ namespace DataTables
                     }
                 }
 
-                var entriesRows = entriesQuery
-                    .Exec()
-                    .FetchAll();
+                var entriesRows = entriesQuery.Exec().FetchAll();
 
-    			// Key by the value for fast lookup
+                // Key by the value for fast lookup
                 entries = new Dictionary<string, object>();
 
-                foreach(var entry in entriesRows) {
+                foreach (var entry in entriesRows)
+                {
                     entries.Add(entry["value"].ToString(), entry);
                 }
             }
 
             var output = new List<Dictionary<string, object>>();
 
-            foreach(var row in rows) {
+            foreach (var row in rows)
+            {
                 var val = row["value"].ToString();
                 Int64? total = row.ContainsKey("total") ? (Int64?)row["total"] : null;
                 Int64? count = total;
 
-                if (entries != null) {
+                if (entries != null)
+                {
                     count = 0;
 
-                    if (entries.ContainsKey(val) && gettingCount) {
+                    if (entries.ContainsKey(val) && gettingCount)
+                    {
                         var diction = (Dictionary<string, object>)entries[val];
 
                         count = diction.ContainsKey("count")
@@ -408,34 +445,40 @@ namespace DataTables
 
                         // For when viewCount is enabled and viewTotal is not
                         // the total needs to be the same as the count!
-                        if (total == null) {
+                        if (total == null)
+                        {
                             total = count;
                         }
                     }
                 }
 
-                output.Add(new Dictionary<string, object>{
-                    {"label", formatter(
-                        (row["label"] is DBNull) ? null : row["label"].ToString()
-                    )},
-                    {"total", total},
-                    {"value", row["value"] is DBNull ? null : val},
-                    {"count", count}
-                });
+                output.Add(
+                    new Dictionary<string, object>
+                    {
+                        {
+                            "label",
+                            formatter((row["label"] is DBNull) ? null : row["label"].ToString())
+                        },
+                        { "total", total },
+                        { "value", row["value"] is DBNull ? null : val },
+                        { "count", count },
+                    }
+                );
             }
 
-		    // Only sort if there was no SQL order field
-            if (_order == null) {
+            // Only sort if there was no SQL order field
+            if (_order == null)
+            {
                 string emptyStringA = "";
                 string emptyStringB = "";
 
-                output.Sort((a, b) => (a["label"] == null && b["label"] == null) ?
-                    emptyStringA.CompareTo(emptyStringB) :
-                    (a["label"] == null) ?
-                        emptyStringA.CompareTo(b["label"].ToString()) :
-                        (b["label"] == null) ?
-                            a["label"].ToString().CompareTo(emptyStringB) :
-                            a["label"].ToString().CompareTo(b["label"].ToString())
+                output.Sort(
+                    (a, b) =>
+                        (a["label"] == null && b["label"] == null)
+                            ? emptyStringA.CompareTo(emptyStringB)
+                        : (a["label"] == null) ? emptyStringA.CompareTo(b["label"].ToString())
+                        : (b["label"] == null) ? a["label"].ToString().CompareTo(emptyStringB)
+                        : a["label"].ToString().CompareTo(b["label"].ToString())
                 );
             }
 

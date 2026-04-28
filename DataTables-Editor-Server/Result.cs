@@ -4,18 +4,18 @@
 // Class to define the results from an executed Query
 // </summary>
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
+using System.Linq;
 
 namespace DataTables
 {
     /// <summary>
     /// Result object given by a <code>Query</code> performed on a database.
-    /// 
+    ///
     /// The typical pattern for using this class is to receive an instance of it as a
     /// result of using the <code>Database</code> and <code>Query</code> class methods
     /// that return a result. This class should not be initialised independently.
-    /// 
+    ///
     /// Note that this is a stub class that a driver will extend and complete as
     /// required for individual database types. Individual drivers could add
     /// additional methods, but this is discouraged to ensure that the API is the
@@ -43,7 +43,6 @@ namespace DataTables
             _query = q;
         }
 
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
          */
@@ -66,8 +65,8 @@ namespace DataTables
             if (_FetchPointer < _dt.Rows.Count)
             {
                 DataRow row = _dt.Rows[_FetchPointer];
-                Dictionary<string, object> data = row.Table.Columns
-                    .Cast<DataColumn>()
+                Dictionary<string, object> data = row
+                    .Table.Columns.Cast<DataColumn>()
                     .ToDictionary(col => col.ColumnName, col => row[col.ColumnName]);
 
                 _FetchPointer++;
@@ -88,9 +87,8 @@ namespace DataTables
             foreach (DataRow row in _dt.Rows)
             {
                 data.Add(
-                    row.Table.Columns
-                      .Cast<DataColumn>()
-                      .ToDictionary(col => col.ColumnName, col => row[col.ColumnName])
+                    row.Table.Columns.Cast<DataColumn>()
+                        .ToDictionary(col => col.ColumnName, col => row[col.ColumnName])
                 );
             }
 

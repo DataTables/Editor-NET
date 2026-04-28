@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.Common;
 using DataTables.DatabaseUtil;
 
 namespace DataTables.DatabaseUtil.Postgres
@@ -19,14 +19,14 @@ namespace DataTables.DatabaseUtil.Postgres
         /// <param name="db">Host database</param>
         /// <param name="type">Query type</param>
         public Query(Database db, string type)
-            : base(db, type)
+            : base(db, type) { }
+
+        internal override string _fieldQuote
         {
+            get { return "\""; }
         }
 
-        override internal string _fieldQuote { get { return "\""; } }
-
         internal override string[] _identifierLimiter => new[] { "\"", "\"" };
-
 
         /// <summary>
         /// Bind parameters to the SQL statement
@@ -79,7 +79,8 @@ namespace DataTables.DatabaseUtil.Postgres
             cmd.Connection = _db.Conn();
             cmd.Transaction = _db.DbTransaction;
 
-            if (_db.CommandTimeout != -1) {
+            if (_db.CommandTimeout != -1)
+            {
                 cmd.CommandTimeout = _db.CommandTimeout;
             }
 
@@ -93,59 +94,74 @@ namespace DataTables.DatabaseUtil.Postgres
                 param.Value = binding.Value ?? DBNull.Value;
                 param.DbType = System.Data.DbType.Object;
 
-                if (binding.Value == null) {
+                if (binding.Value == null)
+                {
                     param.Value = DBNull.Value;
                 }
-                else if (binding.Type == null) {
+                else if (binding.Type == null)
+                {
                     // No binding type specified, attempt to create the correct type for Postgres.
                     // Editor's type system is very weak, but Postgres is strong.
                     // Postgres requires that numeric looking data is actually numeric
                     Type t = binding.Value.GetType();
 
                     // Transform based on the model properties
-                    if (t.Name == "Decimal") {
+                    if (t.Name == "Decimal")
+                    {
                         param.Value = Convert.ToDecimal(binding.Value);
                         param.DbType = System.Data.DbType.Decimal;
                     }
-                    else if (t.Name == "Int32") {
+                    else if (t.Name == "Int32")
+                    {
                         param.Value = Convert.ToInt32(binding.Value);
                         param.DbType = System.Data.DbType.Int32;
                     }
-                    else {
+                    else
+                    {
                         // Really simple numbers should be treated as integers
-                        try {
+                        try
+                        {
                             var str = binding.Value.ToString();
 
-                            if ( IsDigitsOnly(str) ) {
+                            if (IsDigitsOnly(str))
+                            {
                                 param.Value = Convert.ToInt32(binding.Value);
                                 param.DbType = System.Data.DbType.Int32;
                             }
                         }
-                        catch {}
+                        catch { }
 
                         // Attempt to auto detect date and time values by parsing the data
-                        try {
+                        try
+                        {
                             var str = binding.Value.ToString();
 
-                            if (str.IndexOf(',') >= 0 || (str.IndexOf('/') == -1 && str.IndexOf('-') == -1)) {
+                            if (
+                                str.IndexOf(',') >= 0
+                                || (str.IndexOf('/') == -1 && str.IndexOf('-') == -1)
+                            )
+                            {
                                 // noop
                             }
-                            else {
+                            else
+                            {
                                 param.Value = DateTime.Parse(binding.Value);
                                 param.DbType = System.Data.DbType.DateTime;
                             }
                         }
-                        catch {}
+                        catch { }
                     }
                 }
-                else {
+                else
+                {
                     param.DbType = binding.Type;
 
                     if (
-                        binding.Type == System.Data.DbType.Date ||
-                        binding.Type == System.Data.DbType.DateTime ||
-                        binding.Type == System.Data.DbType.DateTime2
-                    ) {
+                        binding.Type == System.Data.DbType.Date
+                        || binding.Type == System.Data.DbType.DateTime
+                        || binding.Type == System.Data.DbType.DateTime2
+                    )
+                    {
                         param.Value = DateTime.Parse(binding.Value);
                     }
                     else if (binding.Type == System.Data.DbType.Int16)
@@ -181,7 +197,6 @@ namespace DataTables.DatabaseUtil.Postgres
 
             _db.DebugInfo(sql, _bindings);
         }
-
 
         /// <summary>
         /// Execute the SQL command

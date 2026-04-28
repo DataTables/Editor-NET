@@ -19,7 +19,6 @@ namespace DataTables
         private IEnumerable<object> _DependsValues = null;
         private Func<object, Dictionary<string, object>, ValidationHost, bool> _DependsFn = null;
 
-
         /// <summary>
         /// Error message should the validation fail
         /// </summary>
@@ -40,7 +39,6 @@ namespace DataTables
         /// giving the ability to submit just a partial list of options.
         /// </summary>
         public bool Optional = true;
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public static methods
@@ -94,7 +92,9 @@ namespace DataTables
         /// </summary>
         /// <param name="fn">Callback function. The function should true if the validator should apply, false otherwise</param>
         /// <returns>Self for chaining</returns>
-        public ValidationOpts DependsOn(Func<object, Dictionary<string, object>, ValidationHost, bool> fn)
+        public ValidationOpts DependsOn(
+            Func<object, Dictionary<string, object>, ValidationHost, bool> fn
+        )
         {
             _DependsFn = fn;
 
@@ -136,7 +136,6 @@ namespace DataTables
 
             return this;
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods

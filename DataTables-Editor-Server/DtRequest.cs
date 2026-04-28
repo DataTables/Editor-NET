@@ -5,8 +5,8 @@
 // </summary>
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -33,13 +33,16 @@ namespace DataTables
         ///
         /// This static method is generic and not specific to the DtRequest. It
         /// may be used for other data formats as well.
-        /// 
+        ///
         /// Note that currently this does not support nested arrays or objects in arrays
         /// </summary>
         /// <param name="dataIn">Collection of HTTP parameters sent by the client-side</param>
         /// <param name="cultureStr">Culture for locale specific conversions</param>
         /// <returns>Dictionary with the data and values contained. These may contain nested lists and dictionaries.</returns>
-        public static Dictionary<string, object> HttpData(IEnumerable<KeyValuePair<string, string>> dataIn, string cultureStr = null)
+        public static Dictionary<string, object> HttpData(
+            IEnumerable<KeyValuePair<string, string>> dataIn,
+            string cultureStr = null
+        )
         {
             var dataOut = new Dictionary<string, object>();
             CultureInfo culture = null;
@@ -95,8 +98,6 @@ namespace DataTables
             return dataOut;
         }
 
-
-
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public parameters
          */
@@ -144,7 +145,7 @@ namespace DataTables
             /// <summary>
             /// Editor dropdown search request
             /// </summary>
-            EditorSearch
+            EditorSearch,
         };
 
         /* Server-side processing parameters */
@@ -199,7 +200,6 @@ namespace DataTables
         /// </summary>
         public List<ColumnT> Columns = new List<ColumnT>();
 
-
         /* Editor parameters */
 
         /// <summary>
@@ -252,7 +252,10 @@ namespace DataTables
          */
 
 #if NETCOREAPP
-        public DtRequest(IEnumerable<KeyValuePair<String, StringValues>> rawHttp, string culture=null)
+        public DtRequest(
+            IEnumerable<KeyValuePair<String, StringValues>> rawHttp,
+            string culture = null
+        )
         {
             var raw = rawHttp.ToDictionary(x => x.Key, x => x.Value.ToString());
             _Build(raw, culture);
@@ -268,8 +271,6 @@ namespace DataTables
         {
             _Build(rawHttp, culture);
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private functions
@@ -287,7 +288,15 @@ namespace DataTables
             }
 
             // Numeric looking data, but with leading zero
-            if (dataIn.Length > 1 && (dataIn.IndexOf('0') == 0 || dataIn.IndexOf('-') == dataIn.Length - 1 || dataIn.IndexOf(',') != -1 || dataIn.IndexOf('+') == 0))
+            if (
+                dataIn.Length > 1
+                && (
+                    dataIn.IndexOf('0') == 0
+                    || dataIn.IndexOf('-') == dataIn.Length - 1
+                    || dataIn.IndexOf(',') != -1
+                    || dataIn.IndexOf('+') == 0
+                )
+            )
             {
                 return dataIn;
             }
@@ -300,9 +309,10 @@ namespace DataTables
             }
 
             decimal testDec;
-            var resDec = culture != null
-                ? Decimal.TryParse(dataIn, NumberStyles.AllowDecimalPoint, culture, out testDec)
-                : Decimal.TryParse(dataIn, out testDec);
+            var resDec =
+                culture != null
+                    ? Decimal.TryParse(dataIn, NumberStyles.AllowDecimalPoint, culture, out testDec)
+                    : Decimal.TryParse(dataIn, out testDec);
             if (resDec)
             {
                 return testDec;
@@ -386,7 +396,7 @@ namespace DataTables
                 Search = new SearchT
                 {
                     Value = search["value"].ToString(),
-                    Regex = (Boolean)search["regex"]
+                    Regex = (Boolean)search["regex"],
                 };
 
                 if (http.ContainsKey("order"))
@@ -395,11 +405,13 @@ namespace DataTables
                     {
                         var order = item.Value as Dictionary<string, object>;
 
-                        Order.Add(new OrderT
-                        {
-                            Column = (int)order["column"],
-                            Dir = order["dir"].ToString()
-                        });
+                        Order.Add(
+                            new OrderT
+                            {
+                                Column = (int)order["column"],
+                                Dir = order["dir"].ToString(),
+                            }
+                        );
                     }
                 }
 
@@ -417,7 +429,7 @@ namespace DataTables
                         {
                             Value = colSearch["value"].ToString(),
                             Regex = (Boolean)colSearch["regex"],
-                        }
+                        },
                     };
 
                     // Parse ColumnControl, if any is given
@@ -459,7 +471,7 @@ namespace DataTables
 
                         col.ColumnControl = cc;
                     }
-                    
+
                     Columns.Add(col);
                 }
 
@@ -467,12 +479,14 @@ namespace DataTables
                 if (http.ContainsKey("searchPanes"))
                 {
                     // Get the column names
-                    Dictionary<string, object> httpSP = (Dictionary<string, object>)http["searchPanes"];
+                    Dictionary<string, object> httpSP =
+                        (Dictionary<string, object>)http["searchPanes"];
                     List<string> keyList = new List<string>(httpSP.Keys);
 
                     foreach (var key in keyList)
                     {
-                        Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                        Dictionary<string, object> httpSPKey =
+                            (Dictionary<string, object>)httpSP[key];
                         List<string> keykeyList = new List<string>(httpSPKey.Keys);
                         string[] values = new string[keykeyList.Count()];
                         int count = 0;
@@ -487,7 +501,6 @@ namespace DataTables
                         {
                             searchPanes.Add(key, values);
                         }
-
                     }
                 }
 
@@ -495,12 +508,14 @@ namespace DataTables
                 if (http.ContainsKey("searchPanes_null"))
                 {
                     // Get the column names
-                    Dictionary<string, object> httpSP = (Dictionary<string, object>)http["searchPanes_null"];
+                    Dictionary<string, object> httpSP =
+                        (Dictionary<string, object>)http["searchPanes_null"];
                     List<string> keyList = new List<string>(httpSP.Keys);
 
                     foreach (var key in keyList)
                     {
-                        Dictionary<string, object> httpSPKey = (Dictionary<string, object>)httpSP[key];
+                        Dictionary<string, object> httpSPKey =
+                            (Dictionary<string, object>)httpSP[key];
                         List<string> keykeyList = new List<string>(httpSPKey.Keys);
                         bool[] values = new bool[keykeyList.Count()];
                         int count = 0;
@@ -518,7 +533,6 @@ namespace DataTables
                         {
                             searchPanes_null.Add(key, values);
                         }
-
                     }
                 }
                 // searchPanesLast
@@ -539,7 +553,9 @@ namespace DataTables
                 // SearchBuilder
                 if (http.ContainsKey("searchBuilder") && !(http["searchBuilder"] is String))
                 {
-                    searchBuilder = searchBuilderParse((Dictionary<String, object>)http["searchBuilder"]);
+                    searchBuilder = searchBuilderParse(
+                        (Dictionary<String, object>)http["searchBuilder"]
+                    );
                 }
             }
             else
@@ -578,8 +594,6 @@ namespace DataTables
 
             return sb;
         }
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Nested classes

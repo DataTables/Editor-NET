@@ -9,12 +9,12 @@ namespace DataTables
     /// The MJoin class provides a one-to-many join link for Editor. This can
     /// be useful in cases were an attribute can take multiple values at the
     /// same time - for example cumulative security access levels.
-    /// 
+    ///
     /// Typically the MJoin class should be used with a link table, but this is
     /// optional. Please note that if you don't use a link table you should be
     /// aware that on edit the linked rows are deleted and then reinserted, thus
     /// if any values should be retained they should also be submitted.
-    /// 
+    ///
     /// Please refer to the Editor .NET documentation for further information
     /// https://editor.datatables.net/manual/net
     /// </summary>
@@ -51,11 +51,11 @@ namespace DataTables
         private string _linkHostField;
         private string _linkChildField;
         private string _order;
-        private List<Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>> _validators = new List<Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>>();
+        private List<
+            Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>
+        > _validators =
+            new List<Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string>>();
         private List<string> _validatorFields = new List<string>();
-
-
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Public methods
@@ -123,12 +123,12 @@ namespace DataTables
         /// <summary>
         /// Create a join link between two tables. The order of the fields does not
         /// matter, but each field must contain the table name as well as the field name.
-        /// 
+        ///
         /// This method can be called a maximum of two times for an MJoin instance:
-        /// 
+        ///
         /// * First time, creates a link between the Editor host table and a join table
         /// * Second time creates the links required for a link table.
-        /// 
+        ///
         /// Please refer to the Editor MJoin documentation for further details:
         /// https://editor.datatables.net/manual/net
         /// </summary>
@@ -139,12 +139,16 @@ namespace DataTables
         {
             if (field1.IndexOf('.') == -1 || field2.IndexOf('.') == -1)
             {
-                throw new Exception("MJoin fields must contain both the table name and the column name");
+                throw new Exception(
+                    "MJoin fields must contain both the table name and the column name"
+                );
             }
 
             if (_links.Count() == 4)
             {
-                throw new Exception("MJoin Link method cannot be called more than twice for a single instance");
+                throw new Exception(
+                    "MJoin Link method cannot be called more than twice for a single instance"
+                );
             }
 
             // Add to list - it is resolved later on
@@ -257,7 +261,10 @@ namespace DataTables
             return this;
         }
 
-        public MJoin Validator(string fieldName, Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> fn)
+        public MJoin Validator(
+            string fieldName,
+            Func<Editor, DtRequest.RequestTypes, Dictionary<string, object>, string> fn
+        )
         {
             _validators.Add(fn);
             _validatorFields.Add(fieldName);
@@ -267,9 +274,9 @@ namespace DataTables
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -289,10 +296,7 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public MJoin Where(Action<Query> fn)
         {
-            _where.Add(new WhereCondition
-            {
-                Custom = fn
-            });
+            _where.Add(new WhereCondition { Custom = fn });
 
             return this;
         }
@@ -300,9 +304,9 @@ namespace DataTables
         /// <summary>
         /// Where condition to add to the query used to get data from the database.
         /// Multiple conditions can be added if required.
-        /// 
+        ///
         /// Can be used in two different ways:
-        /// 
+        ///
         /// * Simple case: `where( field, value, operator )`
         /// * Complex: `where( fn )`
         ///
@@ -324,16 +328,17 @@ namespace DataTables
         /// <returns>Self for chaining</returns>
         public MJoin Where(string key, dynamic value, string op = "=")
         {
-            _where.Add(new WhereCondition
-            {
-                Key = key,
-                Value = value,
-                Operator = op
-            });
+            _where.Add(
+                new WhereCondition
+                {
+                    Key = key,
+                    Value = value,
+                    Operator = op,
+                }
+            );
 
             return this;
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Internal methods
@@ -357,9 +362,11 @@ namespace DataTables
                 var pkeyA = editor.Pkey();
                 if (pkeyA.Length > 1)
                 {
-                    throw new Exception("MJoin is not currently supported with a compound primary key for the main table.");
+                    throw new Exception(
+                        "MJoin is not currently supported with a compound primary key for the main table."
+                    );
                 }
-                
+
                 var readField = "";
                 var joinFieldSplit = _hostField.Split(new[] { '.' });
                 var joinFieldTable = joinFieldSplit.First();
@@ -370,7 +377,8 @@ namespace DataTables
                 var pkeyIsJoin = _hostField == pkeyA[0] || _hostField == editor.Table()[0];
 
                 // Build the basic query
-                var query = editor.Db()
+                var query = editor
+                    .Db()
                     .Query("select")
                     .Distinct(true)
                     .Get(_hostField + " as dteditor_pkey")
@@ -384,7 +392,11 @@ namespace DataTables
                 _ApplyWhere(query);
                 query.LeftJoin(_leftJoin);
 
-                foreach (var field in _fields.Where(field => field.Apply("get") && field.GetValue() == null))
+                foreach (
+                    var field in _fields.Where(field =>
+                        field.Apply("get") && field.GetValue() == null
+                    )
+                )
                 {
                     if (field.DbField().IndexOf('.') == -1)
                     {
@@ -418,9 +430,11 @@ namespace DataTables
                 else if (!pkeyIsJoin)
                 {
                     throw new Exception(
-                        "Join was performed on the field '" + _hostField + "' which was not " +
-                        "included in the Editor field list. The join field must be " +
-                        "included as a regular field in the Editor instance."
+                        "Join was performed on the field '"
+                            + _hostField
+                            + "' which was not "
+                            + "included in the Editor field list. The join field must be "
+                            + "included as a regular field in the Editor instance."
                     );
                 }
 
@@ -442,9 +456,10 @@ namespace DataTables
 
                         foreach (var data in response.data)
                         {
-                            whereIn.Add(pkeyIsJoin
-                                ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
-                                : NestedData.ReadProp(readField, data).ToString()
+                            whereIn.Add(
+                                pkeyIsJoin
+                                    ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
+                                    : NestedData.ReadProp(readField, data).ToString()
                             );
                         }
 
@@ -483,9 +498,11 @@ namespace DataTables
                         ? (data["DT_RowId"].ToString()).Replace(editor.IdPrefix(), "")
                         : NestedData.ReadProp(readField, data).ToString();
 
-                    data.Add(_name, join.ContainsKey(linkField)
-                        ? join[linkField]
-                        : new List<Dictionary<string, object>>()
+                    data.Add(
+                        _name,
+                        join.ContainsKey(linkField)
+                            ? join[linkField]
+                            : new List<Dictionary<string, object>>()
                     );
                 }
             }
@@ -517,7 +534,8 @@ namespace DataTables
                     // do this - todo
                     var a = _childField.Split(new[] { '.' });
 
-                    _editor.Db()
+                    _editor
+                        .Db()
                         .Query("Insert")
                         .Table(_linkTable)
                         .Set(_linkHostField.Split(new[] { '.' }).Last(), parentId)
@@ -526,7 +544,8 @@ namespace DataTables
                 }
                 else
                 {
-                    var query = _editor.Db()
+                    var query = _editor
+                        .Db()
                         .Query("Insert")
                         .Table(_table)
                         .Set(_childField.Split(new[] { '.' }).Last(), parentId);
@@ -535,7 +554,10 @@ namespace DataTables
                     {
                         if (field.Apply("set", dataSet))
                         {
-                            query.Set(field.DbField().Split(new[] { '.' }).Last(), field.Val("set", dataSet));
+                            query.Set(
+                                field.DbField().Split(new[] { '.' }).Last(),
+                                field.Val("set", dataSet)
+                            );
                         }
                     }
 
@@ -560,7 +582,7 @@ namespace DataTables
                 if (optsInst != null)
                 {
                     var opts = optsInst.Exec(db, refresh);
-                    
+
                     if (opts != null)
                     {
                         options.Add(_name + "[]." + field.Name(), opts);
@@ -604,17 +626,18 @@ namespace DataTables
 
             if (_linkTable != null)
             {
-                var query = editor.Db()
+                var query = editor
+                    .Db()
                     .Query("Delete")
                     .Table(_linkTable)
                     .OrWhere(_linkHostField, ids);
 
-                query
-                    .Exec();
+                query.Exec();
             }
             else
             {
-                var query = editor.Db()
+                var query = editor
+                    .Db()
                     .Query("Delete")
                     .Table(_table)
                     .WhereGroup(q =>
@@ -628,14 +651,18 @@ namespace DataTables
             }
         }
 
-
         /// <summary>
         /// Validate the MJoin fields submitted
         /// </summary>
         /// <param name="response">DataTables response object to record the errors</param>
         /// <param name="editor">Host Editor instance</param>
         /// <param name="data">Data submitted by the client</param>
-        internal void Validate(DtResponse response, Editor editor, Dictionary<string, object> data, DtRequest.RequestTypes action)
+        internal void Validate(
+            DtResponse response,
+            Editor editor,
+            Dictionary<string, object> data,
+            DtRequest.RequestTypes action
+        )
         {
             if (!_set)
             {
@@ -643,9 +670,9 @@ namespace DataTables
             }
 
             _Prepare(editor);
-            var list = data.ContainsKey(_name) ?
-                (Dictionary<string, object>)data[_name] :
-                new Dictionary<string, object>();
+            var list = data.ContainsKey(_name)
+                ? (Dictionary<string, object>)data[_name]
+                : new Dictionary<string, object>();
 
             // Grouped validation
             for (var i = 0; i < _validators.Count(); i++)
@@ -654,11 +681,9 @@ namespace DataTables
 
                 if (res != "" && res != null)
                 {
-                    response.fieldErrors.Add(new DtResponse.FieldError
-                    {
-                        name = _validatorFields[i],
-                        status = res
-                    });
+                    response.fieldErrors.Add(
+                        new DtResponse.FieldError { name = _validatorFields[i], status = res }
+                    );
                 }
             }
 
@@ -671,16 +696,17 @@ namespace DataTables
 
                     if (validation != null)
                     {
-                        response.fieldErrors.Add(new DtResponse.FieldError
-                        {
-                            name = _name + "[]." + field.Name(),
-                            status = validation
-                        });
+                        response.fieldErrors.Add(
+                            new DtResponse.FieldError
+                            {
+                                name = _name + "[]." + field.Name(),
+                                status = validation,
+                            }
+                        );
                     }
                 }
             }
         }
-
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * Private methods
@@ -744,10 +770,11 @@ namespace DataTables
                     // table, or the child table - this is based on the
                     // partner property that was given with this linking
                     // field when 'Link()' was called.
-                    var partner = i == 0 ? _links[1] :
-                        i == 1 ? _links[0] :
-                        i == 2 ? _links[3] :
-                                 _links[2];
+                    var partner =
+                        i == 0 ? _links[1]
+                        : i == 1 ? _links[0]
+                        : i == 2 ? _links[3]
+                        : _links[2];
 
                     if (partner.Contains(_table + ".") && partner.IndexOf(_table + ".") == 0)
                     {
@@ -770,9 +797,9 @@ namespace DataTables
             foreach (var pi in _userModelT.GetProperties())
             {
                 // Check for ignore attribute
-                var ignAttr = pi
-                    .GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
-                    .Cast<EditorIgnoreAttribute>().FirstOrDefault();
+                var ignAttr = pi.GetCustomAttributes(typeof(EditorIgnoreAttribute), true)
+                    .Cast<EditorIgnoreAttribute>()
+                    .FirstOrDefault();
 
                 if (ignAttr != null && ignAttr.Ignore)
                 {
@@ -792,7 +819,8 @@ namespace DataTables
                 field.Type(pi.PropertyType);
 
                 var err = pi.GetCustomAttributes(typeof(EditorTypeErrorAttribute), false)
-                     .Cast<EditorTypeErrorAttribute>().FirstOrDefault();
+                    .Cast<EditorTypeErrorAttribute>()
+                    .FirstOrDefault();
 
                 if (err != null)
                 {
@@ -800,25 +828,26 @@ namespace DataTables
                 }
 
                 var name = pi.GetCustomAttributes(typeof(EditorHttpNameAttribute), false)
-                     .Cast<EditorHttpNameAttribute>().FirstOrDefault();
+                    .Cast<EditorHttpNameAttribute>()
+                    .FirstOrDefault();
 
                 if (name != null)
                 {
                     field.Name(name.Name);
                 }
 
-                var get = pi
-                    .GetCustomAttributes(typeof(EditorGetAttribute), false)
-                    .Cast<EditorGetAttribute>().FirstOrDefault();
+                var get = pi.GetCustomAttributes(typeof(EditorGetAttribute), false)
+                    .Cast<EditorGetAttribute>()
+                    .FirstOrDefault();
 
                 if (get != null)
                 {
                     field.Get(get.Get);
                 }
 
-                var set = pi
-                    .GetCustomAttributes(typeof(EditorSetAttribute), false)
-                    .Cast<EditorSetAttribute>().FirstOrDefault();
+                var set = pi.GetCustomAttributes(typeof(EditorSetAttribute), false)
+                    .Cast<EditorSetAttribute>()
+                    .FirstOrDefault();
 
                 if (set != null)
                 {
@@ -857,7 +886,7 @@ namespace DataTables
         /// Get a list of table names that the host Editor instance can use
         /// </summary>
         /// <returns>List of tables</returns>
-        private List<string> _ParentTables ()
+        private List<string> _ParentTables()
         {
             var resolved = new List<string>();
             var i = 0;
@@ -865,13 +894,13 @@ namespace DataTables
             var joins = _editor.LeftJoin();
 
             // Main table(s)
-            for (i=0 ; i<tables.Count() ; i++)
+            for (i = 0; i < tables.Count(); i++)
             {
                 resolved.Add(tables[i]);
             }
 
             // Left joined tables
-            for (i=0 ; i<joins.Count() ; i++)
+            for (i = 0; i < joins.Count(); i++)
             {
                 resolved.Add(joins[i].Table);
             }
