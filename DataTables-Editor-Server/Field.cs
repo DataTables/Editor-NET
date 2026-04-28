@@ -233,11 +233,20 @@ namespace DataTables
             return this;
         }
 
+		/// <summary>
+		/// Get the database type for the field
+		/// </summary>
+		/// <returns>The DB type</returns>
         public DbType? DbType()
         {
             return _dbType;
         }
 
+		/// <summary>
+		/// Set the database type for the field
+		/// </summary>
+        /// <param name="type">DB type to set</param>
+		/// <returns>Self for chaining</returns>
         public Field DbType(DbType? type)
         {
             _dbType = type;

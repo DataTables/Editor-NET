@@ -171,7 +171,7 @@ namespace DataTables.DatabaseUtil.Oracle
         /// <returns>Result instance</returns>
         protected override DataTables.Result _Exec()
         {
-            var dt = new DataTable();
+            var dt = new System.Data.DataTable();
 
             /*
             if (_type == "insert")

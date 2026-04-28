@@ -1,4 +1,4 @@
-.NET libraries for DataTables Editor
+.NET libraries for DataTables
 The MIT License (MIT)
 
 Copyright (c) 2018-present SpryMedia Limited and other contributors

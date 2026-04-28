@@ -1,4 +1,4 @@
-// <copyright>Copyright (c) 2014-2017 SpryMedia Ltd - All Rights Reserved</copyright>
+// <copyright>Copyright (c) SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // Editor class for reading tables as well as creating, editing and deleting rows
@@ -111,7 +111,7 @@ namespace DataTables
         /// <summary>
         /// Version string
         /// </summary>
-        public const string Version = "2.5.2";
+        public const string Version = "3.0.0-dev";
 
         /// <summary>
         /// Create a new Editor instance
@@ -401,6 +401,7 @@ namespace DataTables
         /// </summary>
         /// <param name="f">Field name to select</param>
         /// <returns>Field instance</returns>
+		/// <exception cref="Exception">Unknown field name</exception>
         public Field Field(string f)
         {
             for (var i = 0; i < _field.Count(); i++)
