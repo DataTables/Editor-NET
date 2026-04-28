@@ -82,6 +82,53 @@ namespace DataTables
          * Public methods
          */
 
+		/// <summary>
+		/// Get a column instance that has already been added
+		/// </summary>
+		/// <param name="name">Column name to get</param>
+		/// <returns>Colum instance</returns>
+		/// <exception cref="Exception">Unknown column name</exception>
+		public Column Column(string name)
+		{
+            for (var i = 0; i < _columns.Count(); i++)
+            {
+                if (_columns[i].Name() == name)
+                {
+                    return _columns[i];
+                }
+            }
+
+            throw new Exception("Unknown column: " + name);
+		}
+
+		/// <summary>
+		/// Add a single column
+		/// </summary>
+		/// <param name="column">Column instance</param>
+		/// <returns>Self for chaining</returns>
+		public DataTable Column(Column column)
+		{
+			_columns.Add(column);
+            _editor.Field(column.Field());
+
+			return this;
+		}
+
+		/// <summary>
+		/// Add a single column
+		/// </summary>
+		/// <param name="column">Column instance</param>
+		/// <returns>Self for chaining</returns>
+		public DataTable Columns(IEnumerable<Column> columns)
+		{
+            foreach (var c in columns)
+            {
+                Column(c);
+            }
+
+			return this;
+		}
+
         /// <summary>
         /// Get the response object that has been created by this instance. This
         /// is only useful after <code>process()</code> has been called.
@@ -155,38 +202,6 @@ namespace DataTables
             _editor.Debug(debug);
             return this;
         }
-
-		/// <summary>
-		/// Get a column instance that has already been added
-		/// </summary>
-		/// <param name="name">Column name to get</param>
-		/// <returns>Colum instance</returns>
-		/// <exception cref="Exception">Unknown column name</exception>
-		public Column Column(string name)
-		{
-            for (var i = 0; i < _columns.Count(); i++)
-            {
-                if (_columns[i].Name() == name)
-                {
-                    return _columns[i];
-                }
-            }
-
-            throw new Exception("Unknown column: " + name);
-		}
-
-		/// <summary>
-		/// Add a single column
-		/// </summary>
-		/// <param name="column">Column instance</param>
-		/// <returns>Self for chaining</returns>
-		public DataTable Column(Column column)
-		{
-			_columns.Add(column);
-            _editor.Field(column.Field());
-
-			return this;
-		}
 
         /// <summary>
         /// Get the DOM prefix.

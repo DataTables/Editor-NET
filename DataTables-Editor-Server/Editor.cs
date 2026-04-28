@@ -427,11 +427,25 @@ namespace DataTables
         }
 
         /// <summary>
-        /// Add multiple fields too this instance
+        /// Add multiple fields to this instance
         /// </summary>
         /// <param name="fields">Collection of fields to add</param>
         /// <returns>Self for chaining</returns>
         public Editor Field(IEnumerable<Field> fields)
+        {
+            foreach (var f in fields)
+            {
+                _field.Add(f);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Add multiple fields to this instance
+        /// </summary>
+        /// <param name="fields">Collection of fields to add</param>
+        /// <returns>Self for chaining</returns>
+        public Editor Fields(IEnumerable<Field> fields)
         {
             foreach (var f in fields)
             {
