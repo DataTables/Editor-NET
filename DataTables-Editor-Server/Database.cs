@@ -1,4 +1,4 @@
-﻿// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
+// <copyright>Copyright (c) 2014 SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // DataTables database abstraction library core class.

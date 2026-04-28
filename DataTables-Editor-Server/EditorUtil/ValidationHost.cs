@@ -1,4 +1,4 @@
-﻿// <copyright>Copyright (c) SpryMedia Ltd - All Rights Reserved</copyright>
+// <copyright>Copyright (c) SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // Information passed to validation methods about their host callers

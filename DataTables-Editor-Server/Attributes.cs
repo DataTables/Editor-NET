@@ -1,4 +1,4 @@
-﻿// <copyright>Copyright (c) SpryMedia Ltd - All Rights Reserved</copyright>
+// <copyright>Copyright (c) SpryMedia Ltd - All Rights Reserved</copyright>
 //
 // <summary>
 // Attributes that can be used for properties in Editor models
