@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using IFormFile = Microsoft.AspNetCore.Http.IFormFile;
