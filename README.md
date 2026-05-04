@@ -1,6 +1,6 @@
 # DataTables .NET server-side libraries
 
-This is a collection of .NET libraries (.NET Framework, .NET Core and .NET) to provide easy server-side support for the [DataTables](https://datatables.net/) - _the_ Javascript table library.
+This is a collection of .NET libraries (.NET Framework, .NET Core and .NET) to provide easy server-side support for [DataTables](https://datatables.net/) - _the_ Javascript table library.
 
 These libraries provide support for:
 
