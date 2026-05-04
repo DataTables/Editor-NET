@@ -5,7 +5,7 @@ This is a collection of .NET libraries (.NET Framework, .NET Core and .NET) to p
 These libraries provide support for:
 
 * Server-side processing - work with millions of rows
-* Editor - CRUD UI for DataTables
+* [Editor](https://editor.datatables.net) - CRUD UI for DataTables
 * ColumnControl - Column search controls for DataTables
 * SearchBuilder - Complex search logic UI
 
@@ -20,7 +20,7 @@ Available on [NuGet](https://www.nuget.org/packages/datatables-editor-server), t
 dotnet add package DataTables-Editor-Server
 ```
 
-The library introduces the `DataTables` namespace, under which you will find the relevent classes and methods. There are two primary entry points:
+The library introduces the `DataTables` namespace, under which you will find the relevant classes and methods. There are two primary entry points:
 
 * `DataTable` - for read only tables
 * `Editor` - for read / write tables, with [Editor](https://editor.datatables.net/)
@@ -84,7 +84,7 @@ namespace EditorNetDemo.Controllers
 }
 ```
 
-Similarly, if your table is readonly, the `DataTable` and `Column` classes can be used:
+Similarly, if your table is readonly, the `DataTable` and `Column` classes can be used (this will support DataTables' client-side or server-side processing modes):
 
 ```csharp
 using System;
@@ -124,11 +124,11 @@ namespace EditorNetDemo.Controllers
 }
 ```
 
-### Documentation
+## Documentation
 
 For full documentation, [please refer to the DataTables site](https://datatables.net/manual/net).
 
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for full text.
+MIT — see [LICENSE](License.txt) for full text.
