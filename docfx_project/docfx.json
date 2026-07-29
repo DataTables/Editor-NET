@@ -4,10 +4,8 @@
       "src": [
         {
           "files": [
-            "*.csproj",
-            "**/*.cs"
+            "**.dll"
           ],
-          "exclude": [ "**/obj/**" ],
           "src": "../DataTables-Editor-Server"
         }
       ],
