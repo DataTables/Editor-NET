@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;netcoreapp2.1;net48</TargetFrameworks>
-    <Version >3.0.0</Version>
+    <Version >3.0.1</Version>
     <Authors>SpryMedia Ltd</Authors>
     <Product>DataTables - server-side libraries for .NET</Product>
     <Copyright>SpryMedia Ltd</Copyright>
@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/DataTables/Editor-NET</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>DataTables, Javascript, Editor, CRUD</PackageTags>
-    <AssemblyVersion >3.0.0.0</AssemblyVersion>
+    <AssemblyVersion >3.0.1.0</AssemblyVersion>
     <PackageLicenseUrl>https://datatables.net/license</PackageLicenseUrl>
     <Description>This library provides support for DataTables on the server-side, including for its extensions such as Editor.
 
