@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using DataTables.EditorUtil;
 #if NETCOREAPP
@@ -35,10 +36,10 @@ namespace DataTables
         private string _columnTable = "table";
         private string _columnUser = "user";
         private Database _db;
-        private DtResponse _result;
+        private DtResponse _result = new DtResponse();
         private Dictionary<string, object> _set = new Dictionary<string, object>();
         private string _table = "";
-        private string _userId = "";
+        private dynamic _userId = null;
         private readonly List<WhereCondition> _where = new List<WhereCondition>();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -49,7 +50,7 @@ namespace DataTables
         /// Get the column name for the default state flag
         /// </summary>
         /// <returns>Column name</returns>
-        public string columnDefault()
+        public string ColumnDefault()
         {
             return _columnDefault;
         }
@@ -59,7 +60,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnDefault(string col)
+		public StateRestore ColumnDefault(string col)
         {
             _columnDefault = col;
             return this;
@@ -69,7 +70,7 @@ namespace DataTables
         /// Get the column name for the table's primary key
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnId()
+		public string ColumnId()
         {
             return _columnId;
         }
@@ -79,7 +80,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnId(string col)
+		public StateRestore ColumnId(string col)
         {
             _columnId = col;
             return this;
@@ -89,7 +90,7 @@ namespace DataTables
         /// Get the column name for the state's name
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnName()
+		public string ColumnName()
         {
             return _columnName;
         }
@@ -99,7 +100,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnName(string col)
+		public StateRestore ColumnName(string col)
         {
             _columnName = col;
             return this;
@@ -109,7 +110,7 @@ namespace DataTables
         /// Get the column name for the URL (path) of where the state applied
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnPath()
+		public string ColumnPath()
         {
             return _columnPath;
         }
@@ -119,7 +120,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnPath(string col)
+		public StateRestore ColumnPath(string col)
         {
             _columnPath = col;
             return this;
@@ -129,7 +130,7 @@ namespace DataTables
         /// Get the column name for the shared flag
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnShared()
+		public string ColumnShared()
         {
             return _columnShared;
         }
@@ -139,7 +140,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnShared(string col)
+		public StateRestore ColumnShared(string col)
         {
             _columnShared = col;
             return this;
@@ -149,7 +150,7 @@ namespace DataTables
         /// Get the column name for where the state itself is stored
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnState()
+		public string ColumnState()
         {
             return _columnState;
         }
@@ -159,7 +160,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnState(string col)
+		public StateRestore ColumnState(string col)
         {
             _columnState = col;
             return this;
@@ -169,7 +170,7 @@ namespace DataTables
         /// Get the column name for where the name of the host DataTable stored
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnTable()
+		public string ColumnTable()
         {
             return _columnTable;
         }
@@ -179,7 +180,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnTable(string col)
+		public StateRestore ColumnTable(string col)
         {
             _columnTable = col;
             return this;
@@ -190,7 +191,7 @@ namespace DataTables
 		/// identifier is stored.
         /// </summary>
         /// <returns>Column name</returns>
-		public string columnUser()
+		public string ColumnUser()
         {
             return _columnUser;
         }
@@ -201,7 +202,7 @@ namespace DataTables
         /// </summary>
         /// <param name="col">Column name</param>
         /// <returns>Self for chaining</returns>
-		public StateRestore columnUser(string col)
+		public StateRestore ColumnUser(string col)
         {
             _columnUser = col;
             return this;
@@ -212,7 +213,7 @@ namespace DataTables
 		/// processed.
         /// </summary>
         /// <returns>The result data</returns>
-		public DtResponse data()
+        public DtResponse Data()
         {
             return _result;
         }
@@ -349,7 +350,7 @@ namespace DataTables
         /// user id, but it could be any other unique identifier.
         /// </summary>
         /// <returns>User id</returns>
-        public string User()
+        public dynamic User()
         {
             return _userId;
         }
@@ -360,7 +361,7 @@ namespace DataTables
         /// </summary>
         /// <param name="user">User id</param>
         /// <returns>Self for chaining</returns>
-        public StateRestore User(string user)
+        public StateRestore User(dynamic user)
         {
             _userId = user;
             return this;
@@ -411,50 +412,85 @@ namespace DataTables
         /// Create a new StateRestore instance
         /// </summary>
         /// <param name="db">An instance of the DataTables Database class that we can use for the DB connection. Can also be set with the <code>Db()</code> method.</param>
-        StateRestore(Database db)
-        {
-            _db = db;
-        }
-
-        /// <summary>
-        /// Create a new StateRestore instance
-        /// </summary>
-        /// <param name="db">An instance of the DataTables Database class that we can use for the DB connection. Can also be set with the <code>Db()</code> method.</param>
-        /// <param name="table">The table name in the database to read and write information from and to. Can also be set with the <code>Table()</code> method.</param>
-        StateRestore(Database db, string table)
-        {
-            _db = db;
-            _table = table;
-        }
-
-        /// <summary>
-        /// Create a new StateRestore instance
-        /// </summary>
-        /// <param name="db">An instance of the DataTables Database class that we can use for the DB connection. Can also be set with the <code>Db()</code> method.</param>
         /// <param name="table">The table name in the database to read and write information from and to. Can also be set with the <code>Table()</code> method.</param>
         /// <param name="pkey">Primary key column names in the table given. Can also be set with the <code>ColumnId()</code> method.</param>
-		StateRestore(Database db, string table, string pkey)
+		public StateRestore(Database db = null, string table = null, string pkey = null)
         {
-            _db = db;
-            _table = table;
-            _columnId = pkey;
+            if (db != null)
+            {
+                _db = db;
+            }
+            
+            if (table != null)
+            {
+                _table = table;
+            }
+            
+            if (pkey != null)
+            {
+                _columnId = pkey;
+            }
         }
 
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 		* Private methods
 		*/
-        private bool _AssertState(DtRequest data)
+        private DtResponse _AssertState(StateRestoreRequest data)
         {
-            // TODO
-            return true;
+            var error = "";
+
+            if (data.Name == "")
+            {
+                error = "Incomplete data - no name";
+            }
+
+            if (data.State == "")
+            {
+                error = "Incomplete data - no name";
+            }
+
+            if (error != "")
+            {
+                return new DtResponse
+                {
+                    error = error
+                };
+            }
+
+            return _AssertStateHost(data);
+        }
+
+        private DtResponse _AssertStateHost(StateRestoreRequest data)
+        {
+            var error = "";
+
+            if (data.Path == "")
+            {
+                error = "Incomplete data - no path";
+            }
+
+            if (data.Table == "")
+            {
+                error = "Incomplete data - no table";
+            }
+
+            if (error != "")
+            {
+                return new DtResponse
+                {
+                    error = error
+                };
+            }
+
+            return null;
         }
 
         private StateRestore _Process(StateRestoreRequest data)
         {
             if (data.Action == "state-read")
             {
-                // _Read(data);
+                _result = _Read(data);
             }
             else if (data.Action == "state-create")
             {
@@ -470,6 +506,103 @@ namespace DataTables
             }
 
             return this;
+        }
+
+        private DtResponse _Read(StateRestoreRequest data, dynamic id=null)
+        {
+		// Must have the table and path, otherwise all states would be returned!
+            var validated = _AssertStateHost(data);
+
+            if (validated != null)
+            {
+                return validated;
+            }
+
+            var q = _db.Query("select").Table(_table).Get(_columnId);
+
+            if (_columnDefault != "")
+            {
+                q.Get(_columnDefault + " as isDefault");
+            }
+
+            if (_columnName != "")
+            {
+                q.Get(_columnName + " as name");
+            }
+
+            if (_columnShared != "")
+            {
+                q.Get(_columnShared + " as isSharedOut");
+            }
+
+            if (_columnState != "")
+            {
+                q.Get(_columnState + " as state");
+            }
+
+            if (_columnUser != "")
+            {
+                q.Get(_columnUser + " as user");
+            }
+
+            q.Where(_columnTable, data.Table);
+            q.Where(_columnPath, data.Path);
+
+            if (id != null)
+            {
+                q.Where(_columnId, id);
+            }
+
+            // The user id is optional, but there can't be any separation of
+            // user states without it!
+            if (_userId != null)
+            {
+                q.Where(r =>
+                {
+                    r.Where(_columnUser, _userId);
+                    r.OrWhere(_columnShared, 1);
+                });
+            }
+
+            // Dev set conditions
+            foreach (var where in _where)
+            {
+                if (where.Custom != null)
+                {
+                    where.Custom(q);
+                }
+                else
+                {
+                    q.Where(where.Key, where.Value, where.Operator);
+                }
+            }
+
+		    // Run the assembled query
+            var res = q.Exec();
+            var output = new List<Dictionary<string, object>>();
+            Dictionary<string, object> row;
+
+		    // Map to the JSON structure that StateRestore expects
+            while ((row = res.Fetch()) != null)
+            {
+                var inner = new Dictionary<string, object>
+                {
+                    { "id", row["id"] },
+                    { "isDefault", row["isDefault"] },
+                    { "isSharedIn", _userId != "" && row["user"] != _userId ? true : false },
+                    { "isSharedOut", row["isSharedOut"] },
+                    { "isStatic", false },
+                    { "name", row["name"] },
+                    { "state", row["state"] },
+                };
+
+                output.Add(inner);
+            }
+
+            return new DtResponse
+            {
+                data = output
+            };
         }
     }
 }
