@@ -22,6 +22,11 @@ using System.Web;
 
 namespace DataTables
 {
+    /// <summary>
+    /// End point class for StateRestore Ajax requests, which can parse
+    /// StateRestore requests for the client-side, providing an easy way to
+    /// read, create, edit and delete states.
+    /// </summary>
     public class StateRestore
     {
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

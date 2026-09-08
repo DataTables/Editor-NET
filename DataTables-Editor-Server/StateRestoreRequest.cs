@@ -80,7 +80,6 @@ namespace DataTables
             {
                 foreach (var id in http["ids"] as Dictionary<string, object>)
                 {
-                    System.Console.WriteLine(id.Value as string);
                     Ids.Add(id.Value.ToString());
                 }
             }
