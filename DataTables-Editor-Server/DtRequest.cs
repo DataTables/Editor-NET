@@ -51,7 +51,10 @@ namespace DataTables
 
             foreach (var pair in dataIn)
             {
-                if (string.IsNullOrEmpty(pair.Key)) continue;
+                if (string.IsNullOrEmpty(pair.Key))
+                {
+                    continue;
+                }
 
                 // Split comma-separated values only when the key uses array notation (e.g. ids[])
                 // to avoid corrupting text values containing commas.
