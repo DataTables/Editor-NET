@@ -73,14 +73,15 @@ namespace DataTables
 
             if (http.ContainsKey("id"))
             {
-                Id = http["id"] as string;
+                Id = http["id"].ToString();
             }
 
             if (http.ContainsKey("ids"))
             {
                 foreach (var id in http["ids"] as Dictionary<string, object>)
                 {
-                    Ids.Add(id.Value as string);
+                    System.Console.WriteLine(id.Value as string);
+                    Ids.Add(id.Value.ToString());
                 }
             }
 

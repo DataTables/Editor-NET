@@ -39,7 +39,7 @@ namespace DataTables
         private DtResponse _result = new DtResponse();
         private Dictionary<string, object> _set = new Dictionary<string, object>();
         private string _table = "";
-        private dynamic _userId = null;
+        private string _userId = null;
         private readonly List<WhereCondition> _where = new List<WhereCondition>();
 
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -350,7 +350,7 @@ namespace DataTables
         /// user id, but it could be any other unique identifier.
         /// </summary>
         /// <returns>User id</returns>
-        public dynamic User()
+        public string User()
         {
             return _userId;
         }
@@ -361,7 +361,7 @@ namespace DataTables
         /// </summary>
         /// <param name="user">User id</param>
         /// <returns>Self for chaining</returns>
-        public StateRestore User(dynamic user)
+        public StateRestore User(string user)
         {
             _userId = user;
             return this;
@@ -420,12 +420,12 @@ namespace DataTables
             {
                 _db = db;
             }
-            
+
             if (table != null)
             {
                 _table = table;
             }
-            
+
             if (pkey != null)
             {
                 _columnId = pkey;
@@ -436,86 +436,203 @@ namespace DataTables
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 		* Private methods
 		*/
-        private DtResponse _AssertState(StateRestoreRequest data)
-        {
-            var error = "";
 
+        /// <summary>
+        /// Validate submitted state data.
+        /// </summary>
+        /// <param name="data">Data to validate</param>
+        /// <returns>`true` if valid</returns>
+        private bool _AssertState(StateRestoreRequest data)
+        {
             if (data.Name == "")
             {
-                error = "Incomplete data - no name";
+                _result.error = "Incomplete data - no name";
+                return false;
             }
 
             if (data.State == "")
             {
-                error = "Incomplete data - no name";
-            }
-
-            if (error != "")
-            {
-                return new DtResponse
-                {
-                    error = error
-                };
+                _result.error = "Incomplete data - no state";
+                return false;
             }
 
             return _AssertStateHost(data);
         }
 
-        private DtResponse _AssertStateHost(StateRestoreRequest data)
+        /// <summary>
+        /// Check the parameters that are submitted for host table information.
+        /// </summary>
+        /// <param name="data">Data to validate</param>
+        /// <returns>`true` if valid</returns>
+        private bool _AssertStateHost(StateRestoreRequest data)
         {
-            var error = "";
-
             if (data.Path == "")
             {
-                error = "Incomplete data - no path";
+                _result.error = "Incomplete data - no path";
+                return false;
             }
 
             if (data.Table == "")
             {
-                error = "Incomplete data - no table";
+                _result.error = "Incomplete data - no table";
+                return false;
             }
 
-            if (error != "")
-            {
-                return new DtResponse
-                {
-                    error = error
-                };
-            }
-
-            return null;
+            return true;
         }
 
+        /// <summary>
+        /// Router for the request - based on the action parameter submitted
+        /// </summary>
+        /// <param name="data">Submitted data</param>
+        /// <returns>Self for chaining</returns>
         private StateRestore _Process(StateRestoreRequest data)
         {
             if (data.Action == "state-read")
             {
-                _result = _Read(data);
+                _Read(data);
             }
             else if (data.Action == "state-create")
             {
-                // _Create(data);
+                _Create(data);
             }
             else if (data.Action == "state-edit")
             {
-                // _Edit(data);
+                _Edit(data);
             }
             else if (data.Action == "state-remove")
             {
-                // _Remove(data);
+                _Remove(data);
             }
 
             return this;
         }
 
-        private DtResponse _Read(StateRestoreRequest data, dynamic id=null)
+        /// <summary>
+        /// Add a new state to the database.
+        /// </summary>
+        /// <param name="data">State information</param>
+        /// <returns>`true` if successful, `false` if in error.</returns>
+        private bool _Create(StateRestoreRequest data)
         {
-		// Must have the table and path, otherwise all states would be returned!
+            var validated = _AssertState(data);
+
+            if (validated == false)
+            {
+                return false;
+            }
+
+            var q = _db.Query("insert").Table(_table);
+
+            q.Set(_columnDefault, data.IsDefault);
+            q.Set(_columnName, data.Name);
+            q.Set(_columnPath, data.Path);
+            q.Set(_columnShared, data.IsSharedOut);
+            q.Set(_columnState, data.State);
+            q.Set(_columnTable, data.Table);
+
+            if (_userId != null)
+            {
+                q.Set(_columnUser, _userId);
+            }
+
+            // Dev defined values
+            foreach (var item in _set)
+            {
+                q.Set(item.Key, item.Value);
+            }
+
+            // There can be only one default
+            if (data.IsDefault)
+            {
+                _RemoveDefault(data);
+            }
+
+            var res = q.Exec();
+            var id = res.InsertId();
+
+            _Read(data, id);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Update a state on the database.
+        /// </summary>
+        /// <param name="data">State information</param>
+        /// <returns>true on success, false on fail</returns>
+        private bool _Edit(StateRestoreRequest data)
+        {
+            // Must have the table and path, otherwise all states would be returned!
+            var validated = _AssertState(data);
+
+            if (validated == false)
+            {
+                return false;
+            }
+
+            if (data.Id == "")
+            {
+                _result.error = "Incomplete data - no id";
+                return false;
+            }
+
+            var q = _db.Query("update").Table(_table);
+
+            // Values to set in the update
+            q.Set(_columnDefault, data.IsDefault);
+            q.Set(_columnName, data.Name);
+            q.Set(_columnShared, data.IsSharedOut);
+            q.Set(_columnState, data.State);
+
+            // Dev defined values
+            foreach (var item in _set)
+            {
+                q.Set(item.Key, item.Value);
+            }
+
+            // Conditions
+            q.Where(_columnId, data.Id);
+            q.Where(_columnTable, data.Table);
+            q.Where(_columnPath, data.Path);
+
+            if (_userId != null)
+            {
+                q.Where(_columnUser, _userId);
+            }
+
+            // There can be only one default
+            if (data.IsDefault)
+            {
+                _RemoveDefault(data);
+            }
+
+            System.Console.WriteLine("Pre exec");
+
+            var res = q.Exec();
+
+            System.Console.WriteLine(data.Id);
+
+            // Read the new state back to the client-side
+            _Read(data, data.Id);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Read the states from the db.
+        /// </summary>
+        /// <param name="data">Submitted data</param>
+        /// <param name="id">Limit the read to a specific ID</param>
+        /// <returns>true on success, false when in error</returns>
+        private bool _Read(StateRestoreRequest data, dynamic id = null)
+        {
+            // Must have the table and path, otherwise all states would be returned!
             var validated = _AssertStateHost(data);
 
-            if (validated != null)
+            if (validated == false)
             {
-                return validated;
+                return false;
             }
 
             var q = _db.Query("select").Table(_table).Get(_columnId);
@@ -577,19 +694,19 @@ namespace DataTables
                 }
             }
 
-		    // Run the assembled query
+            // Run the assembled query
             var res = q.Exec();
             var output = new List<Dictionary<string, object>>();
             Dictionary<string, object> row;
 
-		    // Map to the JSON structure that StateRestore expects
+            // Map to the JSON structure that StateRestore expects
             while ((row = res.Fetch()) != null)
             {
                 var inner = new Dictionary<string, object>
                 {
                     { "id", row["id"] },
                     { "isDefault", row["isDefault"] },
-                    { "isSharedIn", _userId != "" && row["user"] != _userId ? true : false },
+                    { "isSharedIn", _userId != "" && row["user"].ToString() != _userId ? true : false },
                     { "isSharedOut", row["isSharedOut"] },
                     { "isStatic", false },
                     { "name", row["name"] },
@@ -599,10 +716,65 @@ namespace DataTables
                 output.Add(inner);
             }
 
-            return new DtResponse
+            _result.data = output;
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Delete state(s)
+        /// </summary>
+        /// <param name="data">Submitted data</param>
+        private bool _Remove(StateRestoreRequest data)
+        {
+            // Must have the table and path, otherwise all states would be returned!
+            var validated = _AssertStateHost(data);
+
+            if (validated == false)
             {
-                data = output
-            };
+                return false;
+            }
+
+            var q = _db.Query("delete").Table(_table);
+
+            q.Where(_columnTable, data.Table);
+            q.Where(_columnPath, data.Path);
+
+            if (_userId != null)
+            {
+                q.Where(_columnUser, _userId);
+            }
+
+            q.WhereIn(_columnId, data.Ids);
+            q.Exec();
+
+            return true;
+        }
+
+        /// <summary>
+	    /// If there is an existing default, remove it. The client-side will do
+	    /// this as well, so we don't need to worry about there being two
+	    /// default states shown, despite only returning a single record.
+        /// </summary>
+        /// <param name="data">Submitted data</param>
+        private void _RemoveDefault(StateRestoreRequest data)
+        {
+            var q = _db.Query("update").Table(_table);
+
+            // Values to set
+            q.Set(_columnDefault, 0);
+
+            // Conditions
+            q.Where(_columnDefault, 1);
+            q.Where(_columnTable, data.Table);
+            q.Where(_columnPath, data.Path);
+
+            if (_userId != null)
+            {
+                q.Where(_columnUser, _userId);
+            }
+
+            q.Exec();
         }
     }
 }

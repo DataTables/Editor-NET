@@ -45,52 +45,58 @@ namespace DataTables
         )
         {
             var dataOut = new Dictionary<string, object>();
-            CultureInfo culture = null;
+            CultureInfo culture = cultureStr != null ? CultureInfo.CreateSpecificCulture(cultureStr) : null;
 
-            if (cultureStr != null)
-            {
-                culture = CultureInfo.CreateSpecificCulture(cultureStr);
-            }
+            if (dataIn == null) return dataOut;
 
-            if (dataIn != null)
+            foreach (var pair in dataIn)
             {
-                foreach (var pair in dataIn)
+                if (string.IsNullOrEmpty(pair.Key)) continue;
+
+                // Split comma-separated values only when the key uses array notation (e.g. ids[])
+                // to avoid corrupting text values containing commas.
+                var rawVal = pair.Value ?? "";
+                bool isArrayKey = pair.Key.Contains("[]");
+                var values = (isArrayKey && rawVal.Contains(","))
+                    ? rawVal.Split(',')
+                    : new[] { rawVal };
+
+                foreach (var val in values)
                 {
-                    var value = _HttpConv(pair.Value, culture);
+                    var convertedValue = _HttpConv(val.Trim(), culture);
 
-                    if (pair.Key.Contains("["))
+                    if (!pair.Key.Contains("["))
                     {
-                        var keys = pair.Key.Split(new[] { '[' });
-                        var innerDic = dataOut;
-                        string key;
+                        dataOut[pair.Key] = convertedValue;
+                        continue;
+                    }
 
-                        for (int i = 0, ien = keys.Count() - 1; i < ien; i++)
-                        {
-                            key = keys[i].TrimEnd(new[] { ']' });
-                            if (key == "")
-                            {
-                                // If the key is empty it is an array index value
-                                key = innerDic.Count().ToString();
-                            }
+                    var keys = pair.Key.Split('[').Select(k => k.TrimEnd(']')).ToList();
+                    var currentDic = dataOut;
 
-                            if (!innerDic.ContainsKey(key))
-                            {
-                                innerDic.Add(key, new Dictionary<string, object>());
-                            }
-                            innerDic = innerDic[key] as Dictionary<string, object>;
-                        }
+                    for (int i = 0; i < keys.Count; i++)
+                    {
+                        var key = keys[i];
 
-                        key = keys.Last().TrimEnd(new[] { ']' });
+                        // Empty bracket notation [] generates string index keys ("0", "1", etc.)
                         if (key == "")
                         {
-                            key = innerDic.Count().ToString();
+                            key = currentDic.Count.ToString();
                         }
 
-                        innerDic.Add(key, value);
-                    }
-                    else
-                    {
-                        dataOut.Add(pair.Key, value);
+                        if (i == keys.Count - 1)
+                        {
+                            currentDic[key] = convertedValue;
+                        }
+                        else
+                        {
+                            if (!currentDic.ContainsKey(key) || !(currentDic[key] is Dictionary<string, object>))
+                            {
+                                currentDic[key] = new Dictionary<string, object>();
+                            }
+
+                            currentDic = (Dictionary<string, object>)currentDic[key];
+                        }
                     }
                 }
             }
